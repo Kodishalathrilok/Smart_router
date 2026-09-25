@@ -1,0 +1,35 @@
+{
+  "_comment": "Per-role model metadata. Model IDs and providers come from .env (CHEAP_MODEL, CHEAP_PROVIDER, ...). normalized_cost values are experiment weights, NOT money. price_per_mtok_* is optional real pricing (USD per million tokens) and is never mixed into normalized_cost.",
+  "cheap": {
+    "capability_score": 0.60,
+    "normalized_cost": 1.0,
+    "expected_latency": "low",
+    "strengths": ["general_qa", "classification", "summarization"],
+    "price_per_mtok_input": null,
+    "price_per_mtok_output": null
+  },
+  "mid": {
+    "capability_score": 0.80,
+    "normalized_cost": 3.0,
+    "expected_latency": "medium",
+    "strengths": ["general_qa", "summarization", "coding"],
+    "price_per_mtok_input": null,
+    "price_per_mtok_output": null
+  },
+  "strong": {
+    "capability_score": 0.95,
+    "normalized_cost": 10.0,
+    "expected_latency": "high",
+    "strengths": ["reasoning", "math", "coding"],
+    "price_per_mtok_input": null,
+    "price_per_mtok_output": null
+  },
+  "judge": {
+    "capability_score": 0.90,
+    "normalized_cost": 3.0,
+    "expected_latency": "medium",
+    "strengths": ["evaluation"],
+    "price_per_mtok_input": null,
+    "price_per_mtok_output": null
+  }
+}

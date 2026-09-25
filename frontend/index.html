@@ -1,0 +1,112 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>SmartRouter</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <header class="top">
+    <div class="wrap top-inner">
+      <div>
+        <h1>SmartRouter</h1>
+        <p class="sub">Adaptive multi-LLM routing with judge-driven escalation</p>
+      </div>
+      <div class="top-meta">
+        <span id="mode-badge" class="badge" hidden>MOCK MODE · synthetic answers &amp; scores</span>
+        <span id="config-line" class="muted small"></span>
+      </div>
+    </div>
+  </header>
+
+  <main class="wrap">
+    <section class="panel" aria-labelledby="ask-h">
+      <h2 id="ask-h">Ask SmartRouter</h2>
+      <form id="ask-form">
+        <label for="query" class="visually-hidden">Query</label>
+        <textarea id="query" rows="4" placeholder="e.g. Explain binary search simply" required></textarea>
+        <div class="form-row">
+          <button id="run-btn" type="submit">Run Query</button>
+          <span id="ask-status" class="muted small" role="status" aria-live="polite"></span>
+        </div>
+      </form>
+
+      <div id="result" hidden>
+        <h3>Answer</h3>
+        <div id="answer" class="answer"></div>
+        <dl class="facts">
+          <div><dt>Initial route</dt><dd id="r-initial"></dd></div>
+          <div><dt>Final route</dt><dd id="r-final"></dd></div>
+          <div><dt>Quality</dt><dd id="r-quality"></dd></div>
+          <div><dt>Status</dt><dd id="r-status"></dd></div>
+          <div><dt>Escalated</dt><dd id="r-escalated"></dd></div>
+          <div><dt>Attempts</dt><dd id="r-attempts"></dd></div>
+          <div><dt>Latency</dt><dd id="r-latency"></dd></div>
+          <div><dt>Normalized cost</dt><dd id="r-cost"></dd></div>
+        </dl>
+        <details id="trace-box">
+          <summary>Routing Trace</summary>
+          <ol id="trace" class="trace"></ol>
+        </details>
+        <p class="muted small">Quality is an LLM judge's evaluation signal, not a probability of correctness.</p>
+      </div>
+    </section>
+
+    <section aria-labelledby="overview-h">
+      <h2 id="overview-h">Live traffic</h2>
+      <div class="cards" id="cards"></div>
+      <p class="muted small" id="cards-note"></p>
+    </section>
+
+    <section class="grid-2">
+      <div class="panel">
+        <h2>Model utilization</h2>
+        <p class="muted small">Share of generation calls per tier (including escalations).</p>
+        <div id="util-chart" class="chart"></div>
+      </div>
+      <div class="panel">
+        <h2>Quality vs cost</h2>
+        <p class="muted small">One point per query. Dashed line = acceptance threshold.</p>
+        <div id="scatter-chart" class="chart"></div>
+      </div>
+    </section>
+
+    <section class="grid-2">
+      <div class="panel">
+        <h2>Routing flow</h2>
+        <p class="muted small">Where queries started, escalated and stopped.</p>
+        <div id="flow-chart" class="chart"></div>
+      </div>
+      <div class="panel">
+        <h2>Failure analysis</h2>
+        <p class="muted small">Non-accepted attempts grouped by cause.</p>
+        <div id="failure-chart" class="chart"></div>
+      </div>
+    </section>
+
+    <section class="panel">
+      <h2>Routing decisions</h2>
+      <p class="muted small">Most recent first. Select a row to view its trace.</p>
+      <div class="table-scroll">
+        <table>
+          <thead>
+            <tr><th>Query</th><th>Initial model</th><th>Final model</th><th>Quality</th><th>Escalated?</th><th>Latency</th><th>Status</th></tr>
+          </thead>
+          <tbody id="routes-body"></tbody>
+        </table>
+      </div>
+    </section>
+
+    <section class="panel">
+      <h2>Benchmark</h2>
+      <div id="benchmark"></div>
+    </section>
+  </main>
+
+  <footer class="wrap muted small">
+    Data from <code>/api/*</code>. Normalized cost uses configured tier weights, not provider billing.
+  </footer>
+  <script src="app.js"></script>
+</body>
+</html>

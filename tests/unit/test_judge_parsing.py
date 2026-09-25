@@ -1,0 +1,75 @@
+import pytest
+
+from app.core.executor import Executor
+from app.judge.judge import JudgeParseError, QualityJudge, parse_judgement, quality_score
+from app.judge.schemas import JudgeDimensions
+from tests.conftest import FakeProvider, judge_json
+
+VALID = judge_json(0.9)
+
+
+def test_parses_plain_fenced_and_embedded_json():
+    assert parse_judgement(VALID).correctness == 0.9
+    assert parse_judgement(f"```json\n{VALID}\n```").verdict == "good"
+    assert parse_judgement(f"Here is my evaluation: {VALID} Thanks!").relevance == 0.9
+
+
+def test_garbage_raises():
+    with pytest.raises(JudgeParseError):
+        parse_judgement("The answer looks fine to me.")
+    with pytest.raises(JudgeParseError):
+        parse_judgement('{"verdict": "good"}')  # missing dimensions
+
+
+def test_out_of_range_rejected_and_ten_point_scale_normalized():
+    with pytest.raises(JudgeParseError):
+        parse_judgement(VALID.replace('"correctness": 0.9', '"correctness": 42'))
+    assert parse_judgement(VALID.replace('"correctness": 0.9', '"correctness": 8')).correctness == 0.8
+
+
+def test_normalizes_verdict_and_reasons():
+    raw = VALID.replace('"good"', '"Partially Correct"').replace('"failure_reasons": []', '"failure_reasons": ["Reasoning", "made up"]')
+    dims = parse_judgement(raw)
+    assert dims.verdict == "partially_correct"
+    assert dims.failure_reasons == ["reasoning_error", "other"]
+
+
+def dims(c, comp, r, rq):
+    return JudgeDimensions(verdict="good", correctness=c, completeness=comp, relevance=r, reasoning_quality=rq)
+
+
+def test_quality_aggregation_default_and_category_weights():
+    assert quality_score(dims(1, 0, 0, 0), "general_qa") == 0.40
+    assert quality_score(dims(0, 1, 0, 0), "general_qa") == 0.25
+    assert quality_score(dims(0, 0, 1, 0), "general_qa") == 0.20
+    assert quality_score(dims(0, 0, 0, 1), "general_qa") == 0.15
+    assert quality_score(dims(1, 0, 0, 0), "coding") == 0.50
+    assert quality_score(dims(1, 1, 1, 1), "math") == 1.0
+
+
+class RawJudge(FakeProvider):
+    """Returns queued raw strings for judge calls."""
+
+    def __init__(self, outputs):
+        super().__init__({})
+        self.outputs = outputs
+
+    async def generate(self, messages, model, **kw):
+        self.answers[model] = self.outputs.pop(0)
+        return await super().generate(messages, model)
+
+
+def make_judge(registry, outputs):
+    executor = Executor({"mock": RawJudge(outputs)}, max_retries=0, base_delay_s=0, max_delay_s=0)
+    return QualityJudge(executor, registry.judge, max_tokens=256)
+
+
+async def test_judge_retries_malformed_output_once(registry):
+    result = await make_judge(registry, ["not json", VALID]).evaluate("q", "a", "general_qa")
+    assert result.quality_score == 0.9 and result.judge_model == "mock-judge"
+    assert result.correctness == 0.9  # dimensions stored alongside aggregate
+
+
+async def test_judge_gives_up_after_retries(registry):
+    with pytest.raises(JudgeParseError):
+        await make_judge(registry, ["nope", "still nope"]).evaluate("q", "a", "general_qa")
