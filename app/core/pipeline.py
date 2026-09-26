@@ -105,6 +105,11 @@ class SmartRouterPipeline:
             if attempt.accepted:
                 trace.append(TraceStep(kind="accept", label="Accepted"))
                 break
+            if attempt.answer is not None and attempt.quality_score is None:
+                # A judge outage (quota, timeout, malformed output) is not evidence of a bad answer;
+                # escalating would spend stronger models without any quality signal.
+                trace.append(TraceStep(kind="final", label="Judge unavailable: answer returned unverified, no escalation"))
+                break
             if mode != "smart":
                 trace.append(TraceStep(kind="final", label=f"Below threshold; no escalation in {mode} mode"))
                 break

@@ -16,6 +16,9 @@ def test_extract_number():
     assert extract_number("The ball costs $0.05.") == 0.05
     assert extract_number("It is 391.") == 391
     assert extract_number("no numbers") is None
+    assert extract_number("**Final answer: 34 650**") == 34650
+    assert extract_number("Final answer: 34 650") == 34650
+    assert extract_number("It is 1,157.63 dollars") == 1157.63
 
 
 def test_check_numeric_tolerance():
@@ -48,3 +51,13 @@ def test_deterministic_check_dispatch():
     assert deterministic_check(code, "```python\npass\n```", exec_code=False) is None
     assert deterministic_check(code, "```python\npass\n```", exec_code=True) is True
     assert deterministic_check(free, "anything", exec_code=True) is None
+
+
+def test_subset_spans_difficulties():
+    from benchmark.run import select_items
+
+    subset = select_items(load_dataset(), 3)
+    assert len(subset) == 15
+    for category in ("general_qa", "math", "coding"):
+        labels = [i.difficulty for i in subset if i.category == category]
+        assert labels[0] == "easy" and labels[-1] == "hard"

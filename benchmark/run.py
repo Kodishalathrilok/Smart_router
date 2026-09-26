@@ -28,6 +28,9 @@ def summarize_system(system: System, results: list[ItemResult], judge_cost: floa
         stats["reference_quality_mean"] = mean(r.reference_quality for r in results if r.category == cat and r.reference_quality is not None)
     # Only SmartRouter needs the judge at serving time; for baselines the judge is evaluation-only.
     serving_judge_calls = base["judge_calls"] if system.mode == "smart" else 0
+    judge_failures = sum(
+        1 for r in results for a in r.record.attempts if a.answer is not None and a.quality_score is None
+    ) + sum(r.reference_error is not None for r in results)
     return {
         **base,
         "label": system.label,
@@ -36,6 +39,7 @@ def summarize_system(system: System, results: list[ItemResult], judge_cost: floa
         "reference_quality": {"mean": mean(ref), "median": med(ref), "scored": len(ref), "errors": sum(r.reference_error is not None for r in results)},
         "deterministic": {"checked": len(det), "accuracy": rate(sum(det), len(det))},
         "serving_judge_calls": serving_judge_calls,
+        "judge_failures": judge_failures,
         "cost_incl_judge": {"mean": round((base["cost"]["total"] + serving_judge_calls * judge_cost) / base["n"], 4)},
     }
 
@@ -58,14 +62,16 @@ def compare(systems: dict[str, dict]) -> dict:
 
 
 def select_items(items: list[BenchmarkItem], per_category: int | None) -> list[BenchmarkItem]:
+    """Pick `per_category` items per category, evenly spaced so the subset spans easy → hard
+    (items are stored easiest-first; taking the first N would select only easy items)."""
     if per_category is None:
         return items
-    seen: Counter[str] = Counter()
     chosen = []
-    for item in items:
-        if seen[item.category] < per_category:
-            seen[item.category] += 1
-            chosen.append(item)
+    for category in dict.fromkeys(i.category for i in items):
+        pool = [i for i in items if i.category == category]
+        k = min(per_category, len(pool))
+        step = (len(pool) - 1) / (k - 1) if k > 1 else 0
+        chosen += [pool[round(n * step)] for n in range(k)]
     return chosen
 
 
@@ -137,6 +143,10 @@ def main(argv: list[str] | None = None) -> int:
         print(f"Configuration error: {exc}", file=sys.stderr)
         return 2
     print(f"Wrote {settings.results_dir / 'latest.json'} and latest.md ({summary['dataset']['n']} items, mock_mode={summary['mock_mode']})")
+    failures = {name: s["judge_failures"] for name, s in summary["systems"].items() if s["judge_failures"]}
+    if failures:
+        print(f"WARNING: incomplete run, judge calls failed {failures}. Quality numbers are not comparable; "
+              "see events.jsonl in the raw run directory (often a provider quota limit).", file=sys.stderr)
     return 0
 
 

@@ -7,6 +7,7 @@ import pytest
 
 from app.providers.base import (
     AuthenticationError,
+    BadRequestError,
     EmptyResponseError,
     ModelUnavailableError,
     NetworkError,
@@ -71,6 +72,7 @@ async def test_gemini_normalizes_response_and_keeps_key_out_of_url():
     (400, "API key not valid", {}, AuthenticationError),
     (404, "model_not_found", {}, ModelUnavailableError),
     (429, "slow down", {"retry-after": "7"}, RateLimitError),
+    (429, "Request too large for model on output tokens per minute", {}, BadRequestError),
     (503, "overloaded", {}, ProviderServerError),
 ])
 async def test_http_errors_are_typed(status, body, headers, error):

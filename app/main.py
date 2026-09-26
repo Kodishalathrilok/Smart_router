@@ -1,5 +1,6 @@
 """FastAPI app factory and entry point: python -m app.main"""
 
+import asyncio
 import logging
 import sys
 from contextlib import asynccontextmanager
@@ -12,9 +13,7 @@ from fastapi.staticfiles import StaticFiles
 from app.api import routes_models, routes_query, routes_stats
 from app.core.bootstrap import build_runtime
 from app.core.config import PROJECT_ROOT, ConfigError, Settings
-from app.models.registry import ModelRegistry
 from app.providers.base import LLMProvider
-from app.providers.factory import build_providers
 
 log = logging.getLogger("smartrouter")
 
@@ -50,11 +49,16 @@ def create_app(settings: Settings | None = None, *, providers: dict[str, LLMProv
     return app
 
 
+async def _preflight(settings: Settings) -> None:
+    runtime = await build_runtime(settings)
+    await runtime.aclose()
+
+
 def main() -> int:
     logging.basicConfig(level=logging.INFO, format="%(asctime)s %(levelname)s %(name)s: %(message)s")
     settings = Settings()
-    try:  # fail fast on missing model IDs / keys; provider model lists are checked at startup
-        build_providers(settings, ModelRegistry.from_settings(settings).all())
+    try:  # validate config (keys, model IDs vs provider lists) before uvicorn, so errors print as one clear line
+        asyncio.run(_preflight(settings))
     except ConfigError as exc:
         print(f"Configuration error: {exc}", file=sys.stderr)
         return 2

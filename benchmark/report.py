@@ -73,6 +73,12 @@ def render(s: dict) -> str:
         out.append("> **MOCK RUN — SYNTHETIC DATA.** Answers and judge scores come from the deterministic mock provider. "
                    "These numbers exercise the pipeline and say nothing about real model quality, cost or latency.\n")
 
+    failures = {v["label"]: v.get("judge_failures", 0) for v in systems.values() if v.get("judge_failures")}
+    if failures:
+        detail = ", ".join(f"{label}: {n}" for label, n in failures.items())
+        out.append(f"> **INCOMPLETE RUN.** Judge calls failed ({detail}), usually from provider quota or rate limits. "
+                   "Affected answers are unscored, so quality comparisons below are not valid. Re-run once the judge is available.\n")
+
     out.append("## Executive Summary\n\n" + executive_summary(s) + "\n")
 
     out.append("## Dataset\n")

@@ -78,11 +78,20 @@ async def test_all_fail_is_reported_as_failed(tmp_path):
     assert r.final_status == "failed" and r.answer is None and r.final_quality_score is None
 
 
-async def test_judge_parse_failure_escalates_not_accepted(tmp_path):
-    rt, _ = await runtime_with(tmp_path, judgements={"ANS-cheap": "garbage", "ANS-mid": 0.9})
+async def test_judge_parse_failure_returns_unverified_without_escalating(tmp_path):
+    rt, provider = await runtime_with(tmp_path, judgements={"ANS-cheap": "garbage", "ANS-mid": 0.9})
     r = await rt.pipeline.run(EASY)
     assert r.attempts[0].error_type == "JudgeParseError" and r.attempts[0].answer == "ANS-cheap"
-    assert r.final_tier == "mid"
+    assert provider.generation_calls() == ["mock-cheap"]
+    assert (r.final_status, r.answer, r.final_quality_score) == ("best_effort", "ANS-cheap", None)
+
+
+async def test_judge_outage_does_not_escalate(tmp_path):
+    rt, provider = await runtime_with(tmp_path, judgements={"ANS-cheap": RateLimitError("quota", provider="mock")})
+    r = await rt.pipeline.run(EASY)
+    assert provider.generation_calls() == ["mock-cheap"]
+    assert r.final_status == "best_effort" and r.answer == "ANS-cheap"
+    assert any("Judge unavailable" in s.label for s in r.trace)
 
 
 @pytest.mark.parametrize("mode,tiers", [("always_cheap", ["cheap"]), ("always_strong", ["strong"]), ("static", ["cheap"])])

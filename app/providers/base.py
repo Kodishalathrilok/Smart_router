@@ -129,6 +129,9 @@ class HTTPProvider(LLMProvider):
             return AuthenticationError(f"{self.name} rejected the API key (HTTP {status})", provider=self.name, status_code=status)
         if status == 404:
             return ModelUnavailableError(message, provider=self.name, status_code=status)
+        if status == 429 and "request too large" in detail.lower():
+            # The request itself exceeds a per-minute limit (e.g. max_tokens > OTPM); retrying can never succeed.
+            return BadRequestError(message, provider=self.name, status_code=status)
         if status == 429:
             return RateLimitError(message, provider=self.name, retry_after=_retry_after(response))
         if status == 408:

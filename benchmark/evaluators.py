@@ -9,6 +9,7 @@ from pathlib import Path
 from benchmark.dataset import BenchmarkItem
 
 FINAL_ANSWER = re.compile(r"final answer\s*[:=]?\s*\**\s*\$?\s*(-?[\d,]*\.?\d+)", re.I)
+THOUSANDS_SEP = re.compile(r"(?<=\d)[, \u00a0\u2009\u202f](?=\d{3}(?!\d))")  # comma, space, nbsp, thin spaces
 NUMBER = re.compile(r"-?\d[\d,]*\.?\d*|-?\.\d+")
 CODE_BLOCK = re.compile(r"```(?:python|py)?\s*\n(.*?)```", re.S | re.I)
 DEFAULT_REL_TOL = 1e-4
@@ -17,6 +18,7 @@ CODE_TIMEOUT_S = 10
 
 def extract_number(text: str) -> float | None:
     """Prefer an explicit 'Final answer: X'; otherwise take the last number in the text."""
+    text = THOUSANDS_SEP.sub("", text)  # "34 650" / "34,650" -> "34650"
     match = FINAL_ANSWER.search(text)
     raw = match.group(1) if match else (NUMBER.findall(text) or [None])[-1]
     if raw is None:
