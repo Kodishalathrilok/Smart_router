@@ -8,7 +8,9 @@ from pydantic import BaseModel
 
 from app.router.schemas import Category
 
-DATASET_PATH = Path(__file__).parent / "datasets" / "benchmark.jsonl"
+DATASETS_DIR = Path(__file__).parent / "datasets"
+DATASET_PATH = DATASETS_DIR / "benchmark.jsonl"
+DATASET_NAMES = sorted(p.stem for p in DATASETS_DIR.glob("*.jsonl"))  # benchmark = broad mix, hard = deterministic hard items
 
 
 class BenchmarkItem(BaseModel):

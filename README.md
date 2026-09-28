@@ -101,6 +101,8 @@ Judge output is parsed as strict JSON first, then as fenced or embedded JSON, an
 
 `benchmark/datasets/benchmark.jsonl` holds **100 fixed, hand-written items**: 20 each of `general_qa`, `reasoning`, `coding`, `math` and `summarization`, labeled easy, medium or hard. Each item has a reference answer. Math items (and a few numeric reasoning items) have an exact expected value. Function-style coding items ship with unit tests.
 
+`benchmark/datasets/hard.jsonl` adds **30 hard items** (12 math, 9 reasoning, 9 coding), every one of them checked exactly: numeric answers computed in Python, and coding tasks with unit tests verified against a reference solution. The main set turned out too easy for current models, so every system tied; the hard set exists to separate them. Run it with `--dataset hard --exec-code`.
+
 The benchmark runs four systems. All of them run through **the same production pipeline**; only the mode differs:
 
 | System | Mode | What it does |

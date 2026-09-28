@@ -1,4 +1,4 @@
-"""Run the benchmark: python -m benchmark.run [--systems ...] [--per-category N] [--concurrency N]
+"""Run the benchmark: python -m benchmark.run [--dataset NAME] [--systems ...] [--per-category N] [--concurrency N]
 
 Writes raw per-item results to BENCHMARK_DIR/<run_id>/ and the summary to
 RESULTS_DIR/latest.json, then renders RESULTS_DIR/latest.md.
@@ -14,7 +14,7 @@ from datetime import datetime, timezone
 from app.core.bootstrap import build_runtime
 from app.core.config import ConfigError, Settings
 from app.core.metrics import cost_reduction_pct, mean, med, rate, summarize
-from benchmark.dataset import DATASET_PATH, BenchmarkItem, load_dataset
+from benchmark.dataset import DATASET_NAMES, DATASETS_DIR, BenchmarkItem, load_dataset
 from benchmark.report import write_report
 from benchmark.runners import SYSTEMS, ItemResult, System, run_system
 
@@ -76,7 +76,8 @@ def select_items(items: list[BenchmarkItem], per_category: int | None) -> list[B
 
 
 async def run(args: argparse.Namespace, settings: Settings) -> dict:
-    items = select_items(load_dataset(), args.per_category)
+    dataset_path = DATASETS_DIR / f"{args.dataset}.jsonl"
+    items = select_items(load_dataset(dataset_path), args.per_category)
     systems = [s for s in SYSTEMS if s.name in args.systems]
     run_id = datetime.now(timezone.utc).strftime("%Y%m%dT%H%M%SZ")
     raw_dir = settings.benchmark_dir / run_id
@@ -99,7 +100,7 @@ async def run(args: argparse.Namespace, settings: Settings) -> dict:
         "created_at": datetime.now(timezone.utc).isoformat(timespec="seconds"),
         "mock_mode": settings.mock_mode,
         "dataset": {
-            "path": DATASET_PATH.name,
+            "path": dataset_path.name,
             "n": len(items),
             "per_category": dict(Counter(i.category for i in items)),
             "per_difficulty": dict(Counter(i.difficulty for i in items)),
@@ -126,7 +127,8 @@ async def run(args: argparse.Namespace, settings: Settings) -> dict:
 def parse_args(argv: list[str] | None, settings: Settings) -> argparse.Namespace:
     parser = argparse.ArgumentParser(prog="python -m benchmark.run", description=__doc__.splitlines()[0])
     parser.add_argument("--systems", nargs="+", default=[s.name for s in SYSTEMS], choices=[s.name for s in SYSTEMS])
-    parser.add_argument("--per-category", type=int, default=None, help="Use only the first N items of each category.")
+    parser.add_argument("--dataset", default="benchmark", choices=DATASET_NAMES, help="Dataset file in benchmark/datasets/ (default: benchmark).")
+    parser.add_argument("--per-category", type=int, default=None, help="Use N items per category, spread from easy to hard.")
     parser.add_argument("--concurrency", type=int, default=settings.max_concurrent_requests, help="Parallel queries (1 = sequential).")
     parser.add_argument("--delay", type=float, default=0.0, help="Seconds to pause after each query (free-tier rate limits).")
     parser.add_argument("--no-reference-eval", dest="reference_eval", action="store_false", help="Skip the reference-answer judge pass.")

@@ -61,3 +61,14 @@ def test_subset_spans_difficulties():
     for category in ("general_qa", "math", "coding"):
         labels = [i.difficulty for i in subset if i.category == category]
         assert labels[0] == "easy" and labels[-1] == "hard"
+
+
+def test_hard_dataset_answers_verify_against_their_own_references():
+    """Every hard item is deterministically checkable, and its reference passes its own check."""
+    from benchmark.dataset import DATASETS_DIR
+
+    items = load_dataset(DATASETS_DIR / "hard.jsonl")
+    assert len(items) == 30 and all(i.difficulty == "hard" for i in items)
+    for item in items:
+        assert item.answer_type in ("numeric", "code"), item.id
+        assert deterministic_check(item, item.reference_answer, exec_code=True) is True, item.id
