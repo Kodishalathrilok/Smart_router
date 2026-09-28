@@ -26,5 +26,8 @@ async def test_mock_benchmark_end_to_end(tmp_path):
                     "Per-category Results", "Failure Analysis", "Tradeoffs", "Limitations"):
         assert f"## {section}" in report
     assert report == render(latest)
+    assert "### Judge usage" in report and "`mock-judge`" in report
+    assert "Accuracy by answering tier" in report  # mock skips exact checks -> explicit "No exact checks" note
+    assert summary["systems"]["smart_router"]["judge_usage"]["mock-judge"] > 0
     raw = settings.benchmark_dir / summary["run_id"]
     assert (raw / "smart_router.jsonl").exists() and (raw / "events.jsonl").exists()

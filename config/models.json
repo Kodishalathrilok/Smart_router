@@ -31,5 +31,13 @@
     "strengths": ["evaluation"],
     "price_per_mtok_input": null,
     "price_per_mtok_output": null
+  },
+  "judge_fallback": {
+    "capability_score": 0.90,
+    "normalized_cost": 3.0,
+    "expected_latency": "medium",
+    "strengths": ["evaluation"],
+    "price_per_mtok_input": null,
+    "price_per_mtok_output": null
   }
 }

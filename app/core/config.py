@@ -11,6 +11,7 @@ from pydantic_settings import BaseSettings, SettingsConfigDict
 
 PROJECT_ROOT = Path(__file__).resolve().parents[2]
 ROLES = ("cheap", "mid", "strong", "judge")
+OPTIONAL_ROLES = ("judge_fallback",)  # enabled only when JUDGE_FALLBACK_PROVIDER/MODEL are set
 
 
 class ConfigError(RuntimeError):
@@ -24,8 +25,10 @@ class Settings(BaseSettings):
 
     groq_api_key: SecretStr = SecretStr("")
     gemini_api_key: SecretStr = SecretStr("")
+    nvidia_api_key: SecretStr = SecretStr("")
     groq_base_url: str = "https://api.groq.com/openai/v1"
     gemini_base_url: str = "https://generativelanguage.googleapis.com/v1beta"
+    nvidia_base_url: str = "https://integrate.api.nvidia.com/v1"
 
     cheap_provider: str = "groq"
     cheap_model: str = ""
@@ -35,6 +38,8 @@ class Settings(BaseSettings):
     strong_model: str = ""
     judge_provider: str = "gemini"
     judge_model: str = ""
+    judge_fallback_provider: str = ""
+    judge_fallback_model: str = ""
     models_config: Path = Path("config/models.json")
     validate_models: bool = True
 
@@ -72,6 +77,10 @@ class Settings(BaseSettings):
             raise ValueError("CHEAP_MAX_DIFFICULTY must be lower than MID_MAX_DIFFICULTY")
         return self
 
+    def role_enabled(self, role: str) -> bool:
+        """Required roles are always enabled; optional roles only when configured."""
+        return role in ROLES or bool(getattr(self, f"{role}_provider") or getattr(self, f"{role}_model"))
+
     def role(self, role: str) -> tuple[str, str]:
         """Return (provider, model_id) configured for a role. Mock mode routes every role to the mock provider."""
         provider, model = getattr(self, f"{role}_provider"), getattr(self, f"{role}_model")
@@ -81,7 +90,7 @@ class Settings(BaseSettings):
 
     def redact(self, text: str) -> str:
         """Remove API key values from text before it is logged or returned."""
-        for secret in (self.groq_api_key, self.gemini_api_key):
+        for secret in (self.groq_api_key, self.gemini_api_key, self.nvidia_api_key):
             value = secret.get_secret_value()
             if value:
                 text = text.replace(value, "***")

@@ -72,3 +72,12 @@ def test_hard_dataset_answers_verify_against_their_own_references():
     for item in items:
         assert item.answer_type in ("numeric", "code"), item.id
         assert deterministic_check(item, item.reference_answer, exec_code=True) is True, item.id
+
+
+def test_tier_accuracy_section_flags_inverted_tiers():
+    from benchmark.report import tier_accuracy_section
+
+    ok = {"a": {"tier_accuracy": {"cheap": {"correct": 7, "checked": 10}, "strong": {"correct": 9, "checked": 10}}}}
+    bad = {"a": {"tier_accuracy": {"cheap": {"correct": 9, "checked": 10}, "mid": {"correct": 5, "checked": 10}}}}
+    assert "Tier order check failed" not in tier_accuracy_section(ok)
+    assert "Tier order check failed" in tier_accuracy_section(bad)

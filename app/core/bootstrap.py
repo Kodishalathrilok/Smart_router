@@ -46,7 +46,8 @@ async def build_runtime(settings: Settings, *, log_dir: Path | None = None, prov
         providers, max_retries=settings.max_retries, base_delay_s=settings.retry_base_delay_s, max_delay_s=settings.retry_max_delay_s
     )
     router = Router(HeuristicAnalyzer(), ThresholdPolicy(settings.cheap_max_difficulty, settings.mid_max_difficulty), registry)
-    judge = QualityJudge(executor, registry.judge, max_tokens=settings.judge_max_tokens)
+    judges = [spec for spec in (registry.judge, registry.judge_fallback) if spec]
+    judge = QualityJudge(executor, judges, max_tokens=settings.judge_max_tokens)
     pipeline = SmartRouterPipeline(
         settings=settings, registry=registry, router=router, executor=executor, judge=judge, events=events, queries=queries
     )

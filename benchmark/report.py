@@ -133,6 +133,9 @@ def render(s: dict) -> str:
     out.append(table(["System"] + [t.capitalize() for t in TIERS],
                      [[systems[n]["label"]] + [pct(systems[n]["utilization"]["calls_pct"][t]) for t in TIERS] for n in names]) + "\n")
 
+    out.append(tier_accuracy_section(systems))
+    out.append(judge_usage_section(systems))
+
     out.append("## Per-category Results\n")
     out.append("Reference-graded quality (mean) / normalized cost (mean):\n")
     out.append(table(["System"] + list(CATEGORIES), [
@@ -182,6 +185,38 @@ def tradeoffs(systems: dict) -> str:
         f"- SmartRouter needed {smart['serving_judge_calls']} serving-time judge calls for {smart['n']} queries; baselines need none in production.",
         f"- Mean escalations per query: {fmt(smart['escalation']['mean_count'], 2)}.",
     ])
+
+
+def tier_accuracy_section(systems: dict) -> str:
+    """Exact-check accuracy by the tier that answered, pooled over all systems.
+
+    If a higher tier is not more accurate than a lower one, the tier lineup itself is wrong,
+    and routing harder queries "up" makes answers worse.
+    """
+    pooled: dict[str, list[int]] = {}
+    for v in systems.values():
+        for tier, st in v.get("tier_accuracy", {}).items():
+            acc = pooled.setdefault(tier, [0, 0])
+            acc[0] += st["correct"]
+            acc[1] += st["checked"]
+    if not pooled:
+        return "### Accuracy by answering tier\n\nNo exact checks in this run.\n"
+    rows = [[t.capitalize(), str(pooled[t][0]), str(pooled[t][1]), pct(pooled[t][0] / pooled[t][1])] for t in TIERS if t in pooled]
+    accs = [pooled[t][0] / pooled[t][1] for t in TIERS if t in pooled]
+    note = "" if accs == sorted(accs) else ("\n> **Tier order check failed:** a higher tier was less accurate than a lower one on exact checks. "
+                                          "Routing harder queries upward may be making answers worse; review the model lineup.\n")
+    return ("### Accuracy by answering tier (exact checks, all systems pooled)\n\n"
+            + table(["Tier", "Correct", "Checked", "Accuracy"], rows) + "\n" + note)
+
+
+def judge_usage_section(systems: dict) -> str:
+    rows = []
+    for v in systems.values():
+        usage = v.get("judge_usage", {})
+        used = ", ".join(f"`{m}` {n}" for m, n in sorted(usage.items(), key=lambda kv: -kv[1])) or "none"
+        rows.append([v["label"], used, str(v.get("judge_failures", 0))])
+    return ("### Judge usage\n\nWhich judge graded each attempt. More than one judge means scores mix evaluators.\n\n"
+            + table(["System", "Graded by", "Judge failures"], rows) + "\n")
 
 
 def write_report(summary: dict, path: Path) -> None:

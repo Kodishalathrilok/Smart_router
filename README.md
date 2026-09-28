@@ -27,7 +27,7 @@ flowchart LR
     A --> P[Routing Policy<br/>difficulty thresholds]
     P --> R[Model Registry<br/>cheap / mid / strong / judge]
     R --> E[Executor<br/>retries, timing]
-    E --> PR[(Provider adapters<br/>Groq / Gemini / Mock)]
+    E --> PR[(Provider adapters<br/>Groq / NVIDIA / Gemini / Mock)]
     E --> J[Quality Judge<br/>structured JSON]
     J -->|quality >= threshold| OUT[Answer]
     J -->|below threshold| ESC[Escalate to<br/>next stronger tier]
@@ -40,7 +40,7 @@ flowchart LR
 
 | Layer | Path | Responsibility |
 |---|---|---|
-| Providers | `app/providers/` | One `LLMProvider` interface; Groq, Gemini and Mock adapters; typed errors; normalized `LLMResponse` |
+| Providers | `app/providers/` | One `LLMProvider` interface; OpenAI-compatible (Groq, NVIDIA), Gemini and Mock adapters; typed errors; normalized `LLMResponse` |
 | Registry | `app/models/` | Which model fills each role; metadata from `config/models.json`; startup validation |
 | Analyzer | `app/core/analyzer.py` | Category and difficulty heuristics (replaceable by a learned model) |
 | Router | `app/router/` | Threshold policy and escalation targets; no provider code |
@@ -94,6 +94,8 @@ quality_score = 0.40·correctness + 0.25·completeness + 0.20·relevance + 0.15�
 Coding and math queries weight correctness more heavily (`CATEGORY_WEIGHTS` in `app/judge/judge.py`). The individual dimensions are always stored alongside the aggregate.
 
 Judge output is parsed as strict JSON first, then as fenced or embedded JSON, and always schema-validated. A malformed response is retried once. After that it is recorded as a `JudgeParseError`, never as a pass. When the judge is unavailable (malformed output, quota, timeout) the pipeline does **not** escalate, because an outage says nothing about answer quality. It returns the answer as unverified `best_effort`, and benchmark reports are flagged as incomplete.
+
+An optional **fallback judge** (`JUDGE_FALLBACK_PROVIDER` / `JUDGE_FALLBACK_MODEL`) takes over for a single answer when the primary judge fails after its retries. Every attempt records which judge graded it, and the benchmark report shows judge usage per system, because scores from two different judges are not perfectly comparable.
 
 **`quality_score` is not a probability of correctness.** The judge is itself an LLM. It has evaluator bias, verbosity bias and errors correlated with the models it grades. It also makes its own reasoning mistakes and scores inconsistently. That is why the benchmark also uses reference answers and deterministic checks.
 
@@ -177,6 +179,7 @@ cp .env.example .env
 MOCK_MODE=false
 GROQ_API_KEY=...
 GEMINI_API_KEY=...
+NVIDIA_API_KEY=...        # only if a role uses PROVIDER=nvidia
 
 CHEAP_PROVIDER=groq
 CHEAP_MODEL=<current Groq model id>
@@ -263,6 +266,8 @@ The tests use mocked providers and HTTP transports, so they need no API keys or 
 - **Rate limits.** Free tiers throttle aggressively. Retries honor `Retry-After`, but runs can be slow, and errors are recorded as failures.
 - **Provider models change.** Results apply only to the model IDs and date in a report.
 - **Normalized cost is an experimental metric**, not a bill.
+- **Mixed judges.** When the fallback judge is used, some answers are graded by a different model; compare judge usage before comparing quality.
+- **Tier order is an assumption until measured.** The report's *Accuracy by answering tier* table checks it; an early lineup had a "mid" model less accurate than the "cheap" one, which made routing upward counter-productive.
 - **The analyzer is a keyword heuristic.** Its difficulty estimates are unvalidated, and misrouting is expected; that is part of what the benchmark measures.
 - **Storage is JSONL** with full-file scans, which is fine for thousands of records but not millions.
 
@@ -272,7 +277,7 @@ The codebase has clean extension points for later work:
 
 - **Learned or bandit routing**: implement `RoutingPolicy.select(analysis, registry, history)`.
 - **A learned analyzer**: implement `QueryAnalyzer.analyze(query)`.
-- **More providers**: subclass `HTTPProvider` and register it in `app/providers/factory.py`.
+- **More providers**: an OpenAI-compatible API is one row in `OPENAI_COMPATIBLE` in `app/providers/factory.py`; anything else subclasses `HTTPProvider`.
 - **Data-driven routing (V2)**: the consolidated query records already pair query features with the model chosen, its observed quality and whether it escalated. That is the training data for estimating `P(model succeeds | query)`.
 
 ## License

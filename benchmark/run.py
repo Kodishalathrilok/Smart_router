@@ -31,6 +31,15 @@ def summarize_system(system: System, results: list[ItemResult], judge_cost: floa
     judge_failures = sum(
         1 for r in results for a in r.record.attempts if a.answer is not None and a.quality_score is None
     ) + sum(r.reference_error is not None for r in results)
+    judge_usage = Counter(a.judge_model for r in results for a in r.record.attempts if a.judge_model)
+    tier_accuracy: dict[str, dict[str, int]] = {}
+    for r in results:
+        if r.deterministic_correct is None:
+            continue
+        tier = r.record.final_tier or r.record.attempts[-1].tier  # tier that produced (or failed to produce) the answer
+        stats = tier_accuracy.setdefault(tier, {"correct": 0, "checked": 0})
+        stats["correct"] += r.deterministic_correct
+        stats["checked"] += 1
     return {
         **base,
         "label": system.label,
@@ -40,6 +49,8 @@ def summarize_system(system: System, results: list[ItemResult], judge_cost: floa
         "deterministic": {"checked": len(det), "accuracy": rate(sum(det), len(det))},
         "serving_judge_calls": serving_judge_calls,
         "judge_failures": judge_failures,
+        "judge_usage": dict(judge_usage),
+        "tier_accuracy": tier_accuracy,
         "cost_incl_judge": {"mean": round((base["cost"]["total"] + serving_judge_calls * judge_cost) / base["n"], 4)},
     }
 

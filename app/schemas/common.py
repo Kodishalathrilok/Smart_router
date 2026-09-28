@@ -41,6 +41,7 @@ class Attempt(BaseModel):
     finish_reason: str | None = None
     normalized_cost: float = 0.0
     quality_score: float | None = None
+    judge_model: str | None = None
     dimensions: dict[str, float] | None = None
     verdict: str | None = None
     accepted: bool = False

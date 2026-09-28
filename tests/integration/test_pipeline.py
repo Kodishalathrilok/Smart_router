@@ -136,3 +136,25 @@ async def test_mock_mode_end_to_end(tmp_path):
     r2 = await rt.pipeline.run(EASY)
     assert r1.mock_mode and r1.answer.startswith("[MOCK")
     assert [a.quality_score for a in r1.attempts] == [a.quality_score for a in r2.attempts]  # deterministic
+
+
+async def test_fallback_judge_recorded_on_attempt_and_trace(tmp_path):
+    from app.providers.base import ProviderServerError
+
+    class PrimaryJudgeDown(FakeProvider):
+        async def generate(self, messages, model, **kw):
+            if model == "mock-judge":
+                self.calls.append((model, True))
+                raise ProviderServerError("503", provider="mock")
+            return await super().generate(messages, model, **kw)
+
+    provider = PrimaryJudgeDown({**ANSWERS, "mock-backup": ""}, {"ANS-cheap": 0.9})
+    rt = await build_runtime(make_settings(tmp_path, judge_fallback_model="mock-backup"), providers={"mock": provider})
+    r = await rt.pipeline.run(EASY)
+    assert r.final_status == "accepted" and r.attempts[0].judge_model == "mock-backup"
+    assert any("judged by fallback mock-backup" in s.label for s in r.trace)
+
+    healthy = FakeProvider({**ANSWERS, "mock-backup": ""}, {"ANS-cheap": 0.9})
+    rt = await build_runtime(make_settings(tmp_path / "h", judge_fallback_model="mock-backup"), providers={"mock": healthy})
+    r = await rt.pipeline.run(EASY)
+    assert r.attempts[0].judge_model == "mock-judge" and not any("fallback" in s.label for s in r.trace)

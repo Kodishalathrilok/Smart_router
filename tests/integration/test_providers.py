@@ -16,13 +16,19 @@ from app.providers.base import (
     RateLimitError,
 )
 from app.providers.gemini_provider import GeminiProvider
-from app.providers.groq_provider import GroqProvider
+from app.providers.openai_compatible import OpenAICompatibleProvider
 
 MESSAGES = [{"role": "system", "content": "be brief"}, {"role": "user", "content": "hi"}]
 
 
 def groq(handler):
-    return GroqProvider("sk-test", base_url="https://groq.test/v1", timeout=5, transport=httpx.MockTransport(handler))
+    return OpenAICompatibleProvider(
+        "groq", "sk-test", base_url="https://groq.test/v1", timeout=5, token_param="max_completion_tokens", transport=httpx.MockTransport(handler)
+    )
+
+
+def nvidia(handler):
+    return OpenAICompatibleProvider("nvidia", "nv-test", base_url="https://nvidia.test/v1", timeout=5, transport=httpx.MockTransport(handler))
 
 
 def gemini(handler):
@@ -44,7 +50,23 @@ async def test_groq_normalizes_response_and_sends_json_mode():
     r = await groq(handler).generate(MESSAGES, "m1", json_mode=True)
     assert (r.text, r.provider, r.input_tokens, r.output_tokens, r.finish_reason) == ("hello", "groq", 7, 2, "stop")
     assert seen["body"]["response_format"] == {"type": "json_object"}
+    assert seen["body"]["max_completion_tokens"] == 1024
     assert seen["auth"] == "Bearer sk-test"
+
+
+async def test_nvidia_uses_max_tokens_and_its_own_label():
+    seen = {}
+
+    def handler(request):
+        seen["body"] = json.loads(request.content)
+        seen["auth"] = request.headers["authorization"]
+        seen["url"] = str(request.url)
+        return httpx.Response(200, json={"choices": [{"message": {"content": "ok"}, "finish_reason": "stop"}], "usage": {"prompt_tokens": 3, "completion_tokens": 1}})
+
+    r = await nvidia(handler).generate(MESSAGES, "vendor/model-x", max_tokens=256)
+    assert (r.text, r.provider, r.model, r.input_tokens) == ("ok", "nvidia", "vendor/model-x", 3)
+    assert seen["body"]["max_tokens"] == 256 and "max_completion_tokens" not in seen["body"]
+    assert seen["auth"] == "Bearer nv-test" and seen["url"].endswith("/v1/chat/completions")
 
 
 async def test_gemini_normalizes_response_and_keeps_key_out_of_url():

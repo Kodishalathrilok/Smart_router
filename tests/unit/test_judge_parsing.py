@@ -3,6 +3,8 @@ import pytest
 from app.core.executor import Executor
 from app.judge.judge import JudgeParseError, QualityJudge, parse_judgement, quality_score
 from app.judge.schemas import JudgeDimensions
+from app.models.schemas import ModelSpec
+from app.providers.base import LLMResponse, ProviderServerError
 from tests.conftest import FakeProvider, judge_json
 
 VALID = judge_json(0.9)
@@ -61,7 +63,7 @@ class RawJudge(FakeProvider):
 
 def make_judge(registry, outputs):
     executor = Executor({"mock": RawJudge(outputs)}, max_retries=0, base_delay_s=0, max_delay_s=0)
-    return QualityJudge(executor, registry.judge, max_tokens=256)
+    return QualityJudge(executor, [registry.judge], max_tokens=256)
 
 
 async def test_judge_retries_malformed_output_once(registry):
@@ -73,3 +75,48 @@ async def test_judge_retries_malformed_output_once(registry):
 async def test_judge_gives_up_after_retries(registry):
     with pytest.raises(JudgeParseError):
         await make_judge(registry, ["nope", "still nope"]).evaluate("q", "a", "general_qa")
+
+
+class PerModelJudge(FakeProvider):
+    """Judge outputs keyed by judge model id: a raw string, or an Exception to raise."""
+
+    async def generate(self, messages, model, **kw):
+        self.calls.append((model, True))
+        out = self.answers[model]
+        if isinstance(out, Exception):
+            raise out
+        return LLMResponse(text=out, model=model, provider="mock")
+
+
+def fallback_judge(outputs):
+    primary = ModelSpec(id="primary", provider="mock", role="judge", capability_score=0.9, normalized_cost=3, expected_latency="medium")
+    backup = primary.model_copy(update={"id": "backup", "role": "judge_fallback"})
+    provider = PerModelJudge(outputs)
+    executor = Executor({"mock": provider}, max_retries=0, base_delay_s=0, max_delay_s=0)
+    return QualityJudge(executor, [primary, backup], max_tokens=256), provider
+
+
+async def test_primary_judge_used_when_healthy():
+    judge, provider = fallback_judge({"primary": VALID, "backup": VALID})
+    result = await judge.evaluate("q", "a", "general_qa")
+    assert result.judge_model == "primary" and [m for m, _ in provider.calls] == ["primary"]
+
+
+async def test_fallback_judge_on_provider_error():
+    judge, provider = fallback_judge({"primary": ProviderServerError("503", provider="mock"), "backup": VALID})
+    result = await judge.evaluate("q", "a", "general_qa")
+    assert result.judge_model == "backup" and result.quality_score == 0.9
+    assert [m for m, _ in provider.calls] == ["primary", "backup"]
+
+
+async def test_fallback_judge_on_malformed_output():
+    judge, provider = fallback_judge({"primary": "not json", "backup": VALID})
+    result = await judge.evaluate("q", "a", "general_qa")
+    assert result.judge_model == "backup"
+    assert [m for m, _ in provider.calls] == ["primary", "primary", "backup"]  # one parse retry, then fallback
+
+
+async def test_raises_when_every_judge_fails():
+    judge, _ = fallback_judge({"primary": ProviderServerError("503", provider="mock"), "backup": "garbage"})
+    with pytest.raises(JudgeParseError):
+        await judge.evaluate("q", "a", "general_qa")

@@ -7,7 +7,7 @@ Validation fails loudly — a misconfigured model is never swapped for another.
 import json
 from collections.abc import Mapping
 
-from app.core.config import ROLES, ConfigError, Settings
+from app.core.config import OPTIONAL_ROLES, ROLES, ConfigError, Settings
 from app.models.schemas import ModelSpec, Role
 from app.providers.base import LLMProvider, ProviderError
 from app.router.schemas import Tier
@@ -27,7 +27,7 @@ class ModelRegistry:
         except (OSError, json.JSONDecodeError) as exc:
             raise ConfigError(f"Cannot read model metadata from {settings.models_config}: {exc}") from None
         specs = {}
-        for role in ROLES:
+        for role in (*ROLES, *(r for r in OPTIONAL_ROLES if settings.role_enabled(r))):
             provider, model = settings.role(role)
             if not model:
                 raise ConfigError(f"{role.upper()}_MODEL is not set. Set it in .env (or enable MOCK_MODE=true).")
@@ -43,8 +43,12 @@ class ModelRegistry:
     def judge(self) -> ModelSpec:
         return self._specs["judge"]
 
+    @property
+    def judge_fallback(self) -> ModelSpec | None:
+        return self._specs.get("judge_fallback")
+
     def all(self) -> list[ModelSpec]:
-        return [self._specs[r] for r in ROLES]
+        return [self._specs[r] for r in (*ROLES, *OPTIONAL_ROLES) if r in self._specs]
 
     async def validate(self, providers: Mapping[str, LLMProvider]) -> None:
         """Check every configured model is served by its provider. Raises ConfigError otherwise."""

@@ -214,6 +214,7 @@ class SmartRouterPipeline:
             **generated,
             judge_latency_ms=judgement.latency_ms,
             quality_score=judgement.quality_score,
+            judge_model=judgement.judge_model,
             dimensions=dimensions,
             verdict=judgement.verdict,
             accepted=accepted,
@@ -241,7 +242,10 @@ class SmartRouterPipeline:
             return TraceStep(kind="error", label=f"Generation failed: {a.error_type}")
         if a.quality_score is None:
             return TraceStep(kind="error", label=f"Judge failed: {a.error_type} (answer unverified)")
-        return TraceStep(kind="score", label=f"Quality score: {a.quality_score:.2f} (threshold {self._settings.quality_threshold:.2f}) · verdict: {a.verdict}")
+        label = f"Quality score: {a.quality_score:.2f} (threshold {self._settings.quality_threshold:.2f}) · verdict: {a.verdict}"
+        if a.judge_model and a.judge_model != self._judge.model:
+            label += f" · judged by fallback {a.judge_model}"
+        return TraceStep(kind="score", label=label)
 
     def _record(
         self, qid: str, query: str, mode: Mode, analysis: QueryAnalysis, attempts: list[Attempt], trace: list[TraceStep], start: float
