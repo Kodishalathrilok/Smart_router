@@ -81,3 +81,60 @@ def test_tier_accuracy_section_flags_inverted_tiers():
     bad = {"a": {"tier_accuracy": {"cheap": {"correct": 9, "checked": 10}, "mid": {"correct": 5, "checked": 10}}}}
     assert "Tier order check failed" not in tier_accuracy_section(ok)
     assert "Tier order check failed" in tier_accuracy_section(bad)
+
+
+
+def test_ambiguous_final_number_is_not_checkable_instead_of_guessed():
+    from benchmark.evaluators import check_numeric, read_final_number
+
+    assert read_final_number("There are 204 squares of all sizes on a standard 8 x 8 chessboard.") == ("ambiguous", None)
+    assert check_numeric("There are 204 squares of all sizes on a standard 8 x 8 chessboard.", 204) is None
+    assert check_numeric(r"so the count is \[ \boxed{15} \]", 15) is True
+    assert check_numeric("I cannot determine this.", 15) is False
+
+
+def test_escalation_breakdown_and_judge_confusion():
+    from types import SimpleNamespace
+
+    from app.schemas.common import Attempt
+    from benchmark.analysis import escalation_breakdown, judge_confusion
+
+    def attempt(tier, q, verdict, accepted):
+        return Attempt(number=1, model=tier, provider="p", tier=tier, routing_reason="r", answer="a", quality_score=q, verdict=verdict, accepted=accepted)
+
+    record = lambda attempts: SimpleNamespace(attempts=attempts, quality_threshold=0.78)  # noqa: E731
+    results = [
+        # correct cheap answer, falsely rejected by both -> unnecessary escalation
+        SimpleNamespace(item_id="a", record=record([attempt("cheap", 0.2, "incorrect", False), attempt("mid", 1.0, "good", True)]),
+                        attempt_correct=[True, True], deterministic_correct=True),
+        # wrong cheap answer, rightly rejected -> necessary escalation
+        SimpleNamespace(item_id="b", record=record([attempt("cheap", 0.2, "incorrect", False), attempt("mid", 1.0, "good", True)]),
+                        attempt_correct=[False, True], deterministic_correct=True),
+        # wrong answer, judge accepts -> false accept; primary false reject rescued by decision -> decision agrees
+        SimpleNamespace(item_id="c", record=record([attempt("cheap", 1.0, "good", True)]), attempt_correct=[False], deterministic_correct=False),
+        SimpleNamespace(item_id="d", record=record([attempt("cheap", 0.2, "incorrect", True)]), attempt_correct=[True], deterministic_correct=True),
+    ]
+    assert escalation_breakdown(results) == {"total": 2, "necessary": 1, "unnecessary": 1, "unknown": 0}
+    assert judge_confusion(results, decision=False) == {"checked": 6, "agree": 3, "false_accept": 1, "false_reject": 2}
+    assert judge_confusion(results, decision=True) == {"checked": 6, "agree": 4, "false_accept": 1, "false_reject": 1}
+
+
+def test_integer_answers_must_match_exactly():
+    from benchmark.evaluators import check_numeric
+
+    # Regression: the relative 1e-4 default accepted any value within +-7 of 76127.
+    assert check_numeric("Final answer: 76120", 76127) is False
+    assert check_numeric("Final answer: 76,127", 76127) is True
+    assert check_numeric("Final answer: 0.70631", 0.7063) is True  # non-integers keep the relative tolerance
+
+
+def test_hard_v2_dataset_is_reproducible_and_self_consistent():
+    import json
+
+    from benchmark.build_hard_v2 import OUT, build
+
+    assert [json.loads(line) for line in OUT.read_text(encoding="utf-8").splitlines()] == build()  # file == generator output
+    items = load_dataset(OUT)
+    assert len(items) == 22 and {i.answer_type for i in items} == {"numeric", "code"}
+    for item in items:
+        assert deterministic_check(item, item.reference_answer, exec_code=True) is True, item.id

@@ -1,0 +1,11 @@
+# Explicit lint config: newer ruff releases changed the default rule set, so CI must not rely on defaults.
+target-version = "py310"
+line-length = 160
+extend-exclude = ["data"]
+
+[lint]
+select = ["E", "F", "W", "I", "B", "UP", "RUF100"]
+ignore = [
+  "B008",  # FastAPI's Depends(...) in defaults is the framework's documented pattern
+  "E501",  # long lines are allowed; readability is reviewed by hand
+]

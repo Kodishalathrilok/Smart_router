@@ -17,6 +17,7 @@ def make_settings(tmp_path, **overrides) -> Settings:
         results_dir=tmp_path / "results",
         retry_base_delay_s=0,
         max_retries=1,
+        allowed_hosts="testserver,127.0.0.1,localhost",  # TestClient sends Host: testserver
     )
     return Settings(_env_file=None, **{**base, **overrides})
 
@@ -31,9 +32,9 @@ def registry(settings) -> ModelRegistry:
     return ModelRegistry.from_settings(settings)
 
 
-def judge_json(score: float, reasons=(), verdict=None) -> str:
+def judge_json(score: float, reasons=(), verdict=None, confidence=None) -> str:
     verdict = verdict or ("good" if score >= 0.8 else "partially_correct")
-    return json.dumps({
+    payload = {
         "verdict": verdict,
         "correctness": score,
         "completeness": score,
@@ -41,7 +42,10 @@ def judge_json(score: float, reasons=(), verdict=None) -> str:
         "reasoning_quality": score,
         "failure_reasons": list(reasons),
         "rationale": "test",
-    })
+    }
+    if confidence is not None:
+        payload["judge_confidence"] = confidence
+    return json.dumps(payload)
 
 
 class FakeProvider(LLMProvider):

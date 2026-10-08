@@ -132,7 +132,7 @@ def routing_flow(records: Iterable[QueryRecord]) -> list[dict]:
     """Edge counts: tier → next tier on escalation, last tier → final outcome."""
     edges: Counter[tuple[str, str]] = Counter()
     for r in records:
-        for current, following in zip(r.attempts, r.attempts[1:]):
+        for current, following in zip(r.attempts, r.attempts[1:], strict=False):
             edges[(current.tier, following.tier)] += 1
         last = r.attempts[-1]
         edges[(last.tier, "accepted" if last.accepted else r.final_status)] += 1

@@ -97,7 +97,7 @@ async function openQuery(queryId) {
   try {
     showResult(recordToResult(await api(`/api/query/${encodeURIComponent(queryId)}`)));
     $("trace-box").open = true;
-    $("result").scrollIntoView({ behavior: "smooth", block: "start" });
+    $("result").scrollIntoView({ behavior: matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth", block: "start" });
   } catch (err) {
     $("ask-status").textContent = `Error: ${err.message}`;
   }
@@ -110,7 +110,8 @@ function renderCards(stats) {
     ["Queries processed", n, ""],
     ["Average quality", fmt(stats.quality?.mean), "judge score, 0–1"],
     ["Normalized cost", fmt(stats.cost?.mean), n ? `per query · total ${fmt(stats.cost?.total, 1)}` : ""],
-    ["Cost reduction", reduction(stats.cost_reduction_vs_all_strong_pct), "vs. counterfactual all-strong"],
+    ["Cost vs. all-cheap", stats.cost_vs_all_cheap_x == null ? "—" : `${fmt(stats.cost_vs_all_cheap_x, 2)}×`,
+      `${reduction(stats.cost_reduction_vs_all_strong_pct)} vs. all-strong · generation only, judge excluded`],
     ["Escalation rate", pct(stats.escalation?.rate), ""],
     ["Average latency", ms(stats.latency_ms?.mean), n ? `p95 ${ms(stats.latency_ms?.p95)}` : ""],
   ];
@@ -278,19 +279,20 @@ function renderBenchmark(b) {
   const parts = [];
   if (b.mock_mode) parts.push(el("p", { class: "notice" }, "Mock run: synthetic answers and scores. These numbers only exercise the pipeline and do not measure real models."));
   parts.push(el("p", { class: "muted small" }, `Run ${b.run_id} · ${b.dataset.n} items · ${b.created_at}`));
-  const headers = ["System", "Ref. quality", "In-loop quality", "Gen cost", "Cost vs strong", "Strong calls", "Escalation", "p50 latency", "Below threshold"];
+  if (b.claim) parts.push(el("p", { class: "notice" }, el("strong", {}, `Claim verdict: ${b.claim.verdict.replaceAll("_", " ")}. `), b.claim.explanation));
+  const headers = ["System", "Strict accuracy", "95% CI", "Cost incl. judge", "vs. cheap", "Calls/query", "Escalation", "p50 latency"];
   const rows = Object.entries(b.systems).map(([name, s]) => {
     const c = b.comparisons?.[name] ?? {};
+    const ci = s.strict?.ci95;
     return el("tr", {},
       el("td", {}, s.label),
-      el("td", { class: "num" }, fmt(s.reference_quality?.mean, 3)),
-      el("td", { class: "num" }, fmt(s.quality?.mean, 3)),
-      el("td", { class: "num" }, fmt(s.cost?.mean)),
-      el("td", { class: "num" }, reduction(c.cost_reduction_pct_vs_strong)),
-      el("td", { class: "num" }, s.utilization?.calls?.strong ?? "—"),
+      el("td", { class: "num" }, pct(s.strict?.accuracy)),
+      el("td", { class: "num" }, ci ? `${pct(ci[0])}–${pct(ci[1])}` : "—"),
+      el("td", { class: "num" }, fmt(s.cost_incl_judge?.mean)),
+      el("td", { class: "num" }, c.cost_incl_judge_vs_cheap_x == null ? "—" : `${fmt(c.cost_incl_judge_vs_cheap_x, 2)}×`),
+      el("td", { class: "num" }, fmt(s.serving_calls_mean)),
       el("td", { class: "num" }, pct(s.escalation?.rate)),
       el("td", { class: "num" }, ms(s.latency_ms?.median)),
-      el("td", { class: "num" }, pct(s.below_threshold_rate)),
     );
   });
   const table = el("table", {}, el("thead", {}, el("tr", {}, ...headers.map((h) => el("th", {}, h)))), el("tbody", {}, ...rows));

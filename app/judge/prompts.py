@@ -1,5 +1,7 @@
 """Prompt templates for the quality judge."""
 
+import re
+
 JUDGE_SYSTEM = """You are a strict, independent evaluator of answers written by another AI system.
 You never answer the user's question yourself; you only grade the candidate answer.
 Respond with a single JSON object and nothing else."""
@@ -20,6 +22,11 @@ Evaluate the candidate independently.
 - Do not use the candidate's own claims as evidence of correctness; check them yourself.
 - Query category: {category}. Score reasoning_quality as 1.0 if no reasoning is required and none is misapplied.
 - If the query asks for something unsafe, a well-justified refusal is the correct answer.
+- For math or numeric questions, recompute the result yourself before judging it. Do not mark an answer
+  incorrect unless your own computation clearly disagrees with it.
+- Report judge_confidence: how sure you are that YOUR verdict is right (0.0 to 1.0). If you could not
+  verify the answer (for example a long computation or code you cannot run), lower judge_confidence
+  instead of guessing.
 
 Classify the candidate with exactly one verdict:
   "good"              - correct, complete, on-topic
@@ -36,6 +43,7 @@ Return only this JSON object (scores are floats from 0.0 to 1.0):
   "relevance": 0.0,
   "reasoning_quality": 0.0,
   "failure_reasons": [],
+  "judge_confidence": 0.0,
   "rationale": "one short sentence"
 }}
 failure_reasons must be a list containing only these codes: "incorrect", "incomplete", "irrelevant", "reasoning_error", "unsafe", "other". Use [] for a good answer."""
@@ -48,7 +56,23 @@ Reference answer (trusted; use it to check correctness, but accept equivalent ph
 """
 
 
-def build_judge_messages(query: str, answer: str, category: str, reference: str | None = None) -> list[dict[str, str]]:
-    reference_block = REFERENCE_BLOCK.format(reference=reference) if reference else ""
-    user = JUDGE_TEMPLATE.format(query=query, answer=answer, category=category, reference_block=reference_block)
-    return [{"role": "system", "content": JUDGE_SYSTEM}, {"role": "user", "content": user}]
+# Second opinions only: some judges (and providers' JSON modes) reject prose working written before the
+# JSON object. The primary judge's prompt is deliberately left unchanged.
+STRICT_JSON_INSTRUCTION = """Output ONLY the JSON object, starting with '{'. Do any recomputation silently, or summarize it inside the "rationale" string. Never write text outside the JSON."""
+
+
+DELIMITER_TAG = re.compile(r"<\s*(/?)\s*(query|candidate|reference)\b", re.I)
+
+
+def _defang(text: str) -> str:
+    """Untrusted text must not be able to close <query>/<candidate>/<reference> and speak as the evaluator."""
+    return DELIMITER_TAG.sub(lambda m: f"<​{m.group(1)}{m.group(2)}", text)
+
+
+def build_judge_messages(
+    query: str, answer: str, category: str, reference: str | None = None, *, strict_json: bool = False
+) -> list[dict[str, str]]:
+    reference_block = REFERENCE_BLOCK.format(reference=_defang(reference)) if reference else ""
+    user = JUDGE_TEMPLATE.format(query=_defang(query), answer=_defang(answer), category=category, reference_block=reference_block)
+    system = f"{JUDGE_SYSTEM}\n{STRICT_JSON_INSTRUCTION}" if strict_json else JUDGE_SYSTEM
+    return [{"role": "system", "content": system}, {"role": "user", "content": user}]

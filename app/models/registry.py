@@ -47,6 +47,10 @@ class ModelRegistry:
     def judge_fallback(self) -> ModelSpec | None:
         return self._specs.get("judge_fallback")
 
+    @property
+    def second_opinion(self) -> ModelSpec | None:
+        return self._specs.get("second_opinion")
+
     def all(self) -> list[ModelSpec]:
         return [self._specs[r] for r in (*ROLES, *OPTIONAL_ROLES) if r in self._specs]
 

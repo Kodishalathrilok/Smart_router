@@ -1,26 +1,44 @@
-"""Consolidated per-query records (JSONL), one line per completed pipeline run."""
+"""Consolidated per-query records, one row per completed pipeline run (SQLite; see app/logging/store.py)."""
 
-import json
-from pathlib import Path
+import logging
+import sqlite3
 
+from pydantic import ValidationError
+
+from app.logging.store import Store
 from app.schemas.common import QueryRecord
+
+log = logging.getLogger("smartrouter.queries")
 
 
 class QueryLogger:
-    def __init__(self, path: Path) -> None:
-        self.path = path
-        path.parent.mkdir(parents=True, exist_ok=True)
+    def __init__(self, store: Store) -> None:
+        self._store = store
+        self.write_failures = 0
 
     def write(self, record: QueryRecord) -> None:
-        with self.path.open("a", encoding="utf-8") as f:
-            f.write(record.model_dump_json() + "\n")
+        """Best effort, like EventLogger.log: failure is logged and counted, not raised."""
+        try:
+            self._store.put_record(record.query_id, record.timestamp, record.final_status, record.model_dump_json())
+        except sqlite3.Error as exc:
+            self.write_failures += 1
+            log.error("query record write failed (%s): %s", type(exc).__name__, record.query_id)
 
-    def all(self) -> list[QueryRecord]:
-        # ponytail: full-file scan per call; fine for thousands of records, add an index/SQLite when it isn't.
-        if not self.path.exists():
-            return []
-        with self.path.open(encoding="utf-8") as f:
-            return [QueryRecord.model_validate(json.loads(line)) for line in f if line.strip()]
+    def recent(self, limit: int) -> list[QueryRecord]:
+        """Newest `limit` records, oldest first. Rows that no longer match the schema are skipped, not fatal."""
+        return [r for r in (_parse(raw) for raw in self._store.recent_records(limit)) if r is not None]
 
     def get(self, query_id: str) -> QueryRecord | None:
-        return next((r for r in self.all() if r.query_id == query_id), None)
+        raw = self._store.get_record(query_id)
+        return _parse(raw) if raw is not None else None
+
+    def count(self) -> int:
+        return self._store.count_records()
+
+
+def _parse(raw: str) -> QueryRecord | None:
+    try:
+        return QueryRecord.model_validate_json(raw)
+    except ValidationError:
+        log.warning("skipping a stored query record that does not match the current schema")
+        return None

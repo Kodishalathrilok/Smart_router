@@ -15,7 +15,7 @@ def client(tmp_path):
 
 
 def test_health(client):
-    assert client.get("/health").json() == {"status": "ok", "mock_mode": True}
+    assert client.get("/health").json() == {"status": "ok", "mock_mode": True, "log_write_failures": 0}
 
 
 def test_query_roundtrip(client):
@@ -74,3 +74,9 @@ def test_provider_failure_does_not_crash_server(tmp_path):
 
 def test_frontend_served(client):
     assert client.get("/").status_code == 200
+
+
+def test_dashboard_files_are_revalidated_not_served_stale(client):
+    for path in ("/", "/styles.css", "/app.js"):
+        assert client.get(path).headers["cache-control"] == "no-cache"
+    assert "cache-control" not in client.get("/api/models").headers

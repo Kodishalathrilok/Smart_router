@@ -1,5 +1,7 @@
 """POST /api/query and GET /api/query/{query_id}."""
 
+import asyncio
+
 from fastapi import APIRouter, Depends, HTTPException
 
 from app.api.deps import get_runtime
@@ -17,13 +19,19 @@ async def submit_query(body: QueryRequest, runtime: Runtime = Depends(get_runtim
         raise HTTPException(status_code=413, detail=f"query exceeds MAX_QUERY_CHARS ({limit})")
     if not body.query.strip():
         raise HTTPException(status_code=422, detail="query must not be blank")
-    record = await runtime.pipeline.run(body.query, mode="smart")
+    if runtime.gate.locked():
+        raise HTTPException(status_code=429, detail="too many queries in flight; retry shortly", headers={"Retry-After": "5"})
+    async with runtime.gate:
+        try:
+            record = await asyncio.wait_for(runtime.pipeline.run(body.query, mode="smart"), runtime.settings.request_deadline_s)
+        except asyncio.TimeoutError:  # an alias of TimeoutError only from Python 3.11
+            raise HTTPException(status_code=504, detail=f"query exceeded REQUEST_DEADLINE_S ({runtime.settings.request_deadline_s:g}s)") from None
     return QueryResponse.from_record(record)
 
 
 @router.get("/query/{query_id}", response_model=QueryRecord)
 async def get_query(query_id: str, runtime: Runtime = Depends(get_runtime)) -> QueryRecord:
-    record = runtime.queries.get(query_id)
+    record = await asyncio.to_thread(runtime.queries.get, query_id)
     if record is None:
         raise HTTPException(status_code=404, detail=f"unknown query_id {query_id}")
     return record

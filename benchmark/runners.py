@@ -15,7 +15,7 @@ from app.judge.judge import JudgeParseError
 from app.providers.base import ProviderError
 from app.schemas.common import Mode, QueryRecord
 from benchmark.dataset import BenchmarkItem
-from benchmark.evaluators import deterministic_check
+from benchmark.evaluators import deterministic_check, is_checkable
 
 
 @dataclass(frozen=True)
@@ -26,12 +26,15 @@ class System:
     description: str
 
 
+# `always_weak` keeps its historical name so older raw runs in data/benchmarks/ still re-analyze.
 SYSTEMS: tuple[System, ...] = (
-    System("always_weak", "Always Weak", "always_cheap", "Baseline A: every query goes to the cheap tier; no escalation."),
-    System("always_strong", "Always Strong", "always_strong", "Baseline B: every query goes to the strong tier (quality/cost reference)."),
-    System("static_router", "Static Router", "static", "Baseline C: heuristic difficulty routing; no judge-driven escalation."),
-    System("smart_router", "SmartRouter", "smart", "Baseline D: heuristic routing + quality judge + adaptive escalation."),
+    System("always_weak", "Always Cheap", "always_cheap", "Every query goes to the cheap tier; no judge needed in production."),
+    System("always_mid", "Always Mid", "always_mid", "Every query goes to the mid tier."),
+    System("always_strong", "Always Strong", "always_strong", "Every query goes to the strong tier (quality ceiling / cost reference)."),
+    System("static_router", "Static Router", "static", "Heuristic difficulty routing; no judge-driven escalation."),
+    System("smart_router", "SmartRouter", "smart", "Heuristic routing + answer checks + judge-driven escalation."),
 )
+SYSTEM_BY_NAME = {s.name: s for s in SYSTEMS}
 
 
 class ItemResult(BaseModel):
@@ -43,7 +46,9 @@ class ItemResult(BaseModel):
     reference_quality: float | None = None  # judge WITH the reference answer; used to compare systems
     reference_verdict: str | None = None
     reference_error: str | None = None
-    deterministic_correct: bool | None = None  # numeric / code-test check; None when not applicable
+    deterministic_correct: bool | None = None  # numeric / code-test check; None when not applicable or not parseable
+    checkable: bool = False  # the item has a deterministic check that ran in this benchmark (numeric, or code with --exec-code)
+    attempt_correct: list[bool | None] = []  # the same check on every attempt's answer (None: no answer / not checkable)
 
 
 async def run_item(runtime: Runtime, system: System, item: BenchmarkItem, *, reference_eval: bool, exec_code: bool) -> ItemResult:
@@ -51,7 +56,11 @@ async def run_item(runtime: Runtime, system: System, item: BenchmarkItem, *, ref
     record = await runtime.pipeline.run(item.question, mode=system.mode, query_id=f"{system.name}-{item.id}")
     result = ItemResult(system=system.name, item_id=item.id, category=item.category, difficulty=item.difficulty, record=record)
     if not runtime.settings.mock_mode:  # mock answers are synthetic text; deterministic checks would be meaningless
+        result.checkable = is_checkable(item, exec_code=exec_code)
         result.deterministic_correct = deterministic_check(item, record.answer, exec_code=exec_code)
+        result.attempt_correct = [
+            deterministic_check(item, a.answer, exec_code=exec_code) if a.answer is not None else None for a in record.attempts
+        ]
     if reference_eval:
         if record.answer is None:
             result.reference_quality, result.reference_verdict = 0.0, "no_answer"

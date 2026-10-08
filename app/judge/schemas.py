@@ -5,6 +5,7 @@ The judge produces per-dimension scores; SmartRouter computes the aggregate
 probability of correctness (see app/judge/judge.py for known biases).
 """
 
+import math
 from typing import Literal
 
 from pydantic import BaseModel, Field, field_validator
@@ -13,7 +14,6 @@ Verdict = Literal["good", "partially_correct", "incorrect", "incomplete", "irrel
 FailureCode = Literal["incorrect", "incomplete", "irrelevant", "reasoning_error", "unsafe", "other"]
 FAILURE_CODES: tuple[str, ...] = FailureCode.__args__
 DIMENSIONS = ("correctness", "completeness", "relevance", "reasoning_quality")
-TEN_POINT_SCALE_MAX = 10.0
 _VERDICT_ALIASES = {"partial": "partially_correct", "partially correct": "partially_correct", "correct": "good"}
 _REASON_ALIASES = {"reasoning": "reasoning_error", "wrong": "incorrect", "off_topic": "irrelevant", "unsafe_content": "unsafe"}
 
@@ -28,14 +28,26 @@ class JudgeDimensions(BaseModel):
     reasoning_quality: float = Field(ge=0.0, le=1.0)
     failure_reasons: list[FailureCode] = Field(default_factory=list)
     rationale: str = ""
+    judge_confidence: float | None = Field(
+        None, ge=0.0, le=1.0, description="The judge's certainty in its own verdict. Not a probability that the answer is correct."
+    )
 
-    @field_validator(*DIMENSIONS, mode="before")
+    @field_validator(*DIMENSIONS, "judge_confidence", mode="before")
     @classmethod
-    def _normalize_scale(cls, value: object) -> float:
-        """Accept 0-1 scores; tolerate judges that answer on a 0-10 scale."""
-        score = float(value)  # type: ignore[arg-type]
-        if 1.0 < score <= TEN_POINT_SCALE_MAX:
-            score /= TEN_POINT_SCALE_MAX
+    def _strict_score(cls, value: object) -> float | None:
+        """Scores must be finite numbers in [0, 1]. Nothing is rescaled or clamped.
+
+        A judge that answers 7 might mean 7/10, 0.7 typed badly, or be confused; guessing would silently
+        change the escalation decision. An out-of-range score is a parse error (retried, then the fallback
+        judge, then "judge unavailable").
+        """
+        if value is None:
+            return None
+        if isinstance(value, bool) or not isinstance(value, (int, float)):
+            raise ValueError("score must be a JSON number")  # strings, lists, dicts
+        score = float(value)
+        if not math.isfinite(score):
+            raise ValueError("score must be finite")
         return score
 
     @field_validator("verdict", mode="before")

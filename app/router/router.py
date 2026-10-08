@@ -27,7 +27,7 @@ class Router:
         for tier in TIERS[TIERS.index(current) + 1 :]:
             spec = self._registry.for_tier(tier)
             if model_key(spec.provider, spec.id) not in tried:
-                return RouteDecision(tier=tier, selected_model=spec.id, provider=spec.provider, reason=f"escalated from {current}: quality below threshold")
+                return RouteDecision(tier=tier, selected_model=spec.id, provider=spec.provider, reason=f"escalated from {current}: previous answer not accepted")
         return None
 
 

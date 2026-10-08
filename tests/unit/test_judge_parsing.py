@@ -23,10 +23,16 @@ def test_garbage_raises():
         parse_judgement('{"verdict": "good"}')  # missing dimensions
 
 
-def test_out_of_range_rejected_and_ten_point_scale_normalized():
+@pytest.mark.parametrize("bad", ["42", "8", "1.01", "-0.1", "NaN", "Infinity", '"0.9"'])
+def test_out_of_range_or_non_numeric_scores_are_rejected_never_rescaled(bad):
+    # Regression: a score of 8 used to be silently read as 0.8 (guessing a 0-10 scale).
     with pytest.raises(JudgeParseError):
-        parse_judgement(VALID.replace('"correctness": 0.9', '"correctness": 42'))
-    assert parse_judgement(VALID.replace('"correctness": 0.9', '"correctness": 8')).correctness == 0.8
+        parse_judgement(VALID.replace('"correctness": 0.9', f'"correctness": {bad}'))
+
+
+def test_boundary_scores_are_accepted():
+    assert parse_judgement(VALID.replace('"correctness": 0.9', '"correctness": 1')).correctness == 1.0
+    assert parse_judgement(VALID.replace('"correctness": 0.9', '"correctness": 0')).correctness == 0.0
 
 
 def test_normalizes_verdict_and_reasons():

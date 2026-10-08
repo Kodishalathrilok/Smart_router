@@ -54,6 +54,10 @@ class EmptyResponseError(ProviderError):
     """The provider returned no usable text (empty completion, safety block, ...)."""
 
 
+class CallBudgetExceededError(ProviderError):
+    """The per-query provider call budget is spent (raised before any network call; never retried)."""
+
+
 class RateLimitError(ProviderError):
     transient = True
 
@@ -97,7 +101,7 @@ class LLMProvider(ABC):
     async def list_models(self) -> list[str]:
         """Return model IDs this provider currently serves (used for startup validation)."""
 
-    async def aclose(self) -> None:
+    async def aclose(self) -> None:  # noqa: B027 - optional hook; providers without connections need nothing
         """Release network resources."""
 
 

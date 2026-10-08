@@ -9,3 +9,8 @@ data/logs/*
 data/benchmarks/*
 !data/logs/.gitkeep
 !data/benchmarks/.gitkeep
+
+# local tool state (not project source)
+.claude/
+.hallmark/
+.ruff_cache/

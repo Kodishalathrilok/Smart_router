@@ -1,7 +1,7 @@
 """Analytics endpoints over logged queries, plus the latest benchmark summary."""
 
+import asyncio
 import json
-from collections import Counter
 
 from fastapi import APIRouter, Depends, Query
 
@@ -17,15 +17,17 @@ MAX_ROUTES = 500
 async def stats(runtime: Runtime = Depends(get_runtime)) -> dict:
     """Live-traffic metrics. Cost reduction is against a counterfactual 'every query on the strong tier'
     using the configured normalized weights; it is not a measured baseline (run the benchmark for that)."""
-    records = runtime.queries.all()
+    records = await asyncio.to_thread(runtime.queries.recent, runtime.settings.stats_window)
     summary = summarize(records)
+    summary["window"] = {"recent_queries": runtime.settings.stats_window, "total_logged": runtime.queries.count()}
     strong_cost = runtime.registry.for_tier("strong").normalized_cost
     summary["cost_reduction_vs_all_strong_pct"] = cost_reduction_pct(summary.get("cost", {}).get("mean"), strong_cost)
+    # The honest counterpart: how much more than sending everything to the cheap tier (judge calls excluded).
+    cheap_cost, mean_cost = runtime.registry.for_tier("cheap").normalized_cost, summary.get("cost", {}).get("mean")
+    summary["cost_vs_all_cheap_x"] = round(mean_cost / cheap_cost, 2) if mean_cost is not None and cheap_cost else None
     summary["quality_threshold"] = runtime.settings.quality_threshold
     summary["mock_mode"] = runtime.settings.mock_mode
-    summary["provider_errors"] = dict(Counter(
-        f"{e['payload']['provider']}:{e['payload']['error_type']}" for e in runtime.events.read() if e["event_type"] == "provider_error"
-    ))
+    summary["provider_errors"] = runtime.events.provider_error_counts()
     return summary
 
 
@@ -49,14 +51,15 @@ async def routes(limit: int = Query(100, ge=1, le=MAX_ROUTES), runtime: Runtime 
             "attempts": len(r.attempts),
             "latency_ms": r.total_latency_ms,
             "normalized_cost": r.normalized_cost,
+            "provider_calls": r.provider_calls,
         }
-        for r in reversed(runtime.queries.all()[-limit:])
+        for r in reversed(await asyncio.to_thread(runtime.queries.recent, limit))
     ]
 
 
 @router.get("/failures")
 async def failures(limit: int = Query(50, ge=1, le=MAX_ROUTES), runtime: Runtime = Depends(get_runtime)) -> dict:
-    records = runtime.queries.all()
+    records = await asyncio.to_thread(runtime.queries.recent, runtime.settings.stats_window)
     examples = [
         {
             "query_id": r.query_id,

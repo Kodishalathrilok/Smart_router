@@ -4,7 +4,7 @@ from typing import Literal
 
 from pydantic import BaseModel, Field
 
-Role = Literal["cheap", "mid", "strong", "judge", "judge_fallback"]
+Role = Literal["cheap", "mid", "strong", "judge", "judge_fallback", "second_opinion"]
 
 
 class ModelProfile(BaseModel):

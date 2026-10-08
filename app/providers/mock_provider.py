@@ -72,4 +72,4 @@ class MockProvider(LLMProvider):
         else:
             verdict = "partially_correct" if quality >= PARTIAL_ABOVE else "incorrect"
             reasons = [FAILURE_CODES[int(hashlib.sha256(prompt.encode()).hexdigest()[:4], 16) % len(FAILURE_CODES)]]
-        return json.dumps({"verdict": verdict, **dims, "failure_reasons": reasons, "rationale": "Synthetic mock evaluation."})
+        return json.dumps({"verdict": verdict, **dims, "failure_reasons": reasons, "judge_confidence": 0.9, "rationale": "Synthetic mock evaluation."})

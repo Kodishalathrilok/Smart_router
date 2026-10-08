@@ -4,11 +4,12 @@ from datetime import datetime, timezone
 from typing import Literal
 from uuid import uuid4
 
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, field_validator
 
 from app.router.schemas import QueryAnalysis, Tier
+from app.verification.schemas import CheckResult
 
-Mode = Literal["smart", "static", "always_cheap", "always_strong"]
+Mode = Literal["smart", "static", "always_cheap", "always_mid", "always_strong"]
 FinalStatus = Literal["accepted", "best_effort", "failed"]
 
 
@@ -23,6 +24,27 @@ def new_query_id() -> str:
 class QueryRequest(BaseModel):
     query: str = Field(min_length=1)
     session_id: str | None = Field(None, max_length=128)
+
+    @field_validator("query")
+    @classmethod
+    def _encodable(cls, value: str) -> str:
+        """A lone surrogate (JSON "\\ud83d") parses fine but crashes UTF-8 encoding downstream (provider call, response)."""
+        try:
+            value.encode("utf-8")
+        except UnicodeEncodeError:
+            raise ValueError("query contains invalid Unicode (lone surrogate)") from None
+        return value.replace("\x00", "")
+
+
+class SecondOpinion(BaseModel):
+    judge_model: str
+    trigger: Literal["primary_rejection", "low_confidence_acceptance"] | None = None
+    quality_score: float | None = None
+    verdict: str | None = None
+    judge_confidence: float | None = None
+    latency_ms: float = 0.0  # wall clock, success or failure, retries included
+    calls: int = 0  # provider calls made (1 + retries)
+    error: str | None = None
 
 
 class Attempt(BaseModel):
@@ -40,14 +62,23 @@ class Attempt(BaseModel):
     output_tokens: int = 0
     finish_reason: str | None = None
     normalized_cost: float = 0.0
-    quality_score: float | None = None
+    quality_score: float | None = None  # primary judge; this is the answer's reported quality
     judge_model: str | None = None
+    judge_confidence: float | None = None
     dimensions: dict[str, float] | None = None
     verdict: str | None = None
-    accepted: bool = False
+    checks: list[CheckResult] = Field(default_factory=list)  # answer checks (no answer key)
+    second_opinion: SecondOpinion | None = None
+    judge_calls: int = 0
+    accepted: bool = False  # the escalation decision, not a correctness claim
+    decision_reason: str | None = None
     failure_reasons: list[str] = Field(default_factory=list)
     error_type: str | None = None
     error: str | None = None
+
+    @property
+    def failed_checks(self) -> list[CheckResult]:
+        return [c for c in self.checks if c.status == "fail"]
 
 
 class TraceStep(BaseModel):
@@ -80,6 +111,10 @@ class QueryRecord(BaseModel):
     total_latency_ms: float
     normalized_cost: float = Field(description="Sum of generation-model normalized costs. Judge calls counted separately.")
     judge_calls: int
+    provider_calls: int = Field(0, description="Every provider call this query made: generations, judges, second opinions, retries.")
+    billed_calls: dict[str, int] = Field(
+        default_factory=dict, description="Successful responses per model role (cheap/mid/strong/judge/...): the calls a provider bills."
+    )
     trace: list[TraceStep]
 
 
@@ -96,6 +131,7 @@ class QueryResponse(BaseModel):
     attempts: int
     latency_ms: float
     normalized_cost: float
+    provider_calls: int
     quality_threshold: float
     mock_mode: bool
     trace: list[TraceStep]
@@ -115,6 +151,7 @@ class QueryResponse(BaseModel):
             attempts=len(r.attempts),
             latency_ms=r.total_latency_ms,
             normalized_cost=r.normalized_cost,
+            provider_calls=r.provider_calls,
             quality_threshold=r.quality_threshold,
             mock_mode=r.mock_mode,
             trace=r.trace,

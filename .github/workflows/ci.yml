@@ -1,0 +1,21 @@
+name: ci
+on: [push, pull_request]
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: ["3.10", "3.13"]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: { python-version: "${{ matrix.python-version }}", cache: pip }
+      - run: pip install -r requirements-dev.txt
+      - run: ruff check .
+      - run: pytest -q
+      - name: Mock benchmark smoke test (no keys, no network)
+        run: python -m benchmark.run --per-category 1 --no-reference-eval
+        env:
+          MOCK_MODE: "true"
+          RESULTS_DIR: /tmp/sr-results
+          BENCHMARK_DIR: /tmp/sr-bench

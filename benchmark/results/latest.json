@@ -1,0 +1,2500 @@
+{
+  "status": "complete",
+  "run_id": "20260929T131419Z",
+  "created_at": "2026-09-29T13:52:33+00:00",
+  "mock_mode": false,
+  "dataset": {
+    "path": "hard.jsonl",
+    "n": 30,
+    "per_category": {
+      "math": 12,
+      "reasoning": 9,
+      "coding": 9
+    },
+    "per_difficulty": {
+      "hard": 30
+    }
+  },
+  "config": {
+    "quality_threshold": 0.78,
+    "max_escalations": 2,
+    "routing_thresholds": {
+      "cheap_max": 0.35,
+      "mid_max": 0.7
+    },
+    "models": {
+      "cheap": {
+        "id": "openai/gpt-oss-20b",
+        "provider": "groq",
+        "normalized_cost": 1.0
+      },
+      "mid": {
+        "id": "openai/gpt-oss-120b",
+        "provider": "groq",
+        "normalized_cost": 3.0
+      },
+      "strong": {
+        "id": "nvidia/nemotron-3-ultra-550b-a55b",
+        "provider": "nvidia",
+        "normalized_cost": 10.0
+      },
+      "judge": {
+        "id": "gemini-3.5-flash-lite",
+        "provider": "gemini",
+        "normalized_cost": 3.0
+      },
+      "judge_fallback": {
+        "id": "z-ai/glm-5.3-flash",
+        "provider": "nvidia",
+        "normalized_cost": 3.0
+      },
+      "second_opinion": {
+        "id": "qwen/qwen3.8-27b",
+        "provider": "groq",
+        "normalized_cost": 3.0
+      }
+    },
+    "reference_eval": false,
+    "exec_code": true,
+    "concurrency": 1
+  },
+  "systems": {
+    "always_strong": {
+      "n": 30,
+      "quality": {
+        "mean": 0.9717,
+        "median": 1.0,
+        "scored": 29
+      },
+      "cost": {
+        "mean": 9.6667,
+        "total": 290.0
+      },
+      "utilization": {
+        "calls": {
+          "cheap": 0,
+          "mid": 0,
+          "strong": 30
+        },
+        "calls_pct": {
+          "cheap": 0.0,
+          "mid": 0.0,
+          "strong": 1.0
+        },
+        "final_pct": {
+          "cheap": 0.0,
+          "mid": 0.0,
+          "strong": 0.9667
+        }
+      },
+      "escalation": {
+        "rate": 0.0,
+        "mean_count": 0.0
+      },
+      "latency_ms": {
+        "mean": 45788.6067,
+        "median": 37268.3,
+        "p95": 122401.5,
+        "generation_median": 35465.45
+      },
+      "judge_calls": 29,
+      "failure_groups": {
+        "Incomplete": 1,
+        "Provider error": 1
+      },
+      "routing_flow": [
+        {
+          "from": "strong",
+          "to": "accepted",
+          "count": 28
+        },
+        {
+          "from": "strong",
+          "to": "best_effort",
+          "count": 1
+        },
+        {
+          "from": "strong",
+          "to": "failed",
+          "count": 1
+        }
+      ],
+      "failure_rate": 0.0333,
+      "below_threshold_rate": 0.0667,
+      "per_category": {
+        "coding": {
+          "n": 9,
+          "quality_mean": 1.0,
+          "cost_mean": 10.0,
+          "escalation_rate": 0.0,
+          "reference_quality_mean": null
+        },
+        "math": {
+          "n": 12,
+          "quality_mean": 0.9255,
+          "cost_mean": 9.1667,
+          "escalation_rate": 0.0,
+          "reference_quality_mean": null
+        },
+        "reasoning": {
+          "n": 9,
+          "quality_mean": 1.0,
+          "cost_mean": 10.0,
+          "escalation_rate": 0.0,
+          "reference_quality_mean": null
+        }
+      },
+      "label": "Always Strong",
+      "mode": "always_strong",
+      "description": "Every query goes to the strong tier (quality ceiling / cost reference).",
+      "reference_quality": {
+        "mean": null,
+        "median": null,
+        "scored": 0,
+        "errors": 0
+      },
+      "strict": {
+        "checked": 30,
+        "correct": 28,
+        "accuracy": 0.9333,
+        "ci95": [
+          0.7868,
+          0.9815
+        ],
+        "unparseable": 1
+      },
+      "deterministic": {
+        "checked": 29,
+        "accuracy": 0.9655
+      },
+      "serving_calls_mean": 0.967,
+      "cost_method": "estimated_lower_bound",
+      "generation_failures": 1,
+      "provider_calls_mean": null,
+      "serving_judge_calls": 0,
+      "judge_failures": 0,
+      "judge_usage": {
+        "gemini-3.5-flash-lite": 29
+      },
+      "tier_accuracy": {
+        "strong": {
+          "correct": 28,
+          "checked": 29
+        }
+      },
+      "strong_calls": 30,
+      "escalations": {
+        "total": 0,
+        "necessary": 0,
+        "unnecessary": 0,
+        "unknown": 0
+      },
+      "judge_accuracy": {
+        "primary_judge": {
+          "checked": 28,
+          "agree": 28,
+          "false_accept": 0,
+          "false_reject": 0
+        },
+        "decision": {
+          "checked": 28,
+          "agree": 28,
+          "false_accept": 0,
+          "false_reject": 0
+        }
+      },
+      "items": [
+        {
+          "item_id": "math_hard_01",
+          "initial_model": "nvidia/nemotron-3-ultra-550b-a55b",
+          "judge_result": "good 1.00",
+          "judge_confidence": 1.0,
+          "second_opinion": null,
+          "initial_exact": true,
+          "escalated": false,
+          "escalation_reason": "",
+          "final_model": "nvidia/nemotron-3-ultra-550b-a55b",
+          "final_correct": true,
+          "cost": 10.0,
+          "judge_calls": 1
+        },
+        {
+          "item_id": "math_hard_02",
+          "initial_model": "nvidia/nemotron-3-ultra-550b-a55b",
+          "judge_result": "good 1.00",
+          "judge_confidence": 1.0,
+          "second_opinion": null,
+          "initial_exact": true,
+          "escalated": false,
+          "escalation_reason": "",
+          "final_model": "nvidia/nemotron-3-ultra-550b-a55b",
+          "final_correct": true,
+          "cost": 10.0,
+          "judge_calls": 1
+        },
+        {
+          "item_id": "math_hard_03",
+          "initial_model": "nvidia/nemotron-3-ultra-550b-a55b",
+          "judge_result": "good 1.00",
+          "judge_confidence": 1.0,
+          "second_opinion": null,
+          "initial_exact": true,
+          "escalated": false,
+          "escalation_reason": "",
+          "final_model": "nvidia/nemotron-3-ultra-550b-a55b",
+          "final_correct": true,
+          "cost": 10.0,
+          "judge_calls": 1
+        },
+        {
+          "item_id": "math_hard_04",
+          "initial_model": "nvidia/nemotron-3-ultra-550b-a55b",
+          "judge_result": "good 1.00",
+          "judge_confidence": 1.0,
+          "second_opinion": null,
+          "initial_exact": true,
+          "escalated": false,
+          "escalation_reason": "",
+          "final_model": "nvidia/nemotron-3-ultra-550b-a55b",
+          "final_correct": true,
+          "cost": 10.0,
+          "judge_calls": 1
+        },
+        {
+          "item_id": "math_hard_05",
+          "initial_model": "nvidia/nemotron-3-ultra-550b-a55b",
+          "judge_result": "good 1.00",
+          "judge_confidence": 1.0,
+          "second_opinion": null,
+          "initial_exact": true,
+          "escalated": false,
+          "escalation_reason": "",
+          "final_model": "nvidia/nemotron-3-ultra-550b-a55b",
+          "final_correct": true,
+          "cost": 10.0,
+          "judge_calls": 1
+        },
+        {
+          "item_id": "math_hard_06",
+          "initial_model": "nvidia/nemotron-3-ultra-550b-a55b",
+          "judge_result": "good 1.00",
+          "judge_confidence": 1.0,
+          "second_opinion": null,
+          "initial_exact": true,
+          "escalated": false,
+          "escalation_reason": "",
+          "final_model": "nvidia/nemotron-3-ultra-550b-a55b",
+          "final_correct": true,
+          "cost": 10.0,
+          "judge_calls": 1
+        },
+        {
+          "item_id": "math_hard_07",
+          "initial_model": "nvidia/nemotron-3-ultra-550b-a55b",
+          "judge_result": "incomplete 0.18",
+          "judge_confidence": 1.0,
+          "second_opinion": null,
+          "initial_exact": null,
+          "escalated": false,
+          "escalation_reason": "",
+          "final_model": "nvidia/nemotron-3-ultra-550b-a55b",
+          "final_correct": null,
+          "cost": 10.0,
+          "judge_calls": 1
+        },
+        {
+          "item_id": "math_hard_08",
+          "initial_model": "nvidia/nemotron-3-ultra-550b-a55b",
+          "judge_result": null,
+          "judge_confidence": null,
+          "second_opinion": null,
+          "initial_exact": null,
+          "escalated": false,
+          "escalation_reason": "",
+          "final_model": null,
+          "final_correct": false,
+          "cost": 0.0,
+          "judge_calls": 0
+        },
+        {
+          "item_id": "math_hard_09",
+          "initial_model": "nvidia/nemotron-3-ultra-550b-a55b",
+          "judge_result": "good 1.00",
+          "judge_confidence": 1.0,
+          "second_opinion": null,
+          "initial_exact": true,
+          "escalated": false,
+          "escalation_reason": "",
+          "final_model": "nvidia/nemotron-3-ultra-550b-a55b",
+          "final_correct": true,
+          "cost": 10.0,
+          "judge_calls": 1
+        },
+        {
+          "item_id": "math_hard_10",
+          "initial_model": "nvidia/nemotron-3-ultra-550b-a55b",
+          "judge_result": "good 1.00",
+          "judge_confidence": 1.0,
+          "second_opinion": null,
+          "initial_exact": true,
+          "escalated": false,
+          "escalation_reason": "",
+          "final_model": "nvidia/nemotron-3-ultra-550b-a55b",
+          "final_correct": true,
+          "cost": 10.0,
+          "judge_calls": 1
+        },
+        {
+          "item_id": "math_hard_11",
+          "initial_model": "nvidia/nemotron-3-ultra-550b-a55b",
+          "judge_result": "good 1.00",
+          "judge_confidence": 1.0,
+          "second_opinion": null,
+          "initial_exact": true,
+          "escalated": false,
+          "escalation_reason": "",
+          "final_model": "nvidia/nemotron-3-ultra-550b-a55b",
+          "final_correct": true,
+          "cost": 10.0,
+          "judge_calls": 1
+        },
+        {
+          "item_id": "math_hard_12",
+          "initial_model": "nvidia/nemotron-3-ultra-550b-a55b",
+          "judge_result": "good 1.00",
+          "judge_confidence": 1.0,
+          "second_opinion": null,
+          "initial_exact": true,
+          "escalated": false,
+          "escalation_reason": "",
+          "final_model": "nvidia/nemotron-3-ultra-550b-a55b",
+          "final_correct": true,
+          "cost": 10.0,
+          "judge_calls": 1
+        },
+        {
+          "item_id": "reasoning_hard_01",
+          "initial_model": "nvidia/nemotron-3-ultra-550b-a55b",
+          "judge_result": "good 1.00",
+          "judge_confidence": 1.0,
+          "second_opinion": null,
+          "initial_exact": true,
+          "escalated": false,
+          "escalation_reason": "",
+          "final_model": "nvidia/nemotron-3-ultra-550b-a55b",
+          "final_correct": true,
+          "cost": 10.0,
+          "judge_calls": 1
+        },
+        {
+          "item_id": "reasoning_hard_02",
+          "initial_model": "nvidia/nemotron-3-ultra-550b-a55b",
+          "judge_result": "good 1.00",
+          "judge_confidence": 1.0,
+          "second_opinion": null,
+          "initial_exact": true,
+          "escalated": false,
+          "escalation_reason": "",
+          "final_model": "nvidia/nemotron-3-ultra-550b-a55b",
+          "final_correct": true,
+          "cost": 10.0,
+          "judge_calls": 1
+        },
+        {
+          "item_id": "reasoning_hard_03",
+          "initial_model": "nvidia/nemotron-3-ultra-550b-a55b",
+          "judge_result": "good 1.00",
+          "judge_confidence": 1.0,
+          "second_opinion": null,
+          "initial_exact": true,
+          "escalated": false,
+          "escalation_reason": "",
+          "final_model": "nvidia/nemotron-3-ultra-550b-a55b",
+          "final_correct": true,
+          "cost": 10.0,
+          "judge_calls": 1
+        },
+        {
+          "item_id": "reasoning_hard_04",
+          "initial_model": "nvidia/nemotron-3-ultra-550b-a55b",
+          "judge_result": "good 1.00",
+          "judge_confidence": 1.0,
+          "second_opinion": null,
+          "initial_exact": true,
+          "escalated": false,
+          "escalation_reason": "",
+          "final_model": "nvidia/nemotron-3-ultra-550b-a55b",
+          "final_correct": true,
+          "cost": 10.0,
+          "judge_calls": 1
+        },
+        {
+          "item_id": "reasoning_hard_05",
+          "initial_model": "nvidia/nemotron-3-ultra-550b-a55b",
+          "judge_result": "good 1.00",
+          "judge_confidence": 1.0,
+          "second_opinion": null,
+          "initial_exact": true,
+          "escalated": false,
+          "escalation_reason": "",
+          "final_model": "nvidia/nemotron-3-ultra-550b-a55b",
+          "final_correct": true,
+          "cost": 10.0,
+          "judge_calls": 1
+        },
+        {
+          "item_id": "reasoning_hard_06",
+          "initial_model": "nvidia/nemotron-3-ultra-550b-a55b",
+          "judge_result": "good 1.00",
+          "judge_confidence": 1.0,
+          "second_opinion": null,
+          "initial_exact": true,
+          "escalated": false,
+          "escalation_reason": "",
+          "final_model": "nvidia/nemotron-3-ultra-550b-a55b",
+          "final_correct": true,
+          "cost": 10.0,
+          "judge_calls": 1
+        },
+        {
+          "item_id": "reasoning_hard_07",
+          "initial_model": "nvidia/nemotron-3-ultra-550b-a55b",
+          "judge_result": "good 1.00",
+          "judge_confidence": 1.0,
+          "second_opinion": null,
+          "initial_exact": true,
+          "escalated": false,
+          "escalation_reason": "",
+          "final_model": "nvidia/nemotron-3-ultra-550b-a55b",
+          "final_correct": true,
+          "cost": 10.0,
+          "judge_calls": 1
+        },
+        {
+          "item_id": "reasoning_hard_08",
+          "initial_model": "nvidia/nemotron-3-ultra-550b-a55b",
+          "judge_result": "good 1.00",
+          "judge_confidence": 1.0,
+          "second_opinion": null,
+          "initial_exact": true,
+          "escalated": false,
+          "escalation_reason": "",
+          "final_model": "nvidia/nemotron-3-ultra-550b-a55b",
+          "final_correct": true,
+          "cost": 10.0,
+          "judge_calls": 1
+        },
+        {
+          "item_id": "reasoning_hard_09",
+          "initial_model": "nvidia/nemotron-3-ultra-550b-a55b",
+          "judge_result": "good 1.00",
+          "judge_confidence": 1.0,
+          "second_opinion": null,
+          "initial_exact": true,
+          "escalated": false,
+          "escalation_reason": "",
+          "final_model": "nvidia/nemotron-3-ultra-550b-a55b",
+          "final_correct": true,
+          "cost": 10.0,
+          "judge_calls": 1
+        },
+        {
+          "item_id": "coding_hard_01",
+          "initial_model": "nvidia/nemotron-3-ultra-550b-a55b",
+          "judge_result": "good 1.00",
+          "judge_confidence": 1.0,
+          "second_opinion": null,
+          "initial_exact": true,
+          "escalated": false,
+          "escalation_reason": "",
+          "final_model": "nvidia/nemotron-3-ultra-550b-a55b",
+          "final_correct": true,
+          "cost": 10.0,
+          "judge_calls": 1
+        },
+        {
+          "item_id": "coding_hard_02",
+          "initial_model": "nvidia/nemotron-3-ultra-550b-a55b",
+          "judge_result": "good 1.00",
+          "judge_confidence": 1.0,
+          "second_opinion": null,
+          "initial_exact": true,
+          "escalated": false,
+          "escalation_reason": "",
+          "final_model": "nvidia/nemotron-3-ultra-550b-a55b",
+          "final_correct": true,
+          "cost": 10.0,
+          "judge_calls": 1
+        },
+        {
+          "item_id": "coding_hard_03",
+          "initial_model": "nvidia/nemotron-3-ultra-550b-a55b",
+          "judge_result": "good 1.00",
+          "judge_confidence": 1.0,
+          "second_opinion": null,
+          "initial_exact": true,
+          "escalated": false,
+          "escalation_reason": "",
+          "final_model": "nvidia/nemotron-3-ultra-550b-a55b",
+          "final_correct": true,
+          "cost": 10.0,
+          "judge_calls": 1
+        },
+        {
+          "item_id": "coding_hard_04",
+          "initial_model": "nvidia/nemotron-3-ultra-550b-a55b",
+          "judge_result": "good 1.00",
+          "judge_confidence": 1.0,
+          "second_opinion": null,
+          "initial_exact": true,
+          "escalated": false,
+          "escalation_reason": "",
+          "final_model": "nvidia/nemotron-3-ultra-550b-a55b",
+          "final_correct": true,
+          "cost": 10.0,
+          "judge_calls": 1
+        },
+        {
+          "item_id": "coding_hard_05",
+          "initial_model": "nvidia/nemotron-3-ultra-550b-a55b",
+          "judge_result": "good 1.00",
+          "judge_confidence": 1.0,
+          "second_opinion": null,
+          "initial_exact": true,
+          "escalated": false,
+          "escalation_reason": "",
+          "final_model": "nvidia/nemotron-3-ultra-550b-a55b",
+          "final_correct": true,
+          "cost": 10.0,
+          "judge_calls": 1
+        },
+        {
+          "item_id": "coding_hard_06",
+          "initial_model": "nvidia/nemotron-3-ultra-550b-a55b",
+          "judge_result": "good 1.00",
+          "judge_confidence": 1.0,
+          "second_opinion": null,
+          "initial_exact": true,
+          "escalated": false,
+          "escalation_reason": "",
+          "final_model": "nvidia/nemotron-3-ultra-550b-a55b",
+          "final_correct": true,
+          "cost": 10.0,
+          "judge_calls": 1
+        },
+        {
+          "item_id": "coding_hard_07",
+          "initial_model": "nvidia/nemotron-3-ultra-550b-a55b",
+          "judge_result": "good 1.00",
+          "judge_confidence": 1.0,
+          "second_opinion": null,
+          "initial_exact": true,
+          "escalated": false,
+          "escalation_reason": "",
+          "final_model": "nvidia/nemotron-3-ultra-550b-a55b",
+          "final_correct": true,
+          "cost": 10.0,
+          "judge_calls": 1
+        },
+        {
+          "item_id": "coding_hard_08",
+          "initial_model": "nvidia/nemotron-3-ultra-550b-a55b",
+          "judge_result": "good 1.00",
+          "judge_confidence": 1.0,
+          "second_opinion": null,
+          "initial_exact": true,
+          "escalated": false,
+          "escalation_reason": "",
+          "final_model": "nvidia/nemotron-3-ultra-550b-a55b",
+          "final_correct": true,
+          "cost": 10.0,
+          "judge_calls": 1
+        },
+        {
+          "item_id": "coding_hard_09",
+          "initial_model": "nvidia/nemotron-3-ultra-550b-a55b",
+          "judge_result": "good 1.00",
+          "judge_confidence": 1.0,
+          "second_opinion": null,
+          "initial_exact": true,
+          "escalated": false,
+          "escalation_reason": "",
+          "final_model": "nvidia/nemotron-3-ultra-550b-a55b",
+          "final_correct": true,
+          "cost": 10.0,
+          "judge_calls": 1
+        }
+      ],
+      "second_opinions": {
+        "requested": 0,
+        "succeeded": 0,
+        "failed": 0,
+        "success_rate": null,
+        "latency_ms_median": null,
+        "latency_ms_max": null,
+        "by_trigger": {
+          "primary_rejection": 0,
+          "low_confidence_acceptance": 0
+        }
+      },
+      "cost_incl_judge": {
+        "mean": 9.6667
+      }
+    },
+    "always_weak": {
+      "n": 30,
+      "quality": {
+        "mean": 0.9741,
+        "median": 1.0,
+        "scored": 29
+      },
+      "cost": {
+        "mean": 0.9667,
+        "total": 29.0
+      },
+      "utilization": {
+        "calls": {
+          "cheap": 30,
+          "mid": 0,
+          "strong": 0
+        },
+        "calls_pct": {
+          "cheap": 1.0,
+          "mid": 0.0,
+          "strong": 0.0
+        },
+        "final_pct": {
+          "cheap": 0.9667,
+          "mid": 0.0,
+          "strong": 0.0
+        }
+      },
+      "escalation": {
+        "rate": 0.0,
+        "mean_count": 0.0
+      },
+      "latency_ms": {
+        "mean": 2463.3967,
+        "median": 2178.9,
+        "p95": 4490.1,
+        "generation_median": 976.3
+      },
+      "judge_calls": 29,
+      "failure_groups": {
+        "Incorrect": 1,
+        "Provider error": 1,
+        "Below threshold (no reason given)": 1
+      },
+      "routing_flow": [
+        {
+          "from": "cheap",
+          "to": "accepted",
+          "count": 27
+        },
+        {
+          "from": "cheap",
+          "to": "best_effort",
+          "count": 2
+        },
+        {
+          "from": "cheap",
+          "to": "failed",
+          "count": 1
+        }
+      ],
+      "failure_rate": 0.0333,
+      "below_threshold_rate": 0.1,
+      "per_category": {
+        "coding": {
+          "n": 9,
+          "quality_mean": 1.0,
+          "cost_mean": 1.0,
+          "escalation_rate": 0.0,
+          "reference_quality_mean": null
+        },
+        "math": {
+          "n": 12,
+          "quality_mean": 0.9318,
+          "cost_mean": 0.9167,
+          "escalation_rate": 0.0,
+          "reference_quality_mean": null
+        },
+        "reasoning": {
+          "n": 9,
+          "quality_mean": 1.0,
+          "cost_mean": 1.0,
+          "escalation_rate": 0.0,
+          "reference_quality_mean": null
+        }
+      },
+      "label": "Always Cheap",
+      "mode": "always_cheap",
+      "description": "Every query goes to the cheap tier; no judge needed in production.",
+      "reference_quality": {
+        "mean": null,
+        "median": null,
+        "scored": 0,
+        "errors": 0
+      },
+      "strict": {
+        "checked": 30,
+        "correct": 28,
+        "accuracy": 0.9333,
+        "ci95": [
+          0.7868,
+          0.9815
+        ],
+        "unparseable": 1
+      },
+      "deterministic": {
+        "checked": 29,
+        "accuracy": 0.9655
+      },
+      "serving_calls_mean": 0.967,
+      "cost_method": "estimated_lower_bound",
+      "generation_failures": 1,
+      "provider_calls_mean": null,
+      "serving_judge_calls": 0,
+      "judge_failures": 0,
+      "judge_usage": {
+        "gemini-3.5-flash-lite": 29
+      },
+      "tier_accuracy": {
+        "cheap": {
+          "correct": 28,
+          "checked": 29
+        }
+      },
+      "strong_calls": 0,
+      "escalations": {
+        "total": 0,
+        "necessary": 0,
+        "unnecessary": 0,
+        "unknown": 0
+      },
+      "judge_accuracy": {
+        "primary_judge": {
+          "checked": 28,
+          "agree": 27,
+          "false_accept": 0,
+          "false_reject": 1
+        },
+        "decision": {
+          "checked": 28,
+          "agree": 26,
+          "false_accept": 0,
+          "false_reject": 2
+        }
+      },
+      "items": [
+        {
+          "item_id": "math_hard_01",
+          "initial_model": "openai/gpt-oss-20b",
+          "judge_result": "good 1.00",
+          "judge_confidence": 1.0,
+          "second_opinion": null,
+          "initial_exact": true,
+          "escalated": false,
+          "escalation_reason": "",
+          "final_model": "openai/gpt-oss-20b",
+          "final_correct": true,
+          "cost": 1.0,
+          "judge_calls": 1
+        },
+        {
+          "item_id": "math_hard_02",
+          "initial_model": "openai/gpt-oss-20b",
+          "judge_result": "good 1.00",
+          "judge_confidence": 1.0,
+          "second_opinion": null,
+          "initial_exact": true,
+          "escalated": false,
+          "escalation_reason": "",
+          "final_model": "openai/gpt-oss-20b",
+          "final_correct": true,
+          "cost": 1.0,
+          "judge_calls": 1
+        },
+        {
+          "item_id": "math_hard_03",
+          "initial_model": "openai/gpt-oss-20b",
+          "judge_result": "good 1.00",
+          "judge_confidence": 1.0,
+          "second_opinion": null,
+          "initial_exact": true,
+          "escalated": false,
+          "escalation_reason": "",
+          "final_model": "openai/gpt-oss-20b",
+          "final_correct": true,
+          "cost": 1.0,
+          "judge_calls": 1
+        },
+        {
+          "item_id": "math_hard_04",
+          "initial_model": "openai/gpt-oss-20b",
+          "judge_result": "good 1.00",
+          "judge_confidence": 1.0,
+          "second_opinion": null,
+          "initial_exact": true,
+          "escalated": false,
+          "escalation_reason": "",
+          "final_model": "openai/gpt-oss-20b",
+          "final_correct": true,
+          "cost": 1.0,
+          "judge_calls": 1
+        },
+        {
+          "item_id": "math_hard_05",
+          "initial_model": "openai/gpt-oss-20b",
+          "judge_result": "incorrect 0.25",
+          "judge_confidence": 1.0,
+          "second_opinion": null,
+          "initial_exact": true,
+          "escalated": false,
+          "escalation_reason": "",
+          "final_model": "openai/gpt-oss-20b",
+          "final_correct": true,
+          "cost": 1.0,
+          "judge_calls": 1
+        },
+        {
+          "item_id": "math_hard_06",
+          "initial_model": "openai/gpt-oss-20b",
+          "judge_result": "good 1.00",
+          "judge_confidence": 1.0,
+          "second_opinion": null,
+          "initial_exact": true,
+          "escalated": false,
+          "escalation_reason": "",
+          "final_model": "openai/gpt-oss-20b",
+          "final_correct": true,
+          "cost": 1.0,
+          "judge_calls": 1
+        },
+        {
+          "item_id": "math_hard_07",
+          "initial_model": "openai/gpt-oss-20b",
+          "judge_result": null,
+          "judge_confidence": null,
+          "second_opinion": null,
+          "initial_exact": null,
+          "escalated": false,
+          "escalation_reason": "",
+          "final_model": null,
+          "final_correct": false,
+          "cost": 0.0,
+          "judge_calls": 0
+        },
+        {
+          "item_id": "math_hard_08",
+          "initial_model": "openai/gpt-oss-20b",
+          "judge_result": "good 1.00",
+          "judge_confidence": 1.0,
+          "second_opinion": null,
+          "initial_exact": true,
+          "escalated": false,
+          "escalation_reason": "",
+          "final_model": "openai/gpt-oss-20b",
+          "final_correct": true,
+          "cost": 1.0,
+          "judge_calls": 1
+        },
+        {
+          "item_id": "math_hard_09",
+          "initial_model": "openai/gpt-oss-20b",
+          "judge_result": "good 1.00",
+          "judge_confidence": 1.0,
+          "second_opinion": null,
+          "initial_exact": true,
+          "escalated": false,
+          "escalation_reason": "",
+          "final_model": "openai/gpt-oss-20b",
+          "final_correct": true,
+          "cost": 1.0,
+          "judge_calls": 1
+        },
+        {
+          "item_id": "math_hard_10",
+          "initial_model": "openai/gpt-oss-20b",
+          "judge_result": "good 1.00",
+          "judge_confidence": 1.0,
+          "second_opinion": null,
+          "initial_exact": true,
+          "escalated": false,
+          "escalation_reason": "",
+          "final_model": "openai/gpt-oss-20b",
+          "final_correct": true,
+          "cost": 1.0,
+          "judge_calls": 1
+        },
+        {
+          "item_id": "math_hard_11",
+          "initial_model": "openai/gpt-oss-20b",
+          "judge_result": "good 1.00",
+          "judge_confidence": 1.0,
+          "second_opinion": null,
+          "initial_exact": true,
+          "escalated": false,
+          "escalation_reason": "",
+          "final_model": "openai/gpt-oss-20b",
+          "final_correct": true,
+          "cost": 1.0,
+          "judge_calls": 1
+        },
+        {
+          "item_id": "math_hard_12",
+          "initial_model": "openai/gpt-oss-20b",
+          "judge_result": "good 1.00",
+          "judge_confidence": 1.0,
+          "second_opinion": null,
+          "initial_exact": true,
+          "escalated": false,
+          "escalation_reason": "",
+          "final_model": "openai/gpt-oss-20b",
+          "final_correct": true,
+          "cost": 1.0,
+          "judge_calls": 1
+        },
+        {
+          "item_id": "reasoning_hard_01",
+          "initial_model": "openai/gpt-oss-20b",
+          "judge_result": "good 1.00",
+          "judge_confidence": 1.0,
+          "second_opinion": null,
+          "initial_exact": true,
+          "escalated": false,
+          "escalation_reason": "",
+          "final_model": "openai/gpt-oss-20b",
+          "final_correct": true,
+          "cost": 1.0,
+          "judge_calls": 1
+        },
+        {
+          "item_id": "reasoning_hard_02",
+          "initial_model": "openai/gpt-oss-20b",
+          "judge_result": "good 1.00",
+          "judge_confidence": 1.0,
+          "second_opinion": null,
+          "initial_exact": true,
+          "escalated": false,
+          "escalation_reason": "",
+          "final_model": "openai/gpt-oss-20b",
+          "final_correct": true,
+          "cost": 1.0,
+          "judge_calls": 1
+        },
+        {
+          "item_id": "reasoning_hard_03",
+          "initial_model": "openai/gpt-oss-20b",
+          "judge_result": "good 1.00",
+          "judge_confidence": 1.0,
+          "second_opinion": null,
+          "initial_exact": true,
+          "escalated": false,
+          "escalation_reason": "",
+          "final_model": "openai/gpt-oss-20b",
+          "final_correct": true,
+          "cost": 1.0,
+          "judge_calls": 1
+        },
+        {
+          "item_id": "reasoning_hard_04",
+          "initial_model": "openai/gpt-oss-20b",
+          "judge_result": "good 1.00",
+          "judge_confidence": 1.0,
+          "second_opinion": null,
+          "initial_exact": true,
+          "escalated": false,
+          "escalation_reason": "",
+          "final_model": "openai/gpt-oss-20b",
+          "final_correct": true,
+          "cost": 1.0,
+          "judge_calls": 1
+        },
+        {
+          "item_id": "reasoning_hard_05",
+          "initial_model": "openai/gpt-oss-20b",
+          "judge_result": "good 1.00",
+          "judge_confidence": 1.0,
+          "second_opinion": null,
+          "initial_exact": null,
+          "escalated": false,
+          "escalation_reason": "",
+          "final_model": "openai/gpt-oss-20b",
+          "final_correct": null,
+          "cost": 1.0,
+          "judge_calls": 1
+        },
+        {
+          "item_id": "reasoning_hard_06",
+          "initial_model": "openai/gpt-oss-20b",
+          "judge_result": "good 1.00",
+          "judge_confidence": 1.0,
+          "second_opinion": null,
+          "initial_exact": true,
+          "escalated": false,
+          "escalation_reason": "",
+          "final_model": "openai/gpt-oss-20b",
+          "final_correct": true,
+          "cost": 1.0,
+          "judge_calls": 1
+        },
+        {
+          "item_id": "reasoning_hard_07",
+          "initial_model": "openai/gpt-oss-20b",
+          "judge_result": "good 1.00",
+          "judge_confidence": 1.0,
+          "second_opinion": null,
+          "initial_exact": true,
+          "escalated": false,
+          "escalation_reason": "",
+          "final_model": "openai/gpt-oss-20b",
+          "final_correct": true,
+          "cost": 1.0,
+          "judge_calls": 1
+        },
+        {
+          "item_id": "reasoning_hard_08",
+          "initial_model": "openai/gpt-oss-20b",
+          "judge_result": "good 1.00",
+          "judge_confidence": 1.0,
+          "second_opinion": null,
+          "initial_exact": true,
+          "escalated": false,
+          "escalation_reason": "",
+          "final_model": "openai/gpt-oss-20b",
+          "final_correct": true,
+          "cost": 1.0,
+          "judge_calls": 1
+        },
+        {
+          "item_id": "reasoning_hard_09",
+          "initial_model": "openai/gpt-oss-20b",
+          "judge_result": "good 1.00",
+          "judge_confidence": 1.0,
+          "second_opinion": null,
+          "initial_exact": true,
+          "escalated": false,
+          "escalation_reason": "",
+          "final_model": "openai/gpt-oss-20b",
+          "final_correct": true,
+          "cost": 1.0,
+          "judge_calls": 1
+        },
+        {
+          "item_id": "coding_hard_01",
+          "initial_model": "openai/gpt-oss-20b",
+          "judge_result": "good 1.00",
+          "judge_confidence": 1.0,
+          "second_opinion": null,
+          "initial_exact": true,
+          "escalated": false,
+          "escalation_reason": "",
+          "final_model": "openai/gpt-oss-20b",
+          "final_correct": true,
+          "cost": 1.0,
+          "judge_calls": 1
+        },
+        {
+          "item_id": "coding_hard_02",
+          "initial_model": "openai/gpt-oss-20b",
+          "judge_result": "good 1.00",
+          "judge_confidence": 1.0,
+          "second_opinion": null,
+          "initial_exact": true,
+          "escalated": false,
+          "escalation_reason": "",
+          "final_model": "openai/gpt-oss-20b",
+          "final_correct": true,
+          "cost": 1.0,
+          "judge_calls": 1
+        },
+        {
+          "item_id": "coding_hard_03",
+          "initial_model": "openai/gpt-oss-20b",
+          "judge_result": "good 1.00",
+          "judge_confidence": 1.0,
+          "second_opinion": null,
+          "initial_exact": true,
+          "escalated": false,
+          "escalation_reason": "",
+          "final_model": "openai/gpt-oss-20b",
+          "final_correct": true,
+          "cost": 1.0,
+          "judge_calls": 1
+        },
+        {
+          "item_id": "coding_hard_04",
+          "initial_model": "openai/gpt-oss-20b",
+          "judge_result": "good 1.00",
+          "judge_confidence": 1.0,
+          "second_opinion": null,
+          "initial_exact": true,
+          "escalated": false,
+          "escalation_reason": "",
+          "final_model": "openai/gpt-oss-20b",
+          "final_correct": true,
+          "cost": 1.0,
+          "judge_calls": 1
+        },
+        {
+          "item_id": "coding_hard_05",
+          "initial_model": "openai/gpt-oss-20b",
+          "judge_result": "good 1.00",
+          "judge_confidence": 1.0,
+          "second_opinion": null,
+          "initial_exact": true,
+          "escalated": false,
+          "escalation_reason": "",
+          "final_model": "openai/gpt-oss-20b",
+          "final_correct": true,
+          "cost": 1.0,
+          "judge_calls": 1
+        },
+        {
+          "item_id": "coding_hard_06",
+          "initial_model": "openai/gpt-oss-20b",
+          "judge_result": "good 1.00",
+          "judge_confidence": 1.0,
+          "second_opinion": null,
+          "initial_exact": true,
+          "escalated": false,
+          "escalation_reason": "",
+          "final_model": "openai/gpt-oss-20b",
+          "final_correct": true,
+          "cost": 1.0,
+          "judge_calls": 1
+        },
+        {
+          "item_id": "coding_hard_07",
+          "initial_model": "openai/gpt-oss-20b",
+          "judge_result": "good 1.00",
+          "judge_confidence": 1.0,
+          "second_opinion": null,
+          "initial_exact": true,
+          "escalated": false,
+          "escalation_reason": "",
+          "final_model": "openai/gpt-oss-20b",
+          "final_correct": true,
+          "cost": 1.0,
+          "judge_calls": 1
+        },
+        {
+          "item_id": "coding_hard_08",
+          "initial_model": "openai/gpt-oss-20b",
+          "judge_result": "good 1.00",
+          "judge_confidence": 1.0,
+          "second_opinion": null,
+          "initial_exact": true,
+          "escalated": false,
+          "escalation_reason": "",
+          "final_model": "openai/gpt-oss-20b",
+          "final_correct": true,
+          "cost": 1.0,
+          "judge_calls": 1
+        },
+        {
+          "item_id": "coding_hard_09",
+          "initial_model": "openai/gpt-oss-20b",
+          "judge_result": "good 1.00",
+          "judge_confidence": 1.0,
+          "second_opinion": null,
+          "initial_exact": true,
+          "escalated": false,
+          "escalation_reason": "",
+          "final_model": "openai/gpt-oss-20b",
+          "final_correct": true,
+          "cost": 1.0,
+          "judge_calls": 1
+        }
+      ],
+      "second_opinions": {
+        "requested": 0,
+        "succeeded": 0,
+        "failed": 0,
+        "success_rate": null,
+        "latency_ms_median": null,
+        "latency_ms_max": null,
+        "by_trigger": {
+          "primary_rejection": 0,
+          "low_confidence_acceptance": 0
+        }
+      },
+      "cost_incl_judge": {
+        "mean": 0.9667
+      }
+    },
+    "smart_router": {
+      "n": 30,
+      "quality": {
+        "mean": 0.9283,
+        "median": 1.0,
+        "scored": 30
+      },
+      "cost": {
+        "mean": 3.0667,
+        "total": 92.0
+      },
+      "utilization": {
+        "calls": {
+          "cheap": 4,
+          "mid": 26,
+          "strong": 1
+        },
+        "calls_pct": {
+          "cheap": 0.129,
+          "mid": 0.8387,
+          "strong": 0.0323
+        },
+        "final_pct": {
+          "cheap": 0.1333,
+          "mid": 0.8333,
+          "strong": 0.0333
+        }
+      },
+      "escalation": {
+        "rate": 0.0333,
+        "mean_count": 0.0333
+      },
+      "latency_ms": {
+        "mean": 11732.1233,
+        "median": 2934.25,
+        "p95": 10613.4,
+        "generation_median": 1441.45
+      },
+      "judge_calls": 35,
+      "failure_groups": {
+        "Incorrect": 2
+      },
+      "routing_flow": [
+        {
+          "from": "cheap",
+          "to": "accepted",
+          "count": 4
+        },
+        {
+          "from": "mid",
+          "to": "accepted",
+          "count": 25
+        },
+        {
+          "from": "mid",
+          "to": "strong",
+          "count": 1
+        },
+        {
+          "from": "strong",
+          "to": "best_effort",
+          "count": 1
+        }
+      ],
+      "failure_rate": 0.0,
+      "below_threshold_rate": 0.0333,
+      "per_category": {
+        "coding": {
+          "n": 9,
+          "quality_mean": 1.0,
+          "cost_mean": 3.0,
+          "escalation_rate": 0.0,
+          "reference_quality_mean": null
+        },
+        "math": {
+          "n": 12,
+          "quality_mean": 0.8958,
+          "cost_mean": 3.6667,
+          "escalation_rate": 0.0833,
+          "reference_quality_mean": null
+        },
+        "reasoning": {
+          "n": 9,
+          "quality_mean": 0.9,
+          "cost_mean": 2.3333,
+          "escalation_rate": 0.0,
+          "reference_quality_mean": null
+        }
+      },
+      "label": "SmartRouter",
+      "mode": "smart",
+      "description": "Heuristic routing + answer checks + judge-driven escalation.",
+      "reference_quality": {
+        "mean": null,
+        "median": null,
+        "scored": 0,
+        "errors": 0
+      },
+      "strict": {
+        "checked": 30,
+        "correct": 29,
+        "accuracy": 0.9667,
+        "ci95": [
+          0.8333,
+          0.9941
+        ],
+        "unparseable": 0
+      },
+      "deterministic": {
+        "checked": 30,
+        "accuracy": 0.9667
+      },
+      "serving_calls_mean": 2.2,
+      "cost_method": "estimated_lower_bound",
+      "generation_failures": 0,
+      "provider_calls_mean": null,
+      "serving_judge_calls": 35,
+      "judge_failures": 0,
+      "judge_usage": {
+        "gemini-3.5-flash-lite": 31
+      },
+      "tier_accuracy": {
+        "mid": {
+          "correct": 24,
+          "checked": 25
+        },
+        "strong": {
+          "correct": 1,
+          "checked": 1
+        },
+        "cheap": {
+          "correct": 4,
+          "checked": 4
+        }
+      },
+      "strong_calls": 1,
+      "escalations": {
+        "total": 1,
+        "necessary": 0,
+        "unnecessary": 1,
+        "unknown": 0
+      },
+      "judge_accuracy": {
+        "primary_judge": {
+          "checked": 31,
+          "agree": 26,
+          "false_accept": 1,
+          "false_reject": 4
+        },
+        "decision": {
+          "checked": 31,
+          "agree": 28,
+          "false_accept": 1,
+          "false_reject": 2
+        }
+      },
+      "items": [
+        {
+          "item_id": "math_hard_01",
+          "initial_model": "openai/gpt-oss-120b",
+          "judge_result": "good 1.00",
+          "judge_confidence": 1.0,
+          "second_opinion": null,
+          "initial_exact": true,
+          "escalated": false,
+          "escalation_reason": "",
+          "final_model": "openai/gpt-oss-120b",
+          "final_correct": true,
+          "cost": 3.0,
+          "judge_calls": 1
+        },
+        {
+          "item_id": "math_hard_02",
+          "initial_model": "openai/gpt-oss-120b",
+          "judge_result": "incorrect 0.25",
+          "judge_confidence": 1.0,
+          "second_opinion": "good 1.00 (0.4s)",
+          "initial_exact": true,
+          "escalated": false,
+          "escalation_reason": "",
+          "final_model": "openai/gpt-oss-120b",
+          "final_correct": true,
+          "cost": 3.0,
+          "judge_calls": 2
+        },
+        {
+          "item_id": "math_hard_03",
+          "initial_model": "openai/gpt-oss-120b",
+          "judge_result": "good 1.00",
+          "judge_confidence": 1.0,
+          "second_opinion": null,
+          "initial_exact": true,
+          "escalated": false,
+          "escalation_reason": "",
+          "final_model": "openai/gpt-oss-120b",
+          "final_correct": true,
+          "cost": 3.0,
+          "judge_calls": 1
+        },
+        {
+          "item_id": "math_hard_04",
+          "initial_model": "openai/gpt-oss-120b",
+          "judge_result": "good 1.00",
+          "judge_confidence": 1.0,
+          "second_opinion": null,
+          "initial_exact": true,
+          "escalated": false,
+          "escalation_reason": "",
+          "final_model": "openai/gpt-oss-120b",
+          "final_correct": true,
+          "cost": 3.0,
+          "judge_calls": 1
+        },
+        {
+          "item_id": "math_hard_05",
+          "initial_model": "openai/gpt-oss-120b",
+          "judge_result": "incorrect 0.25",
+          "judge_confidence": 1.0,
+          "second_opinion": "incorrect 0.25 (1.4s)",
+          "initial_exact": true,
+          "escalated": true,
+          "escalation_reason": "second judge also rejected (qwen/qwen3.8-27b: incorrect, score 0.25, confidence 1.00) afte",
+          "final_model": "nvidia/nemotron-3-ultra-550b-a55b",
+          "final_correct": true,
+          "cost": 13.0,
+          "judge_calls": 4
+        },
+        {
+          "item_id": "math_hard_06",
+          "initial_model": "openai/gpt-oss-120b",
+          "judge_result": "good 1.00",
+          "judge_confidence": 1.0,
+          "second_opinion": null,
+          "initial_exact": true,
+          "escalated": false,
+          "escalation_reason": "",
+          "final_model": "openai/gpt-oss-120b",
+          "final_correct": true,
+          "cost": 3.0,
+          "judge_calls": 1
+        },
+        {
+          "item_id": "math_hard_07",
+          "initial_model": "openai/gpt-oss-120b",
+          "judge_result": "good 1.00",
+          "judge_confidence": 1.0,
+          "second_opinion": null,
+          "initial_exact": true,
+          "escalated": false,
+          "escalation_reason": "",
+          "final_model": "openai/gpt-oss-120b",
+          "final_correct": true,
+          "cost": 3.0,
+          "judge_calls": 1
+        },
+        {
+          "item_id": "math_hard_08",
+          "initial_model": "openai/gpt-oss-120b",
+          "judge_result": "good 1.00",
+          "judge_confidence": 1.0,
+          "second_opinion": null,
+          "initial_exact": true,
+          "escalated": false,
+          "escalation_reason": "",
+          "final_model": "openai/gpt-oss-120b",
+          "final_correct": true,
+          "cost": 3.0,
+          "judge_calls": 1
+        },
+        {
+          "item_id": "math_hard_09",
+          "initial_model": "openai/gpt-oss-120b",
+          "judge_result": "good 1.00",
+          "judge_confidence": 1.0,
+          "second_opinion": null,
+          "initial_exact": true,
+          "escalated": false,
+          "escalation_reason": "",
+          "final_model": "openai/gpt-oss-120b",
+          "final_correct": true,
+          "cost": 3.0,
+          "judge_calls": 1
+        },
+        {
+          "item_id": "math_hard_10",
+          "initial_model": "openai/gpt-oss-120b",
+          "judge_result": "good 1.00",
+          "judge_confidence": 1.0,
+          "second_opinion": null,
+          "initial_exact": true,
+          "escalated": false,
+          "escalation_reason": "",
+          "final_model": "openai/gpt-oss-120b",
+          "final_correct": true,
+          "cost": 3.0,
+          "judge_calls": 1
+        },
+        {
+          "item_id": "math_hard_11",
+          "initial_model": "openai/gpt-oss-20b",
+          "judge_result": "good 1.00",
+          "judge_confidence": 1.0,
+          "second_opinion": null,
+          "initial_exact": true,
+          "escalated": false,
+          "escalation_reason": "",
+          "final_model": "openai/gpt-oss-20b",
+          "final_correct": true,
+          "cost": 1.0,
+          "judge_calls": 1
+        },
+        {
+          "item_id": "math_hard_12",
+          "initial_model": "openai/gpt-oss-120b",
+          "judge_result": "good 1.00",
+          "judge_confidence": 1.0,
+          "second_opinion": null,
+          "initial_exact": true,
+          "escalated": false,
+          "escalation_reason": "",
+          "final_model": "openai/gpt-oss-120b",
+          "final_correct": true,
+          "cost": 3.0,
+          "judge_calls": 1
+        },
+        {
+          "item_id": "reasoning_hard_01",
+          "initial_model": "openai/gpt-oss-20b",
+          "judge_result": "good 1.00",
+          "judge_confidence": 1.0,
+          "second_opinion": null,
+          "initial_exact": true,
+          "escalated": false,
+          "escalation_reason": "",
+          "final_model": "openai/gpt-oss-20b",
+          "final_correct": true,
+          "cost": 1.0,
+          "judge_calls": 1
+        },
+        {
+          "item_id": "reasoning_hard_02",
+          "initial_model": "openai/gpt-oss-120b",
+          "judge_result": "good 1.00",
+          "judge_confidence": 1.0,
+          "second_opinion": null,
+          "initial_exact": true,
+          "escalated": false,
+          "escalation_reason": "",
+          "final_model": "openai/gpt-oss-120b",
+          "final_correct": true,
+          "cost": 3.0,
+          "judge_calls": 1
+        },
+        {
+          "item_id": "reasoning_hard_03",
+          "initial_model": "openai/gpt-oss-120b",
+          "judge_result": "good 1.00",
+          "judge_confidence": 1.0,
+          "second_opinion": null,
+          "initial_exact": true,
+          "escalated": false,
+          "escalation_reason": "",
+          "final_model": "openai/gpt-oss-120b",
+          "final_correct": true,
+          "cost": 3.0,
+          "judge_calls": 1
+        },
+        {
+          "item_id": "reasoning_hard_04",
+          "initial_model": "openai/gpt-oss-120b",
+          "judge_result": "good 1.00",
+          "judge_confidence": 1.0,
+          "second_opinion": null,
+          "initial_exact": true,
+          "escalated": false,
+          "escalation_reason": "",
+          "final_model": "openai/gpt-oss-120b",
+          "final_correct": true,
+          "cost": 3.0,
+          "judge_calls": 1
+        },
+        {
+          "item_id": "reasoning_hard_05",
+          "initial_model": "openai/gpt-oss-20b",
+          "judge_result": "good 1.00",
+          "judge_confidence": 1.0,
+          "second_opinion": null,
+          "initial_exact": true,
+          "escalated": false,
+          "escalation_reason": "",
+          "final_model": "openai/gpt-oss-20b",
+          "final_correct": true,
+          "cost": 1.0,
+          "judge_calls": 1
+        },
+        {
+          "item_id": "reasoning_hard_06",
+          "initial_model": "openai/gpt-oss-120b",
+          "judge_result": "good 1.00",
+          "judge_confidence": 1.0,
+          "second_opinion": null,
+          "initial_exact": true,
+          "escalated": false,
+          "escalation_reason": "",
+          "final_model": "openai/gpt-oss-120b",
+          "final_correct": true,
+          "cost": 3.0,
+          "judge_calls": 1
+        },
+        {
+          "item_id": "reasoning_hard_07",
+          "initial_model": "openai/gpt-oss-120b",
+          "judge_result": "incorrect 0.10",
+          "judge_confidence": 1.0,
+          "second_opinion": "good 1.00 (0.4s)",
+          "initial_exact": true,
+          "escalated": false,
+          "escalation_reason": "",
+          "final_model": "openai/gpt-oss-120b",
+          "final_correct": true,
+          "cost": 3.0,
+          "judge_calls": 2
+        },
+        {
+          "item_id": "reasoning_hard_08",
+          "initial_model": "openai/gpt-oss-20b",
+          "judge_result": "good 1.00",
+          "judge_confidence": 1.0,
+          "second_opinion": null,
+          "initial_exact": true,
+          "escalated": false,
+          "escalation_reason": "",
+          "final_model": "openai/gpt-oss-20b",
+          "final_correct": true,
+          "cost": 1.0,
+          "judge_calls": 1
+        },
+        {
+          "item_id": "reasoning_hard_09",
+          "initial_model": "openai/gpt-oss-120b",
+          "judge_result": "good 1.00",
+          "judge_confidence": 1.0,
+          "second_opinion": null,
+          "initial_exact": true,
+          "escalated": false,
+          "escalation_reason": "",
+          "final_model": "openai/gpt-oss-120b",
+          "final_correct": true,
+          "cost": 3.0,
+          "judge_calls": 1
+        },
+        {
+          "item_id": "coding_hard_01",
+          "initial_model": "openai/gpt-oss-120b",
+          "judge_result": "good 1.00",
+          "judge_confidence": 1.0,
+          "second_opinion": null,
+          "initial_exact": true,
+          "escalated": false,
+          "escalation_reason": "",
+          "final_model": "openai/gpt-oss-120b",
+          "final_correct": true,
+          "cost": 3.0,
+          "judge_calls": 1
+        },
+        {
+          "item_id": "coding_hard_02",
+          "initial_model": "openai/gpt-oss-120b",
+          "judge_result": "good 1.00",
+          "judge_confidence": 1.0,
+          "second_opinion": null,
+          "initial_exact": true,
+          "escalated": false,
+          "escalation_reason": "",
+          "final_model": "openai/gpt-oss-120b",
+          "final_correct": true,
+          "cost": 3.0,
+          "judge_calls": 1
+        },
+        {
+          "item_id": "coding_hard_03",
+          "initial_model": "openai/gpt-oss-120b",
+          "judge_result": "good 1.00",
+          "judge_confidence": 1.0,
+          "second_opinion": null,
+          "initial_exact": false,
+          "escalated": false,
+          "escalation_reason": "",
+          "final_model": "openai/gpt-oss-120b",
+          "final_correct": false,
+          "cost": 3.0,
+          "judge_calls": 1
+        },
+        {
+          "item_id": "coding_hard_04",
+          "initial_model": "openai/gpt-oss-120b",
+          "judge_result": "good 1.00",
+          "judge_confidence": 1.0,
+          "second_opinion": null,
+          "initial_exact": true,
+          "escalated": false,
+          "escalation_reason": "",
+          "final_model": "openai/gpt-oss-120b",
+          "final_correct": true,
+          "cost": 3.0,
+          "judge_calls": 1
+        },
+        {
+          "item_id": "coding_hard_05",
+          "initial_model": "openai/gpt-oss-120b",
+          "judge_result": "good 1.00",
+          "judge_confidence": 1.0,
+          "second_opinion": null,
+          "initial_exact": true,
+          "escalated": false,
+          "escalation_reason": "",
+          "final_model": "openai/gpt-oss-120b",
+          "final_correct": true,
+          "cost": 3.0,
+          "judge_calls": 1
+        },
+        {
+          "item_id": "coding_hard_06",
+          "initial_model": "openai/gpt-oss-120b",
+          "judge_result": "good 1.00",
+          "judge_confidence": 1.0,
+          "second_opinion": null,
+          "initial_exact": true,
+          "escalated": false,
+          "escalation_reason": "",
+          "final_model": "openai/gpt-oss-120b",
+          "final_correct": true,
+          "cost": 3.0,
+          "judge_calls": 1
+        },
+        {
+          "item_id": "coding_hard_07",
+          "initial_model": "openai/gpt-oss-120b",
+          "judge_result": "good 1.00",
+          "judge_confidence": 1.0,
+          "second_opinion": null,
+          "initial_exact": true,
+          "escalated": false,
+          "escalation_reason": "",
+          "final_model": "openai/gpt-oss-120b",
+          "final_correct": true,
+          "cost": 3.0,
+          "judge_calls": 1
+        },
+        {
+          "item_id": "coding_hard_08",
+          "initial_model": "openai/gpt-oss-120b",
+          "judge_result": "good 1.00",
+          "judge_confidence": 1.0,
+          "second_opinion": null,
+          "initial_exact": true,
+          "escalated": false,
+          "escalation_reason": "",
+          "final_model": "openai/gpt-oss-120b",
+          "final_correct": true,
+          "cost": 3.0,
+          "judge_calls": 1
+        },
+        {
+          "item_id": "coding_hard_09",
+          "initial_model": "openai/gpt-oss-120b",
+          "judge_result": "good 1.00",
+          "judge_confidence": 1.0,
+          "second_opinion": null,
+          "initial_exact": true,
+          "escalated": false,
+          "escalation_reason": "",
+          "final_model": "openai/gpt-oss-120b",
+          "final_correct": true,
+          "cost": 3.0,
+          "judge_calls": 1
+        }
+      ],
+      "second_opinions": {
+        "requested": 4,
+        "succeeded": 4,
+        "failed": 0,
+        "success_rate": 1.0,
+        "latency_ms_median": 945.5,
+        "latency_ms_max": 1448.2,
+        "by_trigger": {
+          "primary_rejection": 4,
+          "low_confidence_acceptance": 0
+        }
+      },
+      "cost_incl_judge": {
+        "mean": 6.5667
+      }
+    },
+    "static_router": {
+      "n": 30,
+      "quality": {
+        "mean": 0.9431,
+        "median": 1.0,
+        "scored": 29
+      },
+      "cost": {
+        "mean": 2.6333,
+        "total": 79.0
+      },
+      "utilization": {
+        "calls": {
+          "cheap": 4,
+          "mid": 26,
+          "strong": 0
+        },
+        "calls_pct": {
+          "cheap": 0.1333,
+          "mid": 0.8667,
+          "strong": 0.0
+        },
+        "final_pct": {
+          "cheap": 0.1333,
+          "mid": 0.8333,
+          "strong": 0.0
+        }
+      },
+      "escalation": {
+        "rate": 0.0,
+        "mean_count": 0.0
+      },
+      "latency_ms": {
+        "mean": 4289.0167,
+        "median": 3044.8,
+        "p95": 10447.4,
+        "generation_median": 1518.15
+      },
+      "judge_calls": 29,
+      "failure_groups": {
+        "Incorrect": 2,
+        "Reasoning weakness": 1,
+        "Provider error": 1,
+        "Below threshold (no reason given)": 1
+      },
+      "routing_flow": [
+        {
+          "from": "cheap",
+          "to": "accepted",
+          "count": 4
+        },
+        {
+          "from": "mid",
+          "to": "accepted",
+          "count": 22
+        },
+        {
+          "from": "mid",
+          "to": "best_effort",
+          "count": 3
+        },
+        {
+          "from": "mid",
+          "to": "failed",
+          "count": 1
+        }
+      ],
+      "failure_rate": 0.0333,
+      "below_threshold_rate": 0.1333,
+      "per_category": {
+        "coding": {
+          "n": 9,
+          "quality_mean": 1.0,
+          "cost_mean": 3.0,
+          "escalation_rate": 0.0,
+          "reference_quality_mean": null
+        },
+        "math": {
+          "n": 12,
+          "quality_mean": 0.925,
+          "cost_mean": 2.8333,
+          "escalation_rate": 0.0,
+          "reference_quality_mean": null
+        },
+        "reasoning": {
+          "n": 9,
+          "quality_mean": 0.9062,
+          "cost_mean": 2.0,
+          "escalation_rate": 0.0,
+          "reference_quality_mean": null
+        }
+      },
+      "label": "Static Router",
+      "mode": "static",
+      "description": "Heuristic difficulty routing; no judge-driven escalation.",
+      "reference_quality": {
+        "mean": null,
+        "median": null,
+        "scored": 0,
+        "errors": 0
+      },
+      "strict": {
+        "checked": 30,
+        "correct": 28,
+        "accuracy": 0.9333,
+        "ci95": [
+          0.7868,
+          0.9815
+        ],
+        "unparseable": 0
+      },
+      "deterministic": {
+        "checked": 30,
+        "accuracy": 0.9333
+      },
+      "serving_calls_mean": 0.967,
+      "cost_method": "estimated_lower_bound",
+      "generation_failures": 1,
+      "provider_calls_mean": null,
+      "serving_judge_calls": 0,
+      "judge_failures": 0,
+      "judge_usage": {
+        "gemini-3.5-flash-lite": 29
+      },
+      "tier_accuracy": {
+        "mid": {
+          "correct": 24,
+          "checked": 26
+        },
+        "cheap": {
+          "correct": 4,
+          "checked": 4
+        }
+      },
+      "strong_calls": 0,
+      "escalations": {
+        "total": 0,
+        "necessary": 0,
+        "unnecessary": 0,
+        "unknown": 0
+      },
+      "judge_accuracy": {
+        "primary_judge": {
+          "checked": 29,
+          "agree": 26,
+          "false_accept": 1,
+          "false_reject": 2
+        },
+        "decision": {
+          "checked": 29,
+          "agree": 25,
+          "false_accept": 1,
+          "false_reject": 3
+        }
+      },
+      "items": [
+        {
+          "item_id": "math_hard_01",
+          "initial_model": "openai/gpt-oss-120b",
+          "judge_result": "good 1.00",
+          "judge_confidence": 1.0,
+          "second_opinion": null,
+          "initial_exact": true,
+          "escalated": false,
+          "escalation_reason": "",
+          "final_model": "openai/gpt-oss-120b",
+          "final_correct": true,
+          "cost": 3.0,
+          "judge_calls": 1
+        },
+        {
+          "item_id": "math_hard_02",
+          "initial_model": "openai/gpt-oss-120b",
+          "judge_result": "incorrect 0.10",
+          "judge_confidence": 1.0,
+          "second_opinion": null,
+          "initial_exact": true,
+          "escalated": false,
+          "escalation_reason": "",
+          "final_model": "openai/gpt-oss-120b",
+          "final_correct": true,
+          "cost": 3.0,
+          "judge_calls": 1
+        },
+        {
+          "item_id": "math_hard_03",
+          "initial_model": "openai/gpt-oss-120b",
+          "judge_result": "good 1.00",
+          "judge_confidence": 1.0,
+          "second_opinion": null,
+          "initial_exact": true,
+          "escalated": false,
+          "escalation_reason": "",
+          "final_model": "openai/gpt-oss-120b",
+          "final_correct": true,
+          "cost": 3.0,
+          "judge_calls": 1
+        },
+        {
+          "item_id": "math_hard_04",
+          "initial_model": "openai/gpt-oss-120b",
+          "judge_result": "good 1.00",
+          "judge_confidence": 1.0,
+          "second_opinion": null,
+          "initial_exact": true,
+          "escalated": false,
+          "escalation_reason": "",
+          "final_model": "openai/gpt-oss-120b",
+          "final_correct": true,
+          "cost": 3.0,
+          "judge_calls": 1
+        },
+        {
+          "item_id": "math_hard_05",
+          "initial_model": "openai/gpt-oss-120b",
+          "judge_result": "good 1.00",
+          "judge_confidence": 1.0,
+          "second_opinion": null,
+          "initial_exact": true,
+          "escalated": false,
+          "escalation_reason": "",
+          "final_model": "openai/gpt-oss-120b",
+          "final_correct": true,
+          "cost": 3.0,
+          "judge_calls": 1
+        },
+        {
+          "item_id": "math_hard_06",
+          "initial_model": "openai/gpt-oss-120b",
+          "judge_result": "good 1.00",
+          "judge_confidence": 1.0,
+          "second_opinion": null,
+          "initial_exact": true,
+          "escalated": false,
+          "escalation_reason": "",
+          "final_model": "openai/gpt-oss-120b",
+          "final_correct": true,
+          "cost": 3.0,
+          "judge_calls": 1
+        },
+        {
+          "item_id": "math_hard_07",
+          "initial_model": "openai/gpt-oss-120b",
+          "judge_result": "good 1.00",
+          "judge_confidence": 1.0,
+          "second_opinion": null,
+          "initial_exact": true,
+          "escalated": false,
+          "escalation_reason": "",
+          "final_model": "openai/gpt-oss-120b",
+          "final_correct": true,
+          "cost": 3.0,
+          "judge_calls": 1
+        },
+        {
+          "item_id": "math_hard_08",
+          "initial_model": "openai/gpt-oss-120b",
+          "judge_result": "good 1.00",
+          "judge_confidence": 1.0,
+          "second_opinion": null,
+          "initial_exact": true,
+          "escalated": false,
+          "escalation_reason": "",
+          "final_model": "openai/gpt-oss-120b",
+          "final_correct": true,
+          "cost": 3.0,
+          "judge_calls": 1
+        },
+        {
+          "item_id": "math_hard_09",
+          "initial_model": "openai/gpt-oss-120b",
+          "judge_result": "good 1.00",
+          "judge_confidence": 1.0,
+          "second_opinion": null,
+          "initial_exact": true,
+          "escalated": false,
+          "escalation_reason": "",
+          "final_model": "openai/gpt-oss-120b",
+          "final_correct": true,
+          "cost": 3.0,
+          "judge_calls": 1
+        },
+        {
+          "item_id": "math_hard_10",
+          "initial_model": "openai/gpt-oss-120b",
+          "judge_result": "good 1.00",
+          "judge_confidence": 1.0,
+          "second_opinion": null,
+          "initial_exact": true,
+          "escalated": false,
+          "escalation_reason": "",
+          "final_model": "openai/gpt-oss-120b",
+          "final_correct": true,
+          "cost": 3.0,
+          "judge_calls": 1
+        },
+        {
+          "item_id": "math_hard_11",
+          "initial_model": "openai/gpt-oss-20b",
+          "judge_result": "good 1.00",
+          "judge_confidence": 1.0,
+          "second_opinion": null,
+          "initial_exact": true,
+          "escalated": false,
+          "escalation_reason": "",
+          "final_model": "openai/gpt-oss-20b",
+          "final_correct": true,
+          "cost": 1.0,
+          "judge_calls": 1
+        },
+        {
+          "item_id": "math_hard_12",
+          "initial_model": "openai/gpt-oss-120b",
+          "judge_result": "good 1.00",
+          "judge_confidence": 1.0,
+          "second_opinion": null,
+          "initial_exact": true,
+          "escalated": false,
+          "escalation_reason": "",
+          "final_model": "openai/gpt-oss-120b",
+          "final_correct": true,
+          "cost": 3.0,
+          "judge_calls": 1
+        },
+        {
+          "item_id": "reasoning_hard_01",
+          "initial_model": "openai/gpt-oss-20b",
+          "judge_result": "good 1.00",
+          "judge_confidence": 1.0,
+          "second_opinion": null,
+          "initial_exact": true,
+          "escalated": false,
+          "escalation_reason": "",
+          "final_model": "openai/gpt-oss-20b",
+          "final_correct": true,
+          "cost": 1.0,
+          "judge_calls": 1
+        },
+        {
+          "item_id": "reasoning_hard_02",
+          "initial_model": "openai/gpt-oss-120b",
+          "judge_result": null,
+          "judge_confidence": null,
+          "second_opinion": null,
+          "initial_exact": null,
+          "escalated": false,
+          "escalation_reason": "",
+          "final_model": null,
+          "final_correct": false,
+          "cost": 0.0,
+          "judge_calls": 0
+        },
+        {
+          "item_id": "reasoning_hard_03",
+          "initial_model": "openai/gpt-oss-120b",
+          "judge_result": "good 1.00",
+          "judge_confidence": 1.0,
+          "second_opinion": null,
+          "initial_exact": true,
+          "escalated": false,
+          "escalation_reason": "",
+          "final_model": "openai/gpt-oss-120b",
+          "final_correct": true,
+          "cost": 3.0,
+          "judge_calls": 1
+        },
+        {
+          "item_id": "reasoning_hard_04",
+          "initial_model": "openai/gpt-oss-120b",
+          "judge_result": "good 1.00",
+          "judge_confidence": 1.0,
+          "second_opinion": null,
+          "initial_exact": true,
+          "escalated": false,
+          "escalation_reason": "",
+          "final_model": "openai/gpt-oss-120b",
+          "final_correct": true,
+          "cost": 3.0,
+          "judge_calls": 1
+        },
+        {
+          "item_id": "reasoning_hard_05",
+          "initial_model": "openai/gpt-oss-20b",
+          "judge_result": "good 1.00",
+          "judge_confidence": 1.0,
+          "second_opinion": null,
+          "initial_exact": true,
+          "escalated": false,
+          "escalation_reason": "",
+          "final_model": "openai/gpt-oss-20b",
+          "final_correct": true,
+          "cost": 1.0,
+          "judge_calls": 1
+        },
+        {
+          "item_id": "reasoning_hard_06",
+          "initial_model": "openai/gpt-oss-120b",
+          "judge_result": "good 1.00",
+          "judge_confidence": 1.0,
+          "second_opinion": null,
+          "initial_exact": true,
+          "escalated": false,
+          "escalation_reason": "",
+          "final_model": "openai/gpt-oss-120b",
+          "final_correct": true,
+          "cost": 3.0,
+          "judge_calls": 1
+        },
+        {
+          "item_id": "reasoning_hard_07",
+          "initial_model": "openai/gpt-oss-120b",
+          "judge_result": "incorrect 0.25",
+          "judge_confidence": 1.0,
+          "second_opinion": null,
+          "initial_exact": true,
+          "escalated": false,
+          "escalation_reason": "",
+          "final_model": "openai/gpt-oss-120b",
+          "final_correct": true,
+          "cost": 3.0,
+          "judge_calls": 1
+        },
+        {
+          "item_id": "reasoning_hard_08",
+          "initial_model": "openai/gpt-oss-20b",
+          "judge_result": "good 1.00",
+          "judge_confidence": 1.0,
+          "second_opinion": null,
+          "initial_exact": true,
+          "escalated": false,
+          "escalation_reason": "",
+          "final_model": "openai/gpt-oss-20b",
+          "final_correct": true,
+          "cost": 1.0,
+          "judge_calls": 1
+        },
+        {
+          "item_id": "reasoning_hard_09",
+          "initial_model": "openai/gpt-oss-120b",
+          "judge_result": "good 1.00",
+          "judge_confidence": 1.0,
+          "second_opinion": null,
+          "initial_exact": true,
+          "escalated": false,
+          "escalation_reason": "",
+          "final_model": "openai/gpt-oss-120b",
+          "final_correct": true,
+          "cost": 3.0,
+          "judge_calls": 1
+        },
+        {
+          "item_id": "coding_hard_01",
+          "initial_model": "openai/gpt-oss-120b",
+          "judge_result": "good 1.00",
+          "judge_confidence": 1.0,
+          "second_opinion": null,
+          "initial_exact": true,
+          "escalated": false,
+          "escalation_reason": "",
+          "final_model": "openai/gpt-oss-120b",
+          "final_correct": true,
+          "cost": 3.0,
+          "judge_calls": 1
+        },
+        {
+          "item_id": "coding_hard_02",
+          "initial_model": "openai/gpt-oss-120b",
+          "judge_result": "good 1.00",
+          "judge_confidence": 1.0,
+          "second_opinion": null,
+          "initial_exact": true,
+          "escalated": false,
+          "escalation_reason": "",
+          "final_model": "openai/gpt-oss-120b",
+          "final_correct": true,
+          "cost": 3.0,
+          "judge_calls": 1
+        },
+        {
+          "item_id": "coding_hard_03",
+          "initial_model": "openai/gpt-oss-120b",
+          "judge_result": "good 1.00",
+          "judge_confidence": 1.0,
+          "second_opinion": null,
+          "initial_exact": false,
+          "escalated": false,
+          "escalation_reason": "",
+          "final_model": "openai/gpt-oss-120b",
+          "final_correct": false,
+          "cost": 3.0,
+          "judge_calls": 1
+        },
+        {
+          "item_id": "coding_hard_04",
+          "initial_model": "openai/gpt-oss-120b",
+          "judge_result": "good 1.00",
+          "judge_confidence": 1.0,
+          "second_opinion": null,
+          "initial_exact": true,
+          "escalated": false,
+          "escalation_reason": "",
+          "final_model": "openai/gpt-oss-120b",
+          "final_correct": true,
+          "cost": 3.0,
+          "judge_calls": 1
+        },
+        {
+          "item_id": "coding_hard_05",
+          "initial_model": "openai/gpt-oss-120b",
+          "judge_result": "good 1.00",
+          "judge_confidence": 1.0,
+          "second_opinion": null,
+          "initial_exact": true,
+          "escalated": false,
+          "escalation_reason": "",
+          "final_model": "openai/gpt-oss-120b",
+          "final_correct": true,
+          "cost": 3.0,
+          "judge_calls": 1
+        },
+        {
+          "item_id": "coding_hard_06",
+          "initial_model": "openai/gpt-oss-120b",
+          "judge_result": "good 1.00",
+          "judge_confidence": 1.0,
+          "second_opinion": null,
+          "initial_exact": true,
+          "escalated": false,
+          "escalation_reason": "",
+          "final_model": "openai/gpt-oss-120b",
+          "final_correct": true,
+          "cost": 3.0,
+          "judge_calls": 1
+        },
+        {
+          "item_id": "coding_hard_07",
+          "initial_model": "openai/gpt-oss-120b",
+          "judge_result": "good 1.00",
+          "judge_confidence": 1.0,
+          "second_opinion": null,
+          "initial_exact": true,
+          "escalated": false,
+          "escalation_reason": "",
+          "final_model": "openai/gpt-oss-120b",
+          "final_correct": true,
+          "cost": 3.0,
+          "judge_calls": 1
+        },
+        {
+          "item_id": "coding_hard_08",
+          "initial_model": "openai/gpt-oss-120b",
+          "judge_result": "good 1.00",
+          "judge_confidence": 1.0,
+          "second_opinion": null,
+          "initial_exact": true,
+          "escalated": false,
+          "escalation_reason": "",
+          "final_model": "openai/gpt-oss-120b",
+          "final_correct": true,
+          "cost": 3.0,
+          "judge_calls": 1
+        },
+        {
+          "item_id": "coding_hard_09",
+          "initial_model": "openai/gpt-oss-120b",
+          "judge_result": "good 1.00",
+          "judge_confidence": 1.0,
+          "second_opinion": null,
+          "initial_exact": true,
+          "escalated": false,
+          "escalation_reason": "",
+          "final_model": "openai/gpt-oss-120b",
+          "final_correct": true,
+          "cost": 3.0,
+          "judge_calls": 1
+        }
+      ],
+      "second_opinions": {
+        "requested": 0,
+        "succeeded": 0,
+        "failed": 0,
+        "success_rate": null,
+        "latency_ms_median": null,
+        "latency_ms_max": null,
+        "by_trigger": {
+          "primary_rejection": 0,
+          "low_confidence_acceptance": 0
+        }
+      },
+      "cost_incl_judge": {
+        "mean": 2.6333
+      }
+    }
+  },
+  "comparisons": {
+    "always_strong": {
+      "cost_incl_judge_vs_cheap_x": 10.0,
+      "cost_reduction_pct_vs_strong": 0.0,
+      "cost_incl_judge_reduction_pct_vs_strong": 0.0,
+      "strong_call_reduction_pct": 0.0,
+      "reference_quality_delta_vs_strong": null,
+      "median_latency_delta_ms_vs_strong": 0.0
+    },
+    "always_weak": {
+      "cost_incl_judge_vs_cheap_x": 1.0,
+      "cost_reduction_pct_vs_strong": 90.0,
+      "cost_incl_judge_reduction_pct_vs_strong": 90.0,
+      "strong_call_reduction_pct": 100.0,
+      "reference_quality_delta_vs_strong": null,
+      "median_latency_delta_ms_vs_strong": -35089.4
+    },
+    "smart_router": {
+      "cost_incl_judge_vs_cheap_x": 6.79,
+      "cost_reduction_pct_vs_strong": 68.3,
+      "cost_incl_judge_reduction_pct_vs_strong": 32.1,
+      "strong_call_reduction_pct": 96.7,
+      "reference_quality_delta_vs_strong": null,
+      "median_latency_delta_ms_vs_strong": -34334.1
+    },
+    "static_router": {
+      "cost_incl_judge_vs_cheap_x": 2.72,
+      "cost_reduction_pct_vs_strong": 72.8,
+      "cost_incl_judge_reduction_pct_vs_strong": 72.8,
+      "strong_call_reduction_pct": 100.0,
+      "reference_quality_delta_vs_strong": null,
+      "median_latency_delta_ms_vs_strong": -34223.5
+    }
+  },
+  "raw_dir": "C:\\dev\\smart router\\data\\benchmarks\\20260929T131419Z",
+  "paired": {
+    "smart_vs_cheap": {
+      "items": 30,
+      "wins": 2,
+      "losses": 1,
+      "both_correct": 27,
+      "both_wrong": 0,
+      "sign_test_p": 1.0
+    },
+    "smart_vs_strong": {
+      "items": 30,
+      "wins": 2,
+      "losses": 1,
+      "both_correct": 27,
+      "both_wrong": 0,
+      "sign_test_p": 1.0
+    },
+    "static_vs_cheap": {
+      "items": 30,
+      "wins": 2,
+      "losses": 2,
+      "both_correct": 26,
+      "both_wrong": 0,
+      "sign_test_p": 1.0
+    },
+    "strong_vs_cheap": {
+      "items": 30,
+      "wins": 1,
+      "losses": 1,
+      "both_correct": 27,
+      "both_wrong": 1,
+      "sign_test_p": 1.0
+    }
+  },
+  "claim": {
+    "verdict": "not_supported_cheap_dominates",
+    "explanation": "SmartRouter is cheaper than Always Strong without a measurable accuracy loss, but Always Cheap matches it for less money, so routing adds cost without a measurable benefit on this dataset (strict accuracy SmartRouter 96.7%, Always Cheap 93.3%, Always Strong 93.3%; cost incl. judge 6.57 vs 0.97 vs 9.67; paired vs cheap 2 wins / 1 losses (p=1.0))."
+  },
+  "rescored_by": "benchmark.reanalyze",
+  "analyzer": {
+    "n": 30,
+    "category_accuracy": 0.6667,
+    "label_to_tier": {
+      "hard": {
+        "cheap": 4,
+        "mid": 26,
+        "strong": 0
+      }
+    }
+  }
+}
