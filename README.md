@@ -324,6 +324,10 @@ Then open http://127.0.0.1:8000. The dashboard is served by the same process, so
 | GET | `/api/benchmarks/latest` | Latest benchmark summary, or `not_evaluated` |
 | GET | `/api/models` | Configured registry and thresholds |
 
+### Deploy a public demo (Vercel)
+
+`asgi.py` is the Vercel entrypoint. It forces `MOCK_MODE=true` and `VERIFY_EXECUTE_CODE=false`, so a public deployment never reaches a real provider or runs model-written code (the API has no authentication; see Security model). Import the GitHub repository in Vercel with the default settings. No environment variables are needed, and no API keys belong there. Vercel's filesystem is read-only except `/tmp`, so the query log lives in `/tmp` and starts empty on every cold start; the benchmark panel reads the committed `benchmark/results/latest.json`.
+
 ### Run the benchmark
 
 ```bash
