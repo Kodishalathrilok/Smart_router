@@ -27,18 +27,26 @@ only. This run repeats the experiment with truncated empty replies retried, all 
 | Settings | As in the pooled runs: `QUALITY_THRESHOLD=0.78`, `MAX_ESCALATIONS=2`, routing cut-offs 0.35 / 0.70, `GENERATION_MAX_TOKENS=4096`, `JUDGE_MAX_TOKENS=1024`, `REQUEST_TIMEOUT_S=180`. New: `TRUNCATION_RETRY_MAX_TOKENS=8192` |
 
 `TRUNCATION_RETRY_MAX_TOKENS` must be above `GENERATION_MAX_TOKENS` or the retry never fires; the pooled runs already
-used 4096 for generation, so the default retry limit of 4096 would change nothing. The value used is recorded here
-before the first run; if the repository owner chooses a different one, this file is updated in its own commit first.
+used 4096 for generation, so the default retry limit of 4096 would change nothing. Confirmed 2026-11-10, before any
+run: one test call to each Groq model (`openai/gpt-oss-20b`, `openai/gpt-oss-120b`, `qwen/qwen3.8-27b`) with a limit
+of 8192 was accepted, so 8192 is used (the agreed fallback, had Groq rejected it as too large, was 6000).
 
 Item-runs: 5 systems x 30 items x 3 runs = 450.
 
 ## Which runs are pooled
 
 The first three runs started after this commit that complete (all five per-system result files present, 30 items
-each). All three are pooled, whatever they show. A run that is interrupted (crash, quota exhausted, machine asleep)
-is discarded whole and repeated; its run ID and the reason are listed under Deviations. No run is dropped or repeated
-because of its results. The earlier runs are not pooled with the new ones (they have four systems and predate the
-truncation retry); they stay in the repository for comparison.
+each). All three are pooled, whatever they show. No run is dropped or repeated because of its results. The earlier
+runs are not pooled with the new ones (they have four systems and predate the truncation retry); they stay in the
+repository for comparison.
+
+Amended 2026-11-10, before any run (the first version discarded an interrupted run whole): runs are resumable. If a
+provider is still rate limiting after every retry (in practice an exhausted daily quota), the run stops; the item
+that was being answered is not kept, because a quota error says nothing about the model, and
+`python -m benchmark.run ... --resume RUN_ID` later continues the same run from the next unsaved item. Every item
+that finished is kept exactly as it was first recorded and is never re-run. Each stop is listed under Deviations with
+the run ID, the system and the item count reached. Provider errors other than rate limits (for example a 503) are not
+retried this way: they stay in the results and count as wrong.
 
 ## Metrics
 
