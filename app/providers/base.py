@@ -54,6 +54,13 @@ class EmptyResponseError(ProviderError):
     """The provider returned no usable text (empty completion, safety block, ...)."""
 
 
+class TruncatedEmptyResponseError(EmptyResponseError):
+    """Empty text because the output-token limit was reached (typically all spent on hidden reasoning).
+
+    Not transient: the same request fails the same way. The executor retries it once with a larger limit.
+    """
+
+
 class CallBudgetExceededError(ProviderError):
     """The per-query provider call budget is spent (raised before any network call; never retried)."""
 

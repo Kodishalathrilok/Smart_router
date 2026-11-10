@@ -60,6 +60,9 @@ class Settings(BaseSettings):
     generation_temperature: float = Field(0.2, ge=0.0, le=2.0)
     generation_max_tokens: int = Field(1024, ge=16)
     judge_max_tokens: int = Field(1024, ge=64)
+    # A reply that is empty because the model hit the output limit (finish_reason=length) is retried once with this
+    # limit, if it is larger than the limit the call used. 0 disables the retry.
+    truncation_retry_max_tokens: int = Field(4096, ge=0)
 
     request_timeout_s: float = Field(60.0, gt=0)
     max_retries: int = Field(3, ge=0, le=6)

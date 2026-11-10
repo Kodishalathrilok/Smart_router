@@ -305,6 +305,14 @@ JUDGE_MODEL=<current Gemini model id>
 
 Look up current model IDs from each provider's model list. Model catalogs change, so no IDs are hard-coded. Other settings are listed in `.env.example`: threshold, routing cut-offs, retries, timeouts, concurrency, request size limit and log paths. `.env` is git-ignored. API keys are sent only in request headers, and are redacted from logged error messages.
 
+Output-limit settings (the ones that decide whether a reasoning model gets to finish its answer):
+
+| Setting | Default | Meaning |
+|---|---|---|
+| `GENERATION_MAX_TOKENS` | 1024 | Output limit for answer calls |
+| `JUDGE_MAX_TOKENS` | 1024 | Output limit for judge calls |
+| `TRUNCATION_RETRY_MAX_TOKENS` | 4096 | A reply that is empty because it hit the output limit (`finish_reason=length`, all tokens spent on hidden reasoning) is retried once with this limit, if it is larger than the limit the call used. The retry counts against `MAX_PROVIDER_CALLS_PER_QUERY`. `0` disables it |
+
 ### Run the API and dashboard
 
 ```bash

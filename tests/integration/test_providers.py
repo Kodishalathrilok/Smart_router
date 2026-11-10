@@ -14,6 +14,7 @@ from app.providers.base import (
     ProviderServerError,
     ProviderTimeoutError,
     RateLimitError,
+    TruncatedEmptyResponseError,
 )
 from app.providers.gemini_provider import GeminiProvider
 from app.providers.openai_compatible import OpenAICompatibleProvider
@@ -126,6 +127,24 @@ async def test_empty_responses_raise():
         await empty_groq.generate(MESSAGES, "m1")
     with pytest.raises(EmptyResponseError, match="SAFETY"):
         await blocked_gemini.generate(MESSAGES, "g1")
+
+
+async def test_truncated_empty_replies_raise_their_own_type():
+    cut_groq = groq(lambda r: httpx.Response(200, json={"choices": [{"message": {"content": ""}, "finish_reason": "length"}]}))
+    cut_gemini = gemini(lambda r: httpx.Response(200, json={"candidates": [{"content": {"parts": [{"text": "hm", "thought": True}]}, "finishReason": "MAX_TOKENS"}]}))
+    with pytest.raises(TruncatedEmptyResponseError):
+        await cut_groq.generate(MESSAGES, "m1")
+    with pytest.raises(TruncatedEmptyResponseError):
+        await cut_gemini.generate(MESSAGES, "g1")
+
+
+async def test_other_empty_replies_keep_the_plain_type():
+    stop_groq = groq(lambda r: httpx.Response(200, json={"choices": [{"message": {"content": ""}, "finish_reason": "stop"}]}))
+    safety_gemini = gemini(lambda r: httpx.Response(200, json={"candidates": [{"content": {"parts": []}, "finishReason": "SAFETY"}]}))
+    for provider, model in ((stop_groq, "m1"), (safety_gemini, "g1")):
+        with pytest.raises(EmptyResponseError) as info:
+            await provider.generate(MESSAGES, model)
+        assert type(info.value) is EmptyResponseError
 
 
 async def test_list_models():

@@ -9,7 +9,7 @@ from time import perf_counter
 from typing import TypeVar
 
 from app.models.schemas import ModelSpec
-from app.providers.base import CallBudgetExceededError, LLMProvider, LLMResponse, ProviderError, RateLimitError
+from app.providers.base import CallBudgetExceededError, LLMProvider, LLMResponse, ProviderError, RateLimitError, TruncatedEmptyResponseError
 
 T = TypeVar("T")
 ErrorHook = Callable[[ProviderError, int], None]
@@ -79,8 +79,17 @@ async def with_retries(
 class Executor:
     """Calls a model through its provider and returns a normalized, timed `LLMResponse`."""
 
-    def __init__(self, providers: Mapping[str, LLMProvider], *, max_retries: int, base_delay_s: float, max_delay_s: float) -> None:
+    def __init__(
+        self,
+        providers: Mapping[str, LLMProvider],
+        *,
+        max_retries: int,
+        base_delay_s: float,
+        max_delay_s: float,
+        truncation_retry_max_tokens: int = 0,
+    ) -> None:
         self._providers = providers
+        self._truncation_retry_max_tokens = truncation_retry_max_tokens  # 0 disables the retry
         self._retry = {"max_retries": max_retries, "base_delay_s": base_delay_s, "max_delay_s": max_delay_s}
 
     async def generate(
@@ -97,18 +106,28 @@ class Executor:
         """Latency covers the whole call including retries/backoff, i.e. what the caller actually waited.
 
         `max_retries` overrides the global retry policy for this call only (used by bounded second opinions).
+        A reply that is empty because the output limit was hit is retried once with `truncation_retry_max_tokens`
+        when that is larger than `max_tokens`; the retry draws from the call budget like any other call.
         """
         provider = self._providers[spec.provider]
         retry = self._retry if max_retries is None else {**self._retry, "max_retries": max_retries}
         budget = _budget.get()
 
-        async def call() -> LLMResponse:
-            if budget is not None:
-                budget.take(spec.provider)  # non-transient once exhausted: never retried
-            return await provider.generate(messages, spec.id, temperature=temperature, max_tokens=max_tokens, json_mode=json_mode)
+        def call_with(limit: int) -> Callable[[], Awaitable[LLMResponse]]:
+            async def call() -> LLMResponse:
+                if budget is not None:
+                    budget.take(spec.provider)  # non-transient once exhausted: never retried
+                return await provider.generate(messages, spec.id, temperature=temperature, max_tokens=limit, json_mode=json_mode)
+
+            return call
 
         start = perf_counter()
-        response = await with_retries(call, on_error=on_error, **retry)
+        try:
+            response = await with_retries(call_with(max_tokens), on_error=on_error, **retry)
+        except TruncatedEmptyResponseError:
+            if self._truncation_retry_max_tokens <= max_tokens:
+                raise
+            response = await with_retries(call_with(self._truncation_retry_max_tokens), on_error=on_error, **retry)
         if budget is not None:
             budget.billed[spec.role] = budget.billed.get(spec.role, 0) + 1
         return response.model_copy(update={"latency_ms": round((perf_counter() - start) * 1000, 1)})

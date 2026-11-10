@@ -49,7 +49,11 @@ async def build_runtime(settings: Settings, *, log_dir: Path | None = None, prov
     events = EventLogger(store)
     queries = QueryLogger(store)
     executor = Executor(
-        providers, max_retries=settings.max_retries, base_delay_s=settings.retry_base_delay_s, max_delay_s=settings.retry_max_delay_s
+        providers,
+        max_retries=settings.max_retries,
+        base_delay_s=settings.retry_base_delay_s,
+        max_delay_s=settings.retry_max_delay_s,
+        truncation_retry_max_tokens=settings.truncation_retry_max_tokens,
     )
     router = Router(HeuristicAnalyzer(), ThresholdPolicy(settings.cheap_max_difficulty, settings.mid_max_difficulty), registry)
     judges = [spec for spec in (registry.judge, registry.judge_fallback) if spec]

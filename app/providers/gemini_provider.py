@@ -2,7 +2,7 @@
 
 import httpx
 
-from app.providers.base import EmptyResponseError, HTTPProvider, LLMResponse
+from app.providers.base import EmptyResponseError, HTTPProvider, LLMResponse, TruncatedEmptyResponseError
 
 
 class GeminiProvider(HTTPProvider):
@@ -35,7 +35,8 @@ class GeminiProvider(HTTPProvider):
         parts = (candidate.get("content") or {}).get("parts") or []
         text = "".join(p.get("text", "") for p in parts if not p.get("thought"))
         if not text.strip():
-            raise EmptyResponseError(f"gemini returned empty text (finishReason={candidate.get('finishReason')})", provider=self.name)
+            error = TruncatedEmptyResponseError if candidate.get("finishReason") == "MAX_TOKENS" else EmptyResponseError
+            raise error(f"gemini returned empty text (finishReason={candidate.get('finishReason')})", provider=self.name)
         usage = data.get("usageMetadata") or {}
         return LLMResponse(
             text=text,
