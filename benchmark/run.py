@@ -14,7 +14,7 @@ from datetime import datetime, timezone
 from app.core.bootstrap import build_runtime
 from app.core.config import ConfigError, Settings
 from app.core.metrics import cost_reduction_pct, mean, med, rate, summarize
-from benchmark.analysis import analyzer_validation, escalation_breakdown, item_rows, judge_confusion, second_opinion_stats
+from benchmark.analysis import analyzer_validation, capability, escalation_breakdown, item_rows, judge_confusion, second_opinion_stats
 from benchmark.dataset import DATASET_NAMES, DATASETS_DIR, BenchmarkItem, load_dataset
 from benchmark.report import write_report
 from benchmark.runners import SYSTEMS, ItemResult, System, run_system
@@ -90,6 +90,7 @@ def summarize_system(system: System, results: list[ItemResult], role_costs: dict
         "description": system.description,
         "reference_quality": {"mean": mean(ref), "median": med(ref), "scored": len(ref), "errors": sum(r.reference_error is not None for r in results)},
         "strict": strict_accuracy(results),
+        "capability": capability(results),
         "deterministic": {"checked": len(det), "accuracy": rate(sum(det), len(det))},
         "serving_calls_mean": serving["serving_calls_mean"],
         "cost_method": serving["method"],

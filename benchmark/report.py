@@ -27,6 +27,13 @@ def pct(value) -> str:
     return "n/a" if value is None else f"{value * 100:.1f}%"
 
 
+def plumbing(cap: dict | None) -> str:
+    """'6.7% (2/30)'; summaries written before the capability figures existed have none."""
+    if not cap or cap.get("plumbing_rate") is None:
+        return "n/a"
+    return f"{pct(cap['plumbing_rate'])} ({cap['plumbing_failures']}/{cap['checked']})"
+
+
 def change(reduction_pct) -> str:
     """Render a reduction percentage as 'X% lower' / 'X% higher'."""
     if reduction_pct is None:
@@ -155,7 +162,9 @@ def render(s: dict) -> str:
 
     out.append("## Metrics\n")
     out.append("\n".join([
-        "- **Strict acc.** (primary): correct / all deterministically checkable items (numeric answers, unit tests). An answer with no readable final number counts as wrong (*Unparseable* column). 95% Wilson interval.",
+        "- **Strict acc.** (primary): correct / all deterministically checkable items (numeric answers, unit tests). An answer with no readable final number counts as wrong. 95% Wilson interval.",
+        "- **Plumbing failures**: checkable items missed for a reason that says nothing about the model's ability: an empty reply, an answer cut off by the output limit, a final number that cannot be read, or a provider error. Judged on the final answer.",
+        "- **Acc. among readable** (secondary): correct / checkable items minus plumbing failures. Shows capability once plumbing is set aside; it is not the headline, because a system that fails to deliver an answer has still failed the user.",
         "- **Ref. judge q.** / **In-loop judge q.**: LLM-judge scores with / without the reference answer (secondary; same judge family as the escalation loop).",
         "- **Calls/query**: generation calls plus serving-time judge calls (what production would pay for), excluding transport retries.",
         "- **Gen cost**: mean normalized cost per query (sum of per-call tier weights; experiment weights, not money).",
@@ -172,14 +181,15 @@ def render(s: dict) -> str:
         st = v.get("strict") or {}
         ci = st.get("ci95")
         rows.append([
-            v["label"], pct(st.get("accuracy")), f"{pct(ci[0])}-{pct(ci[1])}" if ci else "n/a", str(st.get("unparseable", "n/a")),
+            v["label"], pct(st.get("accuracy")), f"{pct(ci[0])}-{pct(ci[1])}" if ci else "n/a",
+            pct((v.get("capability") or {}).get("readable_accuracy")), plumbing(v.get("capability")),
             fmt(v["cost"]["mean"], 2), fmt(v["cost_incl_judge"]["mean"], 2),
             f"{c['cost_incl_judge_vs_cheap_x']:.2f}x" if c.get("cost_incl_judge_vs_cheap_x") is not None else "n/a",
             change(c.get("cost_incl_judge_reduction_pct_vs_strong")), fmt(v.get("serving_calls_mean"), 2),
             fmt(v["latency_ms"]["median"], 0), fmt(v["latency_ms"]["p95"], 0),
             pct(v["escalation"]["rate"]), pct(v["failure_rate"]), fmt(v["reference_quality"]["mean"]), fmt(v["quality"]["mean"]),
         ])
-    out.append(table(["System", "Strict acc.", "95% CI", "Unparseable", "Gen cost", "Cost incl. judge", "vs cheap", "vs strong (incl. judge)",
+    out.append(table(["System", "Strict acc.", "95% CI", "Acc. among readable", "Plumbing failures", "Gen cost", "Cost incl. judge", "vs cheap", "vs strong (incl. judge)",
                       "Calls/query", "p50 ms", "p95 ms", "Escalation", "Failed", "Ref. judge q.", "In-loop judge q."], rows) + "\n")
     out.append(paired_section(s))
     out.append(analyzer_section(s))

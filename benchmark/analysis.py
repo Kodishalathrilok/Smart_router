@@ -5,6 +5,7 @@ possible to tell necessary escalations (the escalated-from answer was wrong) fro
 (it was already right), and to score each judge decision against the exact check.
 """
 
+from collections import Counter
 from collections.abc import Sequence
 from typing import Protocol
 
@@ -17,9 +18,56 @@ REASON_CHARS = 90
 
 class Scored(Protocol):
     item_id: str
+    checkable: bool
     record: QueryRecord
     attempt_correct: list[bool | None]
     deterministic_correct: bool | None
+
+
+PLUMBING_KINDS = ("empty_reply", "truncation", "unreadable_final_number", "provider_error")
+TRUNCATED_FINISH = ("length", "MAX_TOKENS")  # OpenAI-compatible / Gemini
+
+
+def plumbing_failure(r: Scored) -> str | None:
+    """Why a missed item says nothing about the model's ability, or None (correct, or a readable wrong answer).
+
+    Judged on the final answer only: a failed attempt that escalation recovered from is not a miss.
+    Records made before TruncatedEmptyResponseError existed carry the finish reason in the error text.
+    """
+    if r.deterministic_correct is True:
+        return None
+    rec = r.record
+    if rec.answer is None:
+        last = rec.attempts[-1]
+        error = last.error or ""
+        if last.error_type == "TruncatedEmptyResponseError" or any(f"={reason})" in error for reason in TRUNCATED_FINISH):
+            return "truncation"
+        return "empty_reply" if last.error_type == "EmptyResponseError" else "provider_error"
+    final = next((a for a in rec.attempts if a.answer == rec.answer), None)
+    if final is not None and final.finish_reason in TRUNCATED_FINISH:
+        return "truncation"  # the answer was cut off before it finished
+    # ponytail: "unreadable" = the exact check returned None (ambiguous final number). An answer with no number
+    # at all is scored False by check_numeric and counts as a wrong answer here; split it out if that ever occurs.
+    return "unreadable_final_number" if r.deterministic_correct is None else None
+
+
+def capability(results: Sequence[Scored]) -> dict:
+    """Accuracy among readable answers, next to the plumbing failure rate. Strict accuracy stays primary:
+    this only shows how much of the gap to 100% is the model being wrong versus the answer never arriving."""
+    checked = [r for r in results if r.checkable]
+    kinds = Counter(k for r in checked if (k := plumbing_failure(r)))
+    failures = sum(kinds.values())
+    readable = len(checked) - failures
+    correct = sum(r.deterministic_correct is True for r in checked)
+    return {
+        "checked": len(checked),
+        "plumbing_failures": failures,
+        "plumbing_rate": round(failures / len(checked), 4) if checked else None,
+        "by_kind": {k: kinds[k] for k in PLUMBING_KINDS if kinds[k]},
+        "readable": readable,
+        "readable_correct": correct,
+        "readable_accuracy": round(correct / readable, 4) if readable else None,
+    }
 
 
 def escalation_breakdown(results: Sequence[Scored]) -> dict[str, int]:
