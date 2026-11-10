@@ -10,6 +10,15 @@ data/benchmarks/*
 !data/logs/.gitkeep
 !data/benchmarks/.gitkeep
 
+# Per-item results of the runs the README reports are committed, so `python -m benchmark.reanalyze`
+# reproduces its table on a fresh clone. Add a line per run; run logs and the SQLite store stay local.
+!data/benchmarks/20260929T050756Z/
+!data/benchmarks/20260929T111739Z/
+!data/benchmarks/20260929T131419Z/
+data/benchmarks/*/events.jsonl
+data/benchmarks/*/queries.jsonl
+data/benchmarks/*/*.db*
+
 # local tool state (not project source)
 .claude/
 .hallmark/

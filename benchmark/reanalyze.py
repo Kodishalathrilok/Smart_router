@@ -63,7 +63,7 @@ def pooled(runs: list[dict[str, list[ItemResult]]]) -> dict[str, list[ItemResult
     common = set.intersection(*(set(r) for r in runs))
     out: dict[str, list[ItemResult]] = defaultdict(list)
     for n, run in enumerate(runs):
-        for name in common:
+        for name in (s for s in SYSTEM_BY_NAME if s in common):  # fixed order: the report must be reproducible
             for r in run[name]:
                 copy = r.model_copy(deep=True)
                 copy.item_id = f"run{n}:{r.item_id}"

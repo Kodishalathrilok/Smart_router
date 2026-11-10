@@ -43,14 +43,14 @@ Quality here means exact-check accuracy (numeric answers and unit tests). LLM-ju
 4. Numeric items are also checked deterministically against the expected value; code items are executed against unit tests (enabled). Deterministic checks are skipped in mock mode.
 5. Quality threshold 0.78, max escalations 2, routing thresholds cheap < 0.35 <= mid < 0.7 <= strong, concurrency 1.
 
-| Role | Model | Provider | Normalized cost |
-|---|---|---|---|
-| cheap | `openai/gpt-oss-20b` | groq | 1.0 |
-| mid | `openai/gpt-oss-120b` | groq | 3.0 |
-| strong | `nvidia/nemotron-3-ultra-550b-a55b` | nvidia | 10.0 |
-| judge | `gemini-3.5-flash-lite` | gemini | 3.0 |
-| judge_fallback | `z-ai/glm-5.3-flash` | nvidia | 3.0 |
-| second_opinion | `qwen/qwen3.8-27b` | groq | 3.0 |
+| Role | Model | Provider | Normalized cost | USD per 1M tokens (in / out) |
+|---|---|---|---|---|
+| cheap | `openai/gpt-oss-20b` | groq | 1.0 | no public price |
+| mid | `openai/gpt-oss-120b` | groq | 3.0 | no public price |
+| strong | `nvidia/nemotron-3-ultra-550b-a55b` | nvidia | 10.0 | no public price |
+| judge | `gemini-3.5-flash-lite` | gemini | 3.0 | no public price |
+| judge_fallback | `z-ai/glm-5.3-flash` | nvidia | 3.0 | no public price |
+| second_opinion | `qwen/qwen3.8-27b` | groq | 3.0 | no public price |
 
 ## Baselines
 
@@ -63,23 +63,26 @@ Quality here means exact-check accuracy (numeric answers and unit tests). LLM-ju
 
 ## Metrics
 
-- **Strict acc.** (primary): correct / all deterministically checkable items (numeric answers, unit tests). An answer with no readable final number counts as wrong (*Unparseable* column). 95% Wilson interval.
+- **Strict acc.** (primary): correct / all deterministically checkable items (numeric answers, unit tests). An answer with no readable final number counts as wrong. 95% Wilson interval.
+- **Plumbing failures**: checkable items missed for a reason that says nothing about the model's ability: an empty reply, an answer cut off by the output limit, a final number that cannot be read, or a provider error. Judged on the final answer.
+- **Acc. among readable** (secondary): correct / checkable items minus plumbing failures. Shows capability once plumbing is set aside; it is not the headline, because a system that fails to deliver an answer has still failed the user.
 - **Ref. judge q.** / **In-loop judge q.**: LLM-judge scores with / without the reference answer (secondary; same judge family as the escalation loop).
 - **Calls/query**: generation calls plus serving-time judge calls (what production would pay for), excluding transport retries.
 - **Gen cost**: mean normalized cost per query (sum of per-call tier weights; experiment weights, not money).
 - **Cost incl. judge**: gen cost plus serving-time judge calls x judge weight (only SmartRouter needs the judge when serving).
+- **$ / 1k queries**: US dollars per 1,000 queries at list prices (`config/models.json`), from the tokens stored for every call, billed failures included, with the same serving convention as *Cost incl. judge*. `unknown` when any model that ran has no public price or the records predate token storage; never a partial sum. Kept separate from normalized cost: *vs cheap* / *vs strong* use normalized units.
 - **Latency**: end-to-end pipeline latency including the in-loop judge call for every system; `gen p50` is generation-only.
 - **Below thr.**: share of queries whose final answer did not meet the quality threshold (best effort or failed).
 - `quality_score` is an LLM evaluation signal, **not** a probability of correctness.
 
 ## Results
 
-| System | Strict acc. | 95% CI | Unparseable | Gen cost | Cost incl. judge | vs cheap | vs strong (incl. judge) | Calls/query | p50 ms | p95 ms | Escalation | Failed | Ref. judge q. | In-loop judge q. |
-|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|
-| Always Strong | 93.3% | 78.7%-98.2% | 1 | 9.67 | 9.67 | 10.00x | 0.0% lower | 0.97 | 37268 | 122402 | 0.0% | 3.3% | n/a | 0.972 |
-| Always Cheap | 93.3% | 78.7%-98.2% | 1 | 0.97 | 0.97 | 1.00x | 90.0% lower | 0.97 | 2179 | 4490 | 0.0% | 3.3% | n/a | 0.974 |
-| SmartRouter | 96.7% | 83.3%-99.4% | 0 | 3.07 | 6.57 | 6.79x | 32.1% lower | 2.20 | 2934 | 10613 | 3.3% | 0.0% | n/a | 0.928 |
-| Static Router | 93.3% | 78.7%-98.2% | 0 | 2.63 | 2.63 | 2.72x | 72.8% lower | 0.97 | 3045 | 10447 | 0.0% | 3.3% | n/a | 0.943 |
+| System | Strict acc. | 95% CI | Acc. among readable | Plumbing failures | Gen cost | Cost incl. judge | $ / 1k queries | vs cheap | vs strong (incl. judge) | Calls/query | p50 ms | p95 ms | Escalation | Failed | Ref. judge q. | In-loop judge q. |
+|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|
+| Always Strong | 93.3% | 78.7%-98.2% | 100.0% | 6.7% (2/30) | 9.67 | 9.67 | unknown | 10.00x | 0.0% lower | 0.97 | 37268 | 122402 | 0.0% | 3.3% | n/a | 0.972 |
+| Always Cheap | 93.3% | 78.7%-98.2% | 100.0% | 6.7% (2/30) | 0.97 | 0.97 | unknown | 1.00x | 90.0% lower | 0.97 | 2179 | 4490 | 0.0% | 3.3% | n/a | 0.974 |
+| SmartRouter | 96.7% | 83.3%-99.4% | 96.7% | 0.0% (0/30) | 3.07 | 6.57 | unknown | 6.79x | 32.1% lower | 2.20 | 2934 | 10613 | 3.3% | 0.0% | n/a | 0.928 |
+| Static Router | 93.3% | 78.7%-98.2% | 96.5% | 3.3% (1/30) | 2.63 | 2.63 | unknown | 2.72x | 72.8% lower | 0.97 | 3045 | 10447 | 0.0% | 3.3% | n/a | 0.943 |
 
 ### Paired comparison (same items, strict exact checks)
 
@@ -233,7 +236,7 @@ SmartRouter routing flow (edge counts):
 - The judge is an LLM: it has evaluator, verbosity and self-preference biases, can share blind spots with the models it grades, and scores inconsistently across calls. quality_score is not ground truth.
 - Reference answers are short and hand-written; open-ended items (reasoning, summarization) admit many valid answers.
 - 30 items is small: the confidence intervals above are wide, and a sign test on a handful of discordant items cannot detect small differences.
-- Normalized cost uses configured tier weights, not provider billing. It measures relative model usage, not money.
+- Normalized cost uses configured tier weights, not provider billing. It measures relative model usage, not money. Dollar figures use list prices on the date recorded in `config/models.json`, not an invoice.
 - Latency depends on provider load, rate limits and retries at run time and is not reproducible across runs.
 - Provider model versions change over time; results apply only to the model IDs listed above on the run date.
 - The query analyzer is a keyword heuristic; see *Router validation* for how its estimates line up with the dataset labels.
