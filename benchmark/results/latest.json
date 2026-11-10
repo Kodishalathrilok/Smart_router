@@ -652,6 +652,11 @@
       "cost_incl_judge": {
         "mean": 9.6667
       },
+      "judge_usd": {
+        "per_1k_queries": null,
+        "priced_queries": 0,
+        "queries": 30
+      },
       "cost_usd": {
         "per_1k_queries": null,
         "priced_queries": 0,
@@ -1251,6 +1256,11 @@
       },
       "cost_incl_judge": {
         "mean": 0.9667
+      },
+      "judge_usd": {
+        "per_1k_queries": null,
+        "priced_queries": 0,
+        "queries": 30
       },
       "cost_usd": {
         "per_1k_queries": null,
@@ -1860,6 +1870,11 @@
       "cost_incl_judge": {
         "mean": 6.5667
       },
+      "judge_usd": {
+        "per_1k_queries": null,
+        "priced_queries": 0,
+        "queries": 30
+      },
       "cost_usd": {
         "per_1k_queries": null,
         "priced_queries": 0,
@@ -2468,6 +2483,11 @@
       },
       "cost_incl_judge": {
         "mean": 2.6333
+      },
+      "judge_usd": {
+        "per_1k_queries": null,
+        "priced_queries": 0,
+        "queries": 30
       },
       "cost_usd": {
         "per_1k_queries": null,

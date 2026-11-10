@@ -239,6 +239,11 @@
             "cost_incl_judge": {
               "mean": 10.0
             },
+            "judge_usd": {
+              "per_1k_queries": null,
+              "priced_queries": 0,
+              "queries": 30
+            },
             "cost_usd": {
               "per_1k_queries": null,
               "priced_queries": 0,
@@ -415,6 +420,11 @@
             },
             "cost_incl_judge": {
               "mean": 0.9667
+            },
+            "judge_usd": {
+              "per_1k_queries": null,
+              "priced_queries": 0,
+              "queries": 30
             },
             "cost_usd": {
               "per_1k_queries": null,
@@ -608,6 +618,11 @@
             "cost_incl_judge": {
               "mean": 7.4667
             },
+            "judge_usd": {
+              "per_1k_queries": null,
+              "priced_queries": 0,
+              "queries": 30
+            },
             "cost_usd": {
               "per_1k_queries": null,
               "priced_queries": 0,
@@ -785,6 +800,11 @@
             },
             "cost_incl_judge": {
               "mean": 2.7333
+            },
+            "judge_usd": {
+              "per_1k_queries": null,
+              "priced_queries": 0,
+              "queries": 30
             },
             "cost_usd": {
               "per_1k_queries": null,
@@ -1035,6 +1055,11 @@
             "cost_incl_judge": {
               "mean": 10.0
             },
+            "judge_usd": {
+              "per_1k_queries": null,
+              "priced_queries": 0,
+              "queries": 30
+            },
             "cost_usd": {
               "per_1k_queries": null,
               "priced_queries": 0,
@@ -1211,6 +1236,11 @@
             },
             "cost_incl_judge": {
               "mean": 0.9667
+            },
+            "judge_usd": {
+              "per_1k_queries": null,
+              "priced_queries": 0,
+              "queries": 30
             },
             "cost_usd": {
               "per_1k_queries": null,
@@ -1399,6 +1429,11 @@
             "cost_incl_judge": {
               "mean": 6.8
             },
+            "judge_usd": {
+              "per_1k_queries": null,
+              "priced_queries": 0,
+              "queries": 30
+            },
             "cost_usd": {
               "per_1k_queries": null,
               "priced_queries": 0,
@@ -1577,6 +1612,11 @@
             },
             "cost_incl_judge": {
               "mean": 2.7333
+            },
+            "judge_usd": {
+              "per_1k_queries": null,
+              "priced_queries": 0,
+              "queries": 30
             },
             "cost_usd": {
               "per_1k_queries": null,
@@ -1834,6 +1874,11 @@
             "cost_incl_judge": {
               "mean": 9.6667
             },
+            "judge_usd": {
+              "per_1k_queries": null,
+              "priced_queries": 0,
+              "queries": 30
+            },
             "cost_usd": {
               "per_1k_queries": null,
               "priced_queries": 0,
@@ -2011,6 +2056,11 @@
             },
             "cost_incl_judge": {
               "mean": 0.9667
+            },
+            "judge_usd": {
+              "per_1k_queries": null,
+              "priced_queries": 0,
+              "queries": 30
             },
             "cost_usd": {
               "per_1k_queries": null,
@@ -2197,6 +2247,11 @@
             },
             "cost_incl_judge": {
               "mean": 6.5667
+            },
+            "judge_usd": {
+              "per_1k_queries": null,
+              "priced_queries": 0,
+              "queries": 30
             },
             "cost_usd": {
               "per_1k_queries": null,
@@ -2385,6 +2440,11 @@
             "cost_incl_judge": {
               "mean": 2.6333
             },
+            "judge_usd": {
+              "per_1k_queries": null,
+              "priced_queries": 0,
+              "queries": 30
+            },
             "cost_usd": {
               "per_1k_queries": null,
               "priced_queries": 0,
@@ -2467,7 +2527,41 @@
         },
         "claim": {
           "verdict": "not_supported_cheap_dominates",
-          "explanation": "SmartRouter is cheaper than Always Strong without a measurable accuracy loss, but Always Cheap matches it for less money, so routing adds cost without a measurable benefit on this dataset (strict accuracy SmartRouter 97.8%, Always Cheap 94.4%, Always Strong 95.6%; cost incl. judge 6.94 vs 0.97 vs 9.89; paired vs cheap 5 wins / 2 losses (p=0.4531))."
+          "explanation": "Paired by question (majority of 3 runs). SmartRouter is cheaper than Always Strong without a measurable accuracy loss, but Always Cheap matches it for less money, so routing adds cost without a measurable benefit on this dataset (strict accuracy SmartRouter 97.8%, Always Cheap 94.4%, Always Strong 95.6%; cost incl. judge 6.94 vs 0.97 vs 9.89; paired vs cheap 1 wins / 0 losses (p=1.0))."
+        },
+        "paired_by_question": {
+          "smart_vs_cheap": {
+            "items": 30,
+            "wins": 1,
+            "losses": 0,
+            "both_correct": 29,
+            "both_wrong": 0,
+            "sign_test_p": 1.0
+          },
+          "smart_vs_strong": {
+            "items": 30,
+            "wins": 1,
+            "losses": 0,
+            "both_correct": 29,
+            "both_wrong": 0,
+            "sign_test_p": 1.0
+          },
+          "static_vs_cheap": {
+            "items": 30,
+            "wins": 1,
+            "losses": 0,
+            "both_correct": 29,
+            "both_wrong": 0,
+            "sign_test_p": 1.0
+          },
+          "strong_vs_cheap": {
+            "items": 30,
+            "wins": 0,
+            "losses": 0,
+            "both_correct": 29,
+            "both_wrong": 1,
+            "sign_test_p": null
+          }
         },
         "systems": {
           "always_weak": {
@@ -2643,6 +2737,11 @@
             },
             "cost_incl_judge": {
               "mean": 0.9667
+            },
+            "judge_usd": {
+              "per_1k_queries": null,
+              "priced_queries": 0,
+              "queries": 90
             },
             "cost_usd": {
               "per_1k_queries": null,
@@ -2821,6 +2920,11 @@
             },
             "cost_incl_judge": {
               "mean": 9.8889
+            },
+            "judge_usd": {
+              "per_1k_queries": null,
+              "priced_queries": 0,
+              "queries": 90
             },
             "cost_usd": {
               "per_1k_queries": null,
@@ -3009,6 +3113,11 @@
             },
             "cost_incl_judge": {
               "mean": 2.7
+            },
+            "judge_usd": {
+              "per_1k_queries": null,
+              "priced_queries": 0,
+              "queries": 90
             },
             "cost_usd": {
               "per_1k_queries": null,
@@ -3202,6 +3311,11 @@
             },
             "cost_incl_judge": {
               "mean": 6.9444
+            },
+            "judge_usd": {
+              "per_1k_queries": null,
+              "priced_queries": 0,
+              "queries": 90
             },
             "cost_usd": {
               "per_1k_queries": null,

@@ -123,6 +123,7 @@ def summarize_system(system: System, results: list[ItemResult], profiles: dict[s
         "second_opinions": second_opinion_stats(results),
         "cost_incl_judge": {"mean": serving["cost_incl_judge_mean"]},
         # Same serving convention as cost_incl_judge: only SmartRouter pays for judges in production.
+        "judge_usd": dollar_cost(results, price_table(profiles), JUDGE_ROLES),  # every judge-side token this system's run used
         "cost_usd": dollar_cost(results, price_table(profiles), None if system.mode == "smart" else GENERATION_ROLES),
     }
 
