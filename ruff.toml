@@ -8,4 +8,5 @@ select = ["E", "F", "W", "I", "B", "UP", "RUF100"]
 ignore = [
   "B008",  # FastAPI's Depends(...) in defaults is the framework's documented pattern
   "E501",  # long lines are allowed; readability is reviewed by hand
+  "UP038", # deprecated and removed in newer ruff; older local versions still flag isinstance((X, Y))
 ]
