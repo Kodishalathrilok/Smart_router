@@ -2455,7 +2455,7 @@
       }
     },
     {
-      "title": "`hard` pooled over 3 complete runs with one model lineup (cheap=`openai/gpt-oss-20b`, mid=`openai/gpt-oss-120b`, strong=`nvidia/nemotron-3-ultra-550b-a55b`); repeated measurements of the same items",
+      "title": "`hard` pooled over 3 complete runs of 4 systems with one model lineup (cheap=`openai/gpt-oss-20b`, mid=`openai/gpt-oss-120b`, strong=`nvidia/nemotron-3-ultra-550b-a55b`); repeated measurements of the same items",
       "summary": {
         "comparisons": {
           "always_weak": {

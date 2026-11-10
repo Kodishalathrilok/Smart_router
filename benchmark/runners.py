@@ -6,6 +6,7 @@ would differ by a single string, so they are rows in one table instead.
 
 import asyncio
 import sys
+from collections.abc import Callable, Sequence
 from dataclasses import dataclass
 
 from pydantic import BaseModel
@@ -51,6 +52,25 @@ class ItemResult(BaseModel):
     attempt_correct: list[bool | None] = []  # the same check on every attempt's answer (None: no answer / not checkable)
 
 
+class QuotaStop(Exception):
+    """A provider kept rate-limiting after every retry (usually a daily quota): the run stops and can be resumed."""
+
+    def __init__(self, system: str, done: int, total: int, detail: str) -> None:
+        super().__init__(f"{system}: rate limited after {done}/{total} items ({detail})")
+        self.system, self.done, self.total, self.detail = system, done, total, detail
+        self.run_id = ""  # filled in by benchmark.run
+
+
+def rate_limited(record: QueryRecord) -> str | None:
+    """The rate-limit error that survived every retry in this query (generation, judge or second opinion), if any."""
+    for a in record.attempts:
+        if a.error_type == "RateLimitError":
+            return a.error or "RateLimitError"
+        if a.second_opinion and (a.second_opinion.error or "").startswith("RateLimitError"):
+            return a.second_opinion.error
+    return None
+
+
 async def run_item(runtime: Runtime, system: System, item: BenchmarkItem, *, reference_eval: bool, exec_code: bool) -> ItemResult:
     # The in-loop judge never sees the reference answer (production realism).
     record = await runtime.pipeline.run(item.question, mode=system.mode, query_id=f"{system.name}-{item.id}")
@@ -74,16 +94,34 @@ async def run_item(runtime: Runtime, system: System, item: BenchmarkItem, *, ref
 
 
 async def run_system(
-    runtime: Runtime, system: System, items: list[BenchmarkItem], *, concurrency: int, delay_s: float, reference_eval: bool, exec_code: bool
+    runtime: Runtime, system: System, items: list[BenchmarkItem], *, concurrency: int, delay_s: float, reference_eval: bool, exec_code: bool,
+    done_before: Sequence[ItemResult] = (), on_result: Callable[[ItemResult], None] | None = None,
 ) -> list[ItemResult]:
-    """Run one system over all items with bounded concurrency (1 = sequential, the free-tier default)."""
-    semaphore = asyncio.Semaphore(concurrency)
-    done = 0
+    """Run one system over all items with bounded concurrency (1 = sequential, the free-tier default).
 
-    async def one(item: BenchmarkItem) -> ItemResult:
-        nonlocal done
+    `done_before` are results saved by an interrupted run: those items are not run again. `on_result` is called
+    with each new result as it finishes. An item that ends rate limited after all retries is not kept (it says
+    nothing about the model); no further items are started and QuotaStop is raised.
+    """
+    semaphore = asyncio.Semaphore(concurrency)
+    saved = {r.item_id: r for r in done_before}
+    done = len(saved)
+    stopped: str | None = None
+
+    async def one(item: BenchmarkItem) -> ItemResult | None:
+        nonlocal done, stopped
+        if item.id in saved:
+            return saved[item.id]
         async with semaphore:
+            if stopped:
+                return None
             result = await run_item(runtime, system, item, reference_eval=reference_eval, exec_code=exec_code)
+            limit = rate_limited(result.record)
+            if limit:
+                stopped = stopped or limit
+                return None
+            if on_result:
+                on_result(result)
             if delay_s:
                 await asyncio.sleep(delay_s)
         done += 1
@@ -92,4 +130,7 @@ async def run_system(
               f" tier={result.record.final_tier} q={'n/a' if q is None else f'{q:.2f}'}", file=sys.stderr)
         return result
 
-    return list(await asyncio.gather(*(one(item) for item in items)))
+    results = await asyncio.gather(*(one(item) for item in items))
+    if stopped:
+        raise QuotaStop(system.name, done, len(items), stopped)
+    return list(results)

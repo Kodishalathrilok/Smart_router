@@ -1,7 +1,11 @@
-"""Run the benchmark: python -m benchmark.run [--dataset NAME] [--systems ...] [--per-category N] [--concurrency N]
+"""Run the benchmark: python -m benchmark.run [--dataset NAME] [--systems ...] [--per-category N] [--concurrency N] [--resume RUN_ID]
 
 Writes raw per-item results to BENCHMARK_DIR/<run_id>/ and the summary to
 RESULTS_DIR/latest.json, then renders RESULTS_DIR/latest.md.
+
+Every item is saved as it finishes (<system>.partial.jsonl, renamed to <system>.jsonl when the system is complete).
+If a provider keeps rate-limiting after all retries (usually a daily quota), the run stops with exit code 3 and
+`--resume RUN_ID` with the same arguments continues it without repeating saved work.
 """
 
 import argparse
@@ -17,7 +21,7 @@ from app.core.metrics import cost_reduction_pct, mean, med, rate, record_cost_us
 from benchmark.analysis import analyzer_validation, capability, escalation_breakdown, item_rows, judge_confusion, second_opinion_stats
 from benchmark.dataset import DATASET_NAMES, DATASETS_DIR, BenchmarkItem, load_dataset
 from benchmark.report import write_report
-from benchmark.runners import SYSTEMS, ItemResult, System, run_system
+from benchmark.runners import SYSTEMS, ItemResult, QuotaStop, System, run_system
 from benchmark.stats import claim_verdict, paired, strict_accuracy
 
 # (key, system, baseline): paired item-level comparisons reported in every run
@@ -30,6 +34,7 @@ PAIRS = (
 )
 
 
+QUOTA_EXIT_CODE = 3
 JUDGE_ROLES = ("judge", "judge_fallback", "second_opinion")
 GENERATION_ROLES = ("cheap", "mid", "strong")
 
@@ -179,18 +184,38 @@ async def run(args: argparse.Namespace, settings: Settings) -> dict:
     dataset_path = DATASETS_DIR / f"{args.dataset}.jsonl"
     items = select_items(load_dataset(dataset_path), args.per_category)
     systems = [s for s in SYSTEMS if s.name in args.systems]
-    run_id = datetime.now(timezone.utc).strftime("%Y%m%dT%H%M%SZ")
+    run_id = args.resume or datetime.now(timezone.utc).strftime("%Y%m%dT%H%M%SZ")
     raw_dir = settings.benchmark_dir / run_id
+    if args.resume and not raw_dir.is_dir():
+        raise ConfigError(f"--resume {run_id}: no such run under {settings.benchmark_dir}")
     runtime = await build_runtime(settings, log_dir=raw_dir)
     summaries: dict[str, dict] = {}
     all_results: dict[str, list[ItemResult]] = {}
     try:
         for system in systems:
-            results = await run_system(
-                runtime, system, items, concurrency=args.concurrency, delay_s=args.delay, reference_eval=args.reference_eval, exec_code=args.exec_code
-            )
-            with (raw_dir / f"{system.name}.jsonl").open("w", encoding="utf-8") as f:
-                f.writelines(r.model_dump_json() + "\n" for r in results)
+            final, partial = raw_dir / f"{system.name}.jsonl", raw_dir / f"{system.name}.partial.jsonl"
+            wanted = {i.id for i in items}
+            if final.exists():  # finished before the run was interrupted
+                results = [r for r in _load(final) if r.item_id in wanted]
+                if len(results) != len(items):
+                    raise ConfigError(f"{final} does not cover the selected items; resume with the arguments the run was started with")
+            else:
+                with partial.open("a", encoding="utf-8") as f:
+                    def save(result: ItemResult, f=f) -> None:
+                        f.write(result.model_dump_json() + "\n")
+                        f.flush()
+
+                    try:
+                        results = await run_system(
+                            runtime, system, items, concurrency=args.concurrency, delay_s=args.delay, reference_eval=args.reference_eval,
+                            exec_code=args.exec_code, done_before=[r for r in _load(partial) if r.item_id in wanted], on_result=save,
+                        )
+                    except QuotaStop as stop:
+                        stop.run_id = run_id
+                        raise
+                with final.open("w", encoding="utf-8") as f:
+                    f.writelines(r.model_dump_json() + "\n" for r in results)
+                partial.unlink()
             all_results[system.name] = results
             summaries[system.name] = summarize_system(system, results, {s.role: s.model_dump() for s in runtime.registry.all()})
     finally:
@@ -230,6 +255,13 @@ async def run(args: argparse.Namespace, settings: Settings) -> dict:
     return summary
 
 
+def _load(path) -> list[ItemResult]:
+    if not path.exists():
+        return []
+    with path.open(encoding="utf-8") as f:
+        return [ItemResult.model_validate_json(line) for line in f if line.strip()]
+
+
 def parse_args(argv: list[str] | None, settings: Settings) -> argparse.Namespace:
     parser = argparse.ArgumentParser(prog="python -m benchmark.run", description=__doc__.splitlines()[0])
     parser.add_argument("--systems", nargs="+", default=[s.name for s in SYSTEMS], choices=[s.name for s in SYSTEMS])
@@ -239,6 +271,8 @@ def parse_args(argv: list[str] | None, settings: Settings) -> argparse.Namespace
     parser.add_argument("--delay", type=float, default=0.0, help="Seconds to pause after each query (free-tier rate limits).")
     parser.add_argument("--no-reference-eval", dest="reference_eval", action="store_false", help="Skip the reference-answer judge pass.")
     parser.add_argument("--exec-code", action="store_true", help="Run model-written code against item tests (executes untrusted code locally).")
+    parser.add_argument("--resume", metavar="RUN_ID", default=None,
+                        help="Continue an interrupted run (same other arguments): finished systems and saved items are not run again.")
     return parser.parse_args(argv)
 
 
@@ -250,6 +284,15 @@ def main(argv: list[str] | None = None) -> int:
     except ConfigError as exc:
         print(f"Configuration error: {exc}", file=sys.stderr)
         return 2
+    except QuotaStop as stop:
+        given = [a for a in (sys.argv[1:] if argv is None else argv)]
+        if "--resume" in given:
+            del given[given.index("--resume"):given.index("--resume") + 2]
+        print(f"STOPPED: a provider kept rate-limiting after all retries (usually a daily quota): {stop.detail[:200]}\n"
+              f"Progress: run {stop.run_id} stopped in {stop.system} at {stop.done}/{stop.total} items; earlier systems are complete "
+              "and every finished item is saved.\n"
+              f"Resume when the quota resets: python -m benchmark.run {' '.join(given)} --resume {stop.run_id}", file=sys.stderr)
+        return QUOTA_EXIT_CODE
     print(f"Wrote {settings.results_dir / 'latest.json'} and latest.md ({summary['dataset']['n']} items, mock_mode={summary['mock_mode']})")
     gen_failures = {name: s["generation_failures"] for name, s in summary["systems"].items() if s.get("generation_failures")}
     if gen_failures:

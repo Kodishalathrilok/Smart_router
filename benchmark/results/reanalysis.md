@@ -62,7 +62,7 @@ SmartRouter judge-side spend (judge, fallback judge, second opinions): unknown p
 
 SmartRouter judge-side spend (judge, fallback judge, second opinions): unknown per 1,000 queries.
 
-## `hard` pooled over 3 complete runs with one model lineup (cheap=`openai/gpt-oss-20b`, mid=`openai/gpt-oss-120b`, strong=`nvidia/nemotron-3-ultra-550b-a55b`); repeated measurements of the same items
+## `hard` pooled over 3 complete runs of 4 systems with one model lineup (cheap=`openai/gpt-oss-20b`, mid=`openai/gpt-oss-120b`, strong=`nvidia/nemotron-3-ultra-550b-a55b`); repeated measurements of the same items
 
 **Verdict: NOT SUPPORTED (Always Cheap dominates).** Paired by question (majority of 3 runs). SmartRouter is cheaper than Always Strong without a measurable accuracy loss, but Always Cheap matches it for less money, so routing adds cost without a measurable benefit on this dataset (strict accuracy SmartRouter 97.8%, Always Cheap 94.4%, Always Strong 95.6%; cost incl. judge 6.94 vs 0.97 vs 9.89; paired vs cheap 1 wins / 0 losses (p=1.0)).
 

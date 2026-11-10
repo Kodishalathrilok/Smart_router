@@ -161,11 +161,11 @@ def main() -> int:
         groups: dict[tuple, list[dict]] = defaultdict(list)
         for _, r in runs:
             if {"smart_router", "always_weak", "always_strong"} <= r.keys():
-                groups[lineup(r)].append(r)
-        for models, full in groups.items():
+                groups[(lineup(r), tuple(s for s in SYSTEM_BY_NAME if s in r))].append(r)  # never pool runs with different system sets
+        for (models, ran), full in groups.items():
             if len(full) > 1:
                 names = ", ".join(f"{t}=`{m}`" for t, m in models)
-                blocks.append({"title": f"`{dataset}` pooled over {len(full)} complete runs with one model lineup ({names}); "
+                blocks.append({"title": f"`{dataset}` pooled over {len(full)} complete runs of {len(ran)} systems with one model lineup ({names}); "
                                         "repeated measurements of the same items",
                                "summary": summarize_pooled(full, judge_cost)})
     report = {"blocks": [{"title": b["title"], "summary": {k: v for k, v in b["summary"].items() if k != "systems"} | {
