@@ -22,7 +22,7 @@ from app.models.registry import ModelRegistry
 from app.providers.base import ProviderError
 from app.router.router import Router, model_key
 from app.router.schemas import QueryAnalysis, RouteDecision
-from app.schemas.common import Attempt, Mode, QueryRecord, SecondOpinion, TraceStep, new_query_id, utc_now
+from app.schemas.common import Attempt, Mode, QueryRecord, SecondOpinion, TokenUsage, TraceStep, new_query_id, utc_now
 from app.verification.checks import check_answer
 
 ANSWER_SYSTEM = (
@@ -108,7 +108,9 @@ class SmartRouterPipeline:
         attempts: list[Attempt] = []
         tried: set[str] = set()
         while True:
+            budget.tokens = {}  # the executor fills this during the attempt
             attempt = await self._attempt(qid, query, analysis, decision, len(attempts) + 1, reference, mode)
+            attempt = attempt.model_copy(update={"usage": {role: TokenUsage(**used) for role, used in budget.tokens.items()}})
             attempts.append(attempt)
             tried.add(model_key(attempt.provider, attempt.model))
             trace.extend(self._attempt_steps(attempt))
@@ -418,6 +420,7 @@ class SmartRouterPipeline:
             judge_calls=sum(a.judge_calls for a in attempts),
             provider_calls=budget.used,
             billed_calls=dict(budget.billed),
+            usage_recorded=True,
             trace=trace,
         )
 

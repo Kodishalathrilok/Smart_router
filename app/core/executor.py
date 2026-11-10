@@ -26,11 +26,19 @@ class CallBudget:
     limit: int
     used: int = 0  # every attempt, including ones that failed (what the budget caps)
     billed: dict[str, int] = field(default_factory=dict)  # successful responses per model role (what costs money)
+    # Tokens per model role since the pipeline last reset this (once per attempt), failed calls that reported usage included.
+    tokens: dict[str, dict] = field(default_factory=dict)
 
     def take(self, provider: str) -> None:
         if self.used >= self.limit:
             raise CallBudgetExceededError(f"per-query provider call budget ({self.limit}) exhausted", provider=provider)
         self.used += 1
+
+    def add_tokens(self, role: str, model: str, input_tokens: int, output_tokens: int) -> None:
+        if input_tokens or output_tokens:
+            usage = self.tokens.setdefault(role, {"model": model, "input_tokens": 0, "output_tokens": 0})
+            usage["input_tokens"] += input_tokens
+            usage["output_tokens"] += output_tokens
 
 
 _budget: ContextVar[CallBudget | None] = ContextVar("smartrouter_call_budget", default=None)
@@ -117,7 +125,15 @@ class Executor:
             async def call() -> LLMResponse:
                 if budget is not None:
                     budget.take(spec.provider)  # non-transient once exhausted: never retried
-                return await provider.generate(messages, spec.id, temperature=temperature, max_tokens=limit, json_mode=json_mode)
+                try:
+                    response = await provider.generate(messages, spec.id, temperature=temperature, max_tokens=limit, json_mode=json_mode)
+                except ProviderError as exc:
+                    if budget is not None:
+                        budget.add_tokens(spec.role, spec.id, exc.input_tokens, exc.output_tokens)
+                    raise
+                if budget is not None:
+                    budget.add_tokens(spec.role, spec.id, response.input_tokens, response.output_tokens)
+                return response
 
             return call
 

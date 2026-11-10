@@ -13,7 +13,7 @@ from datetime import datetime, timezone
 
 from app.core.bootstrap import build_runtime
 from app.core.config import ConfigError, Settings
-from app.core.metrics import cost_reduction_pct, mean, med, rate, summarize
+from app.core.metrics import cost_reduction_pct, mean, med, rate, record_cost_usd, summarize
 from benchmark.analysis import analyzer_validation, capability, escalation_breakdown, item_rows, judge_confusion, second_opinion_stats
 from benchmark.dataset import DATASET_NAMES, DATASETS_DIR, BenchmarkItem, load_dataset
 from benchmark.report import write_report
@@ -62,7 +62,23 @@ def serving_cost(system: System, results: list[ItemResult], role_costs: dict[str
     }
 
 
-def summarize_system(system: System, results: list[ItemResult], role_costs: dict[str, float]) -> dict:
+def price_table(profiles: dict[str, dict]) -> dict[str, dict]:
+    """role -> list price, from config/models.json-shaped profiles."""
+    return {role: {"model": p.get("price_model"), "input": p.get("price_per_mtok_input"), "output": p.get("price_per_mtok_output")}
+            for role, p in profiles.items()}
+
+
+def dollar_cost(results: list[ItemResult], prices: dict[str, dict], roles: tuple[str, ...] | None) -> dict:
+    """USD per 1,000 queries from stored tokens. None ("unknown") unless every query could be priced in full."""
+    costs = [record_cost_usd(r.record, prices, roles) for r in results]
+    known = [c for c in costs if c is not None]
+    complete = bool(costs) and len(known) == len(costs)
+    return {"per_1k_queries": round(sum(known) / len(known) * 1000, 4) if complete else None, "priced_queries": len(known), "queries": len(costs)}
+
+
+def summarize_system(system: System, results: list[ItemResult], profiles: dict[str, dict]) -> dict:
+    """profiles: role -> config/models.json entry (normalized_cost and list prices)."""
+    role_costs = {role: p["normalized_cost"] for role, p in profiles.items()}
     category = {r.record.query_id: r.category for r in results}
     base = summarize([r.record for r in results], category_of=lambda rec: category[rec.query_id])
     ref = [r.reference_quality for r in results if r.reference_quality is not None]
@@ -106,6 +122,8 @@ def summarize_system(system: System, results: list[ItemResult], role_costs: dict
         "items": item_rows(results),
         "second_opinions": second_opinion_stats(results),
         "cost_incl_judge": {"mean": serving["cost_incl_judge_mean"]},
+        # Same serving convention as cost_incl_judge: only SmartRouter pays for judges in production.
+        "cost_usd": dollar_cost(results, price_table(profiles), None if system.mode == "smart" else GENERATION_ROLES),
     }
 
 
@@ -173,7 +191,7 @@ async def run(args: argparse.Namespace, settings: Settings) -> dict:
             with (raw_dir / f"{system.name}.jsonl").open("w", encoding="utf-8") as f:
                 f.writelines(r.model_dump_json() + "\n" for r in results)
             all_results[system.name] = results
-            summaries[system.name] = summarize_system(system, results, {s.role: s.normalized_cost for s in runtime.registry.all()})
+            summaries[system.name] = summarize_system(system, results, {s.role: s.model_dump() for s in runtime.registry.all()})
     finally:
         await runtime.aclose()
 
@@ -192,7 +210,9 @@ async def run(args: argparse.Namespace, settings: Settings) -> dict:
             "quality_threshold": settings.quality_threshold,
             "max_escalations": settings.max_escalations,
             "routing_thresholds": {"cheap_max": settings.cheap_max_difficulty, "mid_max": settings.mid_max_difficulty},
-            "models": {s.role: {"id": s.id, "provider": s.provider, "normalized_cost": s.normalized_cost} for s in runtime.registry.all()},
+            "models": {s.role: {"id": s.id, "provider": s.provider, "normalized_cost": s.normalized_cost,
+                                "usd_per_mtok": [s.price_per_mtok_input, s.price_per_mtok_output] if s.price_model == s.id else None}
+                       for s in runtime.registry.all()},
             "reference_eval": args.reference_eval,
             "exec_code": args.exec_code,
             "concurrency": args.concurrency,

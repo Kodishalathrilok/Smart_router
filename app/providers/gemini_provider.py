@@ -34,16 +34,20 @@ class GeminiProvider(HTTPProvider):
         candidate = candidates[0]
         parts = (candidate.get("content") or {}).get("parts") or []
         text = "".join(p.get("text", "") for p in parts if not p.get("thought"))
-        if not text.strip():
-            error = TruncatedEmptyResponseError if candidate.get("finishReason") == "MAX_TOKENS" else EmptyResponseError
-            raise error(f"gemini returned empty text (finishReason={candidate.get('finishReason')})", provider=self.name)
         usage = data.get("usageMetadata") or {}
+        # Thinking tokens are billed at the output price, so they count as output.
+        input_tokens, output_tokens = usage.get("promptTokenCount", 0), usage.get("candidatesTokenCount", 0) + usage.get("thoughtsTokenCount", 0)
+        if not text.strip():
+            kind = TruncatedEmptyResponseError if candidate.get("finishReason") == "MAX_TOKENS" else EmptyResponseError
+            error = kind(f"gemini returned empty text (finishReason={candidate.get('finishReason')})", provider=self.name)
+            error.input_tokens, error.output_tokens = input_tokens, output_tokens
+            raise error
         return LLMResponse(
             text=text,
             model=model,
             provider=self.name,
-            input_tokens=usage.get("promptTokenCount", 0),
-            output_tokens=usage.get("candidatesTokenCount", 0),
+            input_tokens=input_tokens,
+            output_tokens=output_tokens,
             finish_reason=candidate.get("finishReason"),
         )
 

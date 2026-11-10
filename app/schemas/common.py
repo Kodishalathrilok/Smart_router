@@ -47,6 +47,14 @@ class SecondOpinion(BaseModel):
     error: str | None = None
 
 
+class TokenUsage(BaseModel):
+    """Tokens one model role consumed during an attempt (every call, retries and billed failures included)."""
+
+    model: str
+    input_tokens: int = 0
+    output_tokens: int = 0
+
+
 class Attempt(BaseModel):
     """One generate(+judge) step. Dimension scores are kept, not just the aggregate."""
 
@@ -61,6 +69,8 @@ class Attempt(BaseModel):
     input_tokens: int = 0
     output_tokens: int = 0
     finish_reason: str | None = None
+    # Per model role (cheap/mid/strong/judge/judge_fallback/second_opinion): what dollar cost is computed from.
+    usage: dict[str, TokenUsage] = Field(default_factory=dict)
     normalized_cost: float = 0.0
     quality_score: float | None = None  # primary judge; this is the answer's reported quality
     judge_model: str | None = None
@@ -115,6 +125,7 @@ class QueryRecord(BaseModel):
     billed_calls: dict[str, int] = Field(
         default_factory=dict, description="Successful responses per model role (cheap/mid/strong/judge/...): the calls a provider bills."
     )
+    usage_recorded: bool = Field(False, description="Attempts carry per-role token usage (records made before this have none).")
     trace: list[TraceStep]
 
 

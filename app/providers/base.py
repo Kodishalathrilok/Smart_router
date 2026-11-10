@@ -27,6 +27,9 @@ class ProviderError(Exception):
     """Base class for provider failures. `transient` errors are safe to retry."""
 
     transient: ClassVar[bool] = False
+    # Usage the provider reported for a failed call (an empty reply is still billed). Set by the adapter.
+    input_tokens: int = 0
+    output_tokens: int = 0
 
     def __init__(self, message: str, *, provider: str, status_code: int | None = None) -> None:
         super().__init__(message)

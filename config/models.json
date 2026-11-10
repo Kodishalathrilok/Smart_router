@@ -1,51 +1,75 @@
 {
-  "_comment": "Per-role model metadata. Model IDs and providers come from .env (CHEAP_MODEL, CHEAP_PROVIDER, ...). normalized_cost values are experiment weights, NOT money. price_per_mtok_* is optional real pricing (USD per million tokens) and is never mixed into normalized_cost.",
+  "_comment": "Per-role model metadata. Model IDs and providers come from .env (CHEAP_MODEL, CHEAP_PROVIDER, ...). normalized_cost values are experiment weights, NOT money. price_per_mtok_* is the provider's public list price in USD per million tokens for the model named in price_model, and applies to no other model (change all three together when the .env lineup changes). null = no public per-token price; any system that uses that model reports its dollar cost as unknown. Dollars are never mixed into normalized_cost. Prices looked up 2026-11-10. Groq (openai/gpt-oss-20b, openai/gpt-oss-120b, qwen/qwen3.8-27b): https://console.groq.com/docs/models . Gemini (gemini-3.5-flash-lite, paid tier, standard; output price includes thinking tokens): https://ai.google.dev/gemini-api/docs/pricing . NVIDIA (nvidia/nemotron-3-ultra-550b-a55b, z-ai/glm-5.3-flash): no per-token price published; build.nvidia.com serves them under the NVIDIA API Trial Terms of Service (https://build.nvidia.com/nvidia/nemotron-3-ultra-550b-a55b , https://build.nvidia.com/models).",
   "cheap": {
-    "capability_score": 0.60,
+    "capability_score": 0.6,
     "normalized_cost": 1.0,
     "expected_latency": "low",
-    "strengths": ["general_qa", "classification", "summarization"],
-    "price_per_mtok_input": null,
-    "price_per_mtok_output": null
+    "strengths": [
+      "general_qa",
+      "classification",
+      "summarization"
+    ],
+    "price_per_mtok_input": 0.075,
+    "price_per_mtok_output": 0.3,
+    "price_model": "openai/gpt-oss-20b"
   },
   "mid": {
-    "capability_score": 0.80,
+    "capability_score": 0.8,
     "normalized_cost": 3.0,
     "expected_latency": "medium",
-    "strengths": ["general_qa", "summarization", "coding"],
-    "price_per_mtok_input": null,
-    "price_per_mtok_output": null
+    "strengths": [
+      "general_qa",
+      "summarization",
+      "coding"
+    ],
+    "price_per_mtok_input": 0.15,
+    "price_per_mtok_output": 0.6,
+    "price_model": "openai/gpt-oss-120b"
   },
   "strong": {
     "capability_score": 0.95,
     "normalized_cost": 10.0,
     "expected_latency": "high",
-    "strengths": ["reasoning", "math", "coding"],
+    "strengths": [
+      "reasoning",
+      "math",
+      "coding"
+    ],
     "price_per_mtok_input": null,
-    "price_per_mtok_output": null
+    "price_per_mtok_output": null,
+    "price_model": "nvidia/nemotron-3-ultra-550b-a55b"
   },
   "judge": {
-    "capability_score": 0.90,
+    "capability_score": 0.9,
     "normalized_cost": 3.0,
     "expected_latency": "medium",
-    "strengths": ["evaluation"],
-    "price_per_mtok_input": null,
-    "price_per_mtok_output": null
+    "strengths": [
+      "evaluation"
+    ],
+    "price_per_mtok_input": 0.3,
+    "price_per_mtok_output": 2.5,
+    "price_model": "gemini-3.5-flash-lite"
   },
   "judge_fallback": {
-    "capability_score": 0.90,
+    "capability_score": 0.9,
     "normalized_cost": 3.0,
     "expected_latency": "medium",
-    "strengths": ["evaluation"],
+    "strengths": [
+      "evaluation"
+    ],
     "price_per_mtok_input": null,
-    "price_per_mtok_output": null
+    "price_per_mtok_output": null,
+    "price_model": "z-ai/glm-5.3-flash"
   },
   "second_opinion": {
-    "capability_score": 0.80,
+    "capability_score": 0.8,
     "normalized_cost": 3.0,
     "expected_latency": "low",
-    "strengths": ["evaluation"],
-    "price_per_mtok_input": null,
-    "price_per_mtok_output": null
+    "strengths": [
+      "evaluation"
+    ],
+    "price_per_mtok_input": 0.8,
+    "price_per_mtok_output": 4.0,
+    "price_model": "qwen/qwen3.8-27b"
   }
 }

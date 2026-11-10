@@ -32,10 +32,12 @@ class OpenAICompatibleProvider(HTTPProvider):
         except (KeyError, IndexError, TypeError):
             raise ProviderServerError(f"{self.name} response had no choices", provider=self.name) from None
         text = (choice.get("message") or {}).get("content") or ""
-        if not text.strip():
-            error = TruncatedEmptyResponseError if choice.get("finish_reason") == "length" else EmptyResponseError
-            raise error(f"{self.name} returned an empty completion (finish_reason={choice.get('finish_reason')})", provider=self.name)
         usage = data.get("usage") or {}
+        if not text.strip():
+            kind = TruncatedEmptyResponseError if choice.get("finish_reason") == "length" else EmptyResponseError
+            error = kind(f"{self.name} returned an empty completion (finish_reason={choice.get('finish_reason')})", provider=self.name)
+            error.input_tokens, error.output_tokens = usage.get("prompt_tokens", 0), usage.get("completion_tokens", 0)
+            raise error
         return LLMResponse(
             text=text,
             model=data.get("model", model),

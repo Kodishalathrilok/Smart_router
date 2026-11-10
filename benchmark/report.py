@@ -34,6 +34,12 @@ def plumbing(cap: dict | None) -> str:
     return f"{pct(cap['plumbing_rate'])} ({cap['plumbing_failures']}/{cap['checked']})"
 
 
+def usd(cost: dict | None) -> str:
+    """Dollars per 1,000 queries, or 'unknown' (unpriced model, or a record without stored tokens). Never partial."""
+    value = (cost or {}).get("per_1k_queries")
+    return "unknown" if value is None else f"${value:.2f}"
+
+
 def change(reduction_pct) -> str:
     """Render a reduction percentage as 'X% lower' / 'X% higher'."""
     if reduction_pct is None:
@@ -154,8 +160,10 @@ def render(s: dict) -> str:
         f"5. Quality threshold {cfg['quality_threshold']}, max escalations {cfg['max_escalations']}, routing thresholds "
         f"cheap < {cfg['routing_thresholds']['cheap_max']} <= mid < {cfg['routing_thresholds']['mid_max']} <= strong, concurrency {cfg['concurrency']}.",
     ]) + "\n")
-    out.append(table(["Role", "Model", "Provider", "Normalized cost"],
-                     [[r, f"`{m['id']}`", m["provider"], fmt(m["normalized_cost"], 1)] for r, m in models.items()]) + "\n")
+    out.append(table(["Role", "Model", "Provider", "Normalized cost", "USD per 1M tokens (in / out)"],
+                     [[r, f"`{m['id']}`", m["provider"], fmt(m["normalized_cost"], 1),
+                       "no public price" if not m.get("usd_per_mtok") or None in m["usd_per_mtok"] else "${} / ${}".format(*m["usd_per_mtok"])]
+                      for r, m in models.items()]) + "\n")
 
     out.append("## Baselines\n")
     out.append(table(["System", "Mode", "Description"], [[v["label"], f"`{v['mode']}`", v["description"]] for v in systems.values()]) + "\n")
@@ -169,6 +177,9 @@ def render(s: dict) -> str:
         "- **Calls/query**: generation calls plus serving-time judge calls (what production would pay for), excluding transport retries.",
         "- **Gen cost**: mean normalized cost per query (sum of per-call tier weights; experiment weights, not money).",
         "- **Cost incl. judge**: gen cost plus serving-time judge calls x judge weight (only SmartRouter needs the judge when serving).",
+        "- **$ / 1k queries**: US dollars per 1,000 queries at list prices (`config/models.json`), from the tokens stored for every call, "
+        "billed failures included, with the same serving convention as *Cost incl. judge*. `unknown` when any model that ran has no public "
+        "price or the records predate token storage; never a partial sum. Kept separate from normalized cost: *vs cheap* / *vs strong* use normalized units.",
         "- **Latency**: end-to-end pipeline latency including the in-loop judge call for every system; `gen p50` is generation-only.",
         "- **Below thr.**: share of queries whose final answer did not meet the quality threshold (best effort or failed).",
         "- `quality_score` is an LLM evaluation signal, **not** a probability of correctness.",
@@ -183,13 +194,13 @@ def render(s: dict) -> str:
         rows.append([
             v["label"], pct(st.get("accuracy")), f"{pct(ci[0])}-{pct(ci[1])}" if ci else "n/a",
             pct((v.get("capability") or {}).get("readable_accuracy")), plumbing(v.get("capability")),
-            fmt(v["cost"]["mean"], 2), fmt(v["cost_incl_judge"]["mean"], 2),
+            fmt(v["cost"]["mean"], 2), fmt(v["cost_incl_judge"]["mean"], 2), usd(v.get("cost_usd")),
             f"{c['cost_incl_judge_vs_cheap_x']:.2f}x" if c.get("cost_incl_judge_vs_cheap_x") is not None else "n/a",
             change(c.get("cost_incl_judge_reduction_pct_vs_strong")), fmt(v.get("serving_calls_mean"), 2),
             fmt(v["latency_ms"]["median"], 0), fmt(v["latency_ms"]["p95"], 0),
             pct(v["escalation"]["rate"]), pct(v["failure_rate"]), fmt(v["reference_quality"]["mean"]), fmt(v["quality"]["mean"]),
         ])
-    out.append(table(["System", "Strict acc.", "95% CI", "Acc. among readable", "Plumbing failures", "Gen cost", "Cost incl. judge", "vs cheap", "vs strong (incl. judge)",
+    out.append(table(["System", "Strict acc.", "95% CI", "Acc. among readable", "Plumbing failures", "Gen cost", "Cost incl. judge", "$ / 1k queries", "vs cheap", "vs strong (incl. judge)",
                       "Calls/query", "p50 ms", "p95 ms", "Escalation", "Failed", "Ref. judge q.", "In-loop judge q."], rows) + "\n")
     out.append(paired_section(s))
     out.append(analyzer_section(s))
@@ -232,7 +243,8 @@ def render(s: dict) -> str:
         "- The judge is an LLM: it has evaluator, verbosity and self-preference biases, can share blind spots with the models it grades, and scores inconsistently across calls. quality_score is not ground truth.",
         "- Reference answers are short and hand-written; open-ended items (reasoning, summarization) admit many valid answers.",
         f"- {ds['n']} items is small: the confidence intervals above are wide, and a sign test on a handful of discordant items cannot detect small differences.",
-        "- Normalized cost uses configured tier weights, not provider billing. It measures relative model usage, not money.",
+        "- Normalized cost uses configured tier weights, not provider billing. It measures relative model usage, not money. "
+        "Dollar figures use list prices on the date recorded in `config/models.json`, not an invoice.",
         "- Latency depends on provider load, rate limits and retries at run time and is not reproducible across runs.",
         "- Provider model versions change over time; results apply only to the model IDs listed above on the run date.",
         "- The query analyzer is a keyword heuristic; see *Router validation* for how its estimates line up with the dataset labels.",

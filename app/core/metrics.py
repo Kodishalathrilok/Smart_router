@@ -1,7 +1,7 @@
 """Aggregate metrics over query records. Shared by the benchmark and the dashboard API."""
 
 from collections import Counter, defaultdict
-from collections.abc import Callable, Iterable, Sequence
+from collections.abc import Callable, Collection, Iterable, Mapping, Sequence
 from statistics import fmean, median
 
 from app.router.schemas import TIERS
@@ -49,6 +49,27 @@ def cost_reduction_pct(cost: float | None, baseline: float | None) -> float | No
     if cost is None or not baseline:
         return None
     return round((1 - cost / baseline) * 100, 1)
+
+
+def record_cost_usd(record: QueryRecord, prices: Mapping[str, Mapping], roles: Collection[str] | None = None) -> float | None:
+    """Dollar cost of one query from its stored tokens, or None when it cannot be known.
+
+    prices: role -> {"model": id the price was looked up for, "input": USD per million tokens, "output": ...}.
+    None (never a partial sum) when the record predates token storage, or any role that used tokens has no
+    price for the model that actually ran. `roles` restricts the sum (baselines serve without a judge).
+    """
+    if not record.usage_recorded:
+        return None
+    total = 0.0
+    for attempt in record.attempts:
+        for role, used in attempt.usage.items():
+            if roles is not None and role not in roles:
+                continue
+            price = prices.get(role)
+            if not price or price["model"] != used.model or price["input"] is None or price["output"] is None:
+                return None
+            total += (used.input_tokens * price["input"] + used.output_tokens * price["output"]) / 1_000_000
+    return total
 
 
 def summarize(records: Sequence[QueryRecord], *, category_of: Callable[[QueryRecord], str] | None = None) -> dict:

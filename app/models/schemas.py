@@ -16,6 +16,7 @@ class ModelProfile(BaseModel):
     strengths: list[str] = Field(default_factory=list)
     price_per_mtok_input: float | None = Field(None, description="Optional real USD pricing. Kept separate from normalized_cost.")
     price_per_mtok_output: float | None = None
+    price_model: str | None = Field(None, description="Model ID the prices were looked up for; they apply to no other model.")
 
 
 class ModelSpec(ModelProfile):
