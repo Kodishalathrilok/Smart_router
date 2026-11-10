@@ -85,13 +85,20 @@ Also reported, each as a plain yes/no:
   It holds if the first is larger. If SmartRouter's judge-side cost is "unknown" (the unpriced fallback judge was
   used), the answer is "cannot be determined", not an estimate.
 
-## Validity condition
+## Target
 
-The measurement counts as valid if plumbing failures are at most 1 of the 450 item-runs. If there are more, the numbers
-are still reported in full, and the verdict stands only if it is the same whether the plumbing failures are counted as
-wrong (strict) or left out (readable only); otherwise the outcome is reported as "measurement not valid", with the
-failures listed by kind. The truncation retry addresses empty replies only: answers cut off mid-text, unreadable final
-numbers and provider errors can still occur, so this condition may fail.
+Amended 2026-11-10, before any run (the first version of this section required at most 1 plumbing failure in 450
+item-runs; the repository owner replaced it because the truncation retry can only fix empty replies).
+
+**Zero empty-reply misses**: no item-run in the pooled new runs may be missed because the model returned an empty reply,
+whether or not it was cut off by the output limit (an empty reply with `finish_reason=length` that is still empty after
+the retry counts). The earlier pooled runs had 4.
+
+The other plumbing failures (an answer cut off mid-text, an answer without a readable final number, a provider error)
+are **reported, not targeted**: they are counted per system and by kind, and they count as wrong in the primary metric.
+The answer prompt, the number reader and `GENERATION_MAX_TOKENS` are deliberately left unchanged, so these can recur.
+
+If the target is missed, the numbers are still reported in full and the miss is stated next to the verdict.
 
 ## Deviations
 
