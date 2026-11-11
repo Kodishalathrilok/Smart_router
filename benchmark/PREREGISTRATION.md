@@ -123,19 +123,21 @@ If the target is missed, the numbers are still reported in full and the miss is 
    because only rate limits stopped a run at that point. No result from it was used for any decision other than this
    one, and its files are not committed. The connection-failure rule above was added in response. The three pooled
    runs are the first three complete runs started after this entry was committed.
-2. **Run `20261111T024904Z` (the third pooled run) stopped by hand and resumed (2026-11-11).** Runs
+2. **Run `20261111T024904Z` (the third pooled run) stopped by the judge's daily quota (2026-11-11).** Runs
    `20261111T013331Z` and `20261111T021401Z` completed without any stop. In the third run, Always Cheap, Always Mid
-   and Always Strong completed; during Static Router the Gemini judge returned HTTP 429 through all four tries on two
-   items (`math_hard_06`, `math_hard_08`). This was the per-minute limit, not the daily quota: a single call a few
-   minutes later succeeded. The run did not stop by itself, because the fallback judge took over and the stop rule only
-   looked at the error left on the attempt; each such item then waited about 12 minutes on fallback-judge timeouts. The
-   process was killed at Static Router 7/30. What was done, following the rule already written above ("if a provider is
-   still rate limiting after every retry, the run stops; the item is not kept"):
+   and Always Strong completed; during Static Router the Gemini judge began returning HTTP 429 through all four
+   tries (`math_hard_06`, `math_hard_08`). The cause is the free-tier limit of 500 requests per day for
+   `gemini-3.5-flash-lite` (Google's error names the quota `GenerateRequestsPerDayPerProjectPerModel-FreeTier`).
+   An earlier version of this entry called it a per-minute limit, because one test call in between had succeeded;
+   that was wrong.
+   The run did not stop by itself: the fallback judge took over and the stop rule only looked at the error left on the
+   attempt, so each such item then waited about 12 minutes on fallback-judge timeouts. The process was stopped by hand
+   at Static Router 7/30. What was done, following the rule already written above ("if a provider is still rate
+   limiting after every retry, the run stops; the item is not kept"):
    - the code now applies that rule also when a fallback model answers after the rate-limited one gave up;
    - `math_hard_06`, which had been saved with the judge in that state, was removed from the partial file and is
      answered again on resume (`math_hard_08` was in progress and had not been saved). The other six saved Static
      Router items are kept as first recorded;
-   - the rest of the run uses `--delay 5` instead of `--delay 2`, to stay under the judge's per-minute limit, and is
-     resumed automatically after a 90-second wait when it stops. This changes pacing only; no prompt, model, limit or
-     scoring rule changed.
+   - one resume attempt with `--delay 5` was made before the quota was identified; it hit the same limit on its first
+     item and saved nothing. The run is resumed with the registered command (`--delay 2`) once the quota resets.
    No accuracy figure had been computed or looked at for any new run when this was decided.
