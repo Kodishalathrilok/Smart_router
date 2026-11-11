@@ -6,7 +6,7 @@ import benchmark.run as run_module
 from app.core.bootstrap import build_runtime
 from app.providers.base import LLMProvider, LLMResponse, RateLimitError
 from benchmark.run import QUOTA_EXIT_CODE, main, parse_args, run
-from benchmark.runners import ItemResult, QuotaStop, rate_limited
+from benchmark.runners import ItemResult, QuotaStop, stop_reason
 from tests.conftest import judge_json, make_settings
 
 ARGS = ["--per-category", "1", "--no-reference-eval"]  # 5 items
@@ -54,7 +54,7 @@ async def test_quota_stop_keeps_finished_work_and_resume_completes_it(tmp_path, 
     assert stop.value.system == "always_mid" and stop.value.done == 2 and stop.value.total == 5
     assert len(lines(run_dir / "always_weak.jsonl")) == 5  # a finished system is saved as soon as it finishes
     partial = lines(run_dir / "always_mid.partial.jsonl")
-    assert len(partial) == 2 and not any(rate_limited(r.record) for r in partial)  # the rate-limited item is not kept
+    assert len(partial) == 2 and not any(stop_reason(r.record) for r in partial)  # the rate-limited item is not kept
     assert not (settings.results_dir / "latest.json").exists()  # no summary from half a run
 
     second = Metered(allowance=1000)
@@ -80,11 +80,14 @@ def test_main_reports_progress_and_the_resume_command(tmp_path, monkeypatch, cap
     assert "always_mid" in err and "2/5" in err and "--resume" in err and "--per-category 1" in err
 
 
-def test_rate_limit_is_detected_on_generation_judge_and_second_opinion():
+def test_rate_limits_and_connection_failures_stop_the_run_but_other_errors_do_not():
     from types import SimpleNamespace as NS
 
     ok = NS(error_type=None, second_opinion=None)
-    assert rate_limited(NS(attempts=[ok])) is None
-    assert rate_limited(NS(attempts=[ok, NS(error_type="RateLimitError", error="groq HTTP 429", second_opinion=None)]))
-    assert rate_limited(NS(attempts=[NS(error_type=None, second_opinion=NS(error="RateLimitError: groq HTTP 429"))]))
-    assert rate_limited(NS(attempts=[NS(error_type="ProviderServerError", error="503", second_opinion=NS(error=None))])) is None
+    assert stop_reason(NS(attempts=[ok])) is None
+    assert stop_reason(NS(attempts=[ok, NS(error_type="RateLimitError", error="groq HTTP 429", second_opinion=None)]))
+    assert stop_reason(NS(attempts=[NS(error_type=None, second_opinion=NS(error="RateLimitError: groq HTTP 429"))]))
+    assert stop_reason(NS(attempts=[ok, NS(error_type="NetworkError", error="groq network error: ConnectError", second_opinion=None)]))
+    assert stop_reason(NS(attempts=[NS(error_type=None, second_opinion=NS(error="NetworkError: groq network error: ConnectError"))]))
+    assert stop_reason(NS(attempts=[NS(error_type="ProviderTimeoutError", error="slow", second_opinion=None)])) is None
+    assert stop_reason(NS(attempts=[NS(error_type="ProviderServerError", error="503", second_opinion=NS(error=None))])) is None

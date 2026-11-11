@@ -53,20 +53,24 @@ class ItemResult(BaseModel):
 
 
 class QuotaStop(Exception):
-    """A provider kept rate-limiting after every retry (usually a daily quota): the run stops and can be resumed."""
+    """A provider kept rate-limiting (usually a daily quota) or could not be reached after every retry:
+    the run stops and can be resumed. Neither says anything about a model, so such items are never recorded."""
 
     def __init__(self, system: str, done: int, total: int, detail: str) -> None:
-        super().__init__(f"{system}: rate limited after {done}/{total} items ({detail})")
+        super().__init__(f"{system}: stopped after {done}/{total} items ({detail})")
         self.system, self.done, self.total, self.detail = system, done, total, detail
         self.run_id = ""  # filled in by benchmark.run
 
 
-def rate_limited(record: QueryRecord) -> str | None:
-    """The rate-limit error that survived every retry in this query (generation, judge or second opinion), if any."""
+STOP_ERRORS = ("RateLimitError", "NetworkError")  # quota exhausted / no connection to the provider
+
+
+def stop_reason(record: QueryRecord) -> str | None:
+    """The rate-limit or connection error that survived every retry in this query (generation, judge or second opinion), if any."""
     for a in record.attempts:
-        if a.error_type == "RateLimitError":
-            return a.error or "RateLimitError"
-        if a.second_opinion and (a.second_opinion.error or "").startswith("RateLimitError"):
+        if a.error_type in STOP_ERRORS:
+            return f"{a.error_type}: {a.error or ''}"
+        if a.second_opinion and (a.second_opinion.error or "").startswith(STOP_ERRORS):
             return a.second_opinion.error
     return None
 
@@ -100,7 +104,7 @@ async def run_system(
     """Run one system over all items with bounded concurrency (1 = sequential, the free-tier default).
 
     `done_before` are results saved by an interrupted run: those items are not run again. `on_result` is called
-    with each new result as it finishes. An item that ends rate limited after all retries is not kept (it says
+    with each new result as it finishes. An item that ends rate limited or unreachable after all retries is not kept (it says
     nothing about the model); no further items are started and QuotaStop is raised.
     """
     semaphore = asyncio.Semaphore(concurrency)
@@ -116,7 +120,7 @@ async def run_system(
             if stopped:
                 return None
             result = await run_item(runtime, system, item, reference_eval=reference_eval, exec_code=exec_code)
-            limit = rate_limited(result.record)
+            limit = stop_reason(result.record)
             if limit:
                 stopped = stopped or limit
                 return None

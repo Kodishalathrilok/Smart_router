@@ -48,6 +48,12 @@ that finished is kept exactly as it was first recorded and is never re-run. Each
 the run ID, the system and the item count reached. Provider errors other than rate limits (for example a 503) are not
 retried this way: they stay in the results and count as wrong.
 
+Amended 2026-11-11, after the discarded run described under Deviations and before any run that is pooled: a
+**connection failure** that survives every retry (`NetworkError`: the request never reached the provider) is treated
+exactly like a rate limit. The run stops, the item is not kept, and the run is resumed later. A request that reached
+the provider and failed there (a 5xx, a timeout, an empty or cut-off reply) is still recorded and still counts as
+wrong.
+
 ## Metrics
 
 - **Primary: strict exact accuracy** = correct / every checkable item. An answer that is missing, cut off or
@@ -110,4 +116,10 @@ If the target is missed, the numbers are still reported in full and the miss is 
 
 ## Deviations
 
-None yet.
+1. **Run `20261110T164607Z` discarded whole (decided 2026-11-11 by the repository owner, before any other run
+   existed).** The local network connection dropped about 8 minutes into the run (around 16:54 UTC). Always Cheap had
+   finished (28/30 correct); from the middle of Always Mid onward every call failed with `ConnectError`, so 136 of
+   the 150 item-runs contain a connection failure and say nothing about any model. The run still ran to the end
+   because only rate limits stopped a run at that point. No result from it was used for any decision other than this
+   one, and its files are not committed. The connection-failure rule above was added in response. The three pooled
+   runs are the first three complete runs started after this entry was committed.

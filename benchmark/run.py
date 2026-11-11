@@ -4,7 +4,7 @@ Writes raw per-item results to BENCHMARK_DIR/<run_id>/ and the summary to
 RESULTS_DIR/latest.json, then renders RESULTS_DIR/latest.md.
 
 Every item is saved as it finishes (<system>.partial.jsonl, renamed to <system>.jsonl when the system is complete).
-If a provider keeps rate-limiting after all retries (usually a daily quota), the run stops with exit code 3 and
+If a provider keeps rate-limiting (usually a daily quota) or cannot be reached after all retries, the run stops with exit code 3 and
 `--resume RUN_ID` with the same arguments continues it without repeating saved work.
 """
 
@@ -288,10 +288,10 @@ def main(argv: list[str] | None = None) -> int:
         given = [a for a in (sys.argv[1:] if argv is None else argv)]
         if "--resume" in given:
             del given[given.index("--resume"):given.index("--resume") + 2]
-        print(f"STOPPED: a provider kept rate-limiting after all retries (usually a daily quota): {stop.detail[:200]}\n"
+        print(f"STOPPED: a provider kept rate-limiting (usually a daily quota) or could not be reached, after all retries: {stop.detail[:200]}\n"
               f"Progress: run {stop.run_id} stopped in {stop.system} at {stop.done}/{stop.total} items; earlier systems are complete "
               "and every finished item is saved.\n"
-              f"Resume when the quota resets: python -m benchmark.run {' '.join(given)} --resume {stop.run_id}", file=sys.stderr)
+              f"Resume when the quota resets or the connection is back: python -m benchmark.run {' '.join(given)} --resume {stop.run_id}", file=sys.stderr)
         return QUOTA_EXIT_CODE
     print(f"Wrote {settings.results_dir / 'latest.json'} and latest.md ({summary['dataset']['n']} items, mock_mode={summary['mock_mode']})")
     gen_failures = {name: s["generation_failures"] for name, s in summary["systems"].items() if s.get("generation_failures")}
