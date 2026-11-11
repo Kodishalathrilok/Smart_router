@@ -9,7 +9,15 @@ from time import perf_counter
 from typing import TypeVar
 
 from app.models.schemas import ModelSpec
-from app.providers.base import CallBudgetExceededError, LLMProvider, LLMResponse, ProviderError, RateLimitError, TruncatedEmptyResponseError
+from app.providers.base import (
+    CallBudgetExceededError,
+    LLMProvider,
+    LLMResponse,
+    NetworkError,
+    ProviderError,
+    RateLimitError,
+    TruncatedEmptyResponseError,
+)
 
 T = TypeVar("T")
 ErrorHook = Callable[[ProviderError, int], None]
@@ -28,6 +36,9 @@ class CallBudget:
     billed: dict[str, int] = field(default_factory=dict)  # successful responses per model role (what costs money)
     # Tokens per model role since the pipeline last reset this (once per attempt), failed calls that reported usage included.
     tokens: dict[str, dict] = field(default_factory=dict)
+    # "role: ErrorType" for every call that was still rate limited or unreachable after its last retry, even when a
+    # fallback model then answered. Says the provider was unavailable, not that a model was wrong.
+    gave_up: list[str] = field(default_factory=list)
 
     def take(self, provider: str) -> None:
         if self.used >= self.limit:
@@ -139,11 +150,16 @@ class Executor:
 
         start = perf_counter()
         try:
-            response = await with_retries(call_with(max_tokens), on_error=on_error, **retry)
-        except TruncatedEmptyResponseError:
-            if self._truncation_retry_max_tokens <= max_tokens:
-                raise
-            response = await with_retries(call_with(self._truncation_retry_max_tokens), on_error=on_error, **retry)
+            try:
+                response = await with_retries(call_with(max_tokens), on_error=on_error, **retry)
+            except TruncatedEmptyResponseError:
+                if self._truncation_retry_max_tokens <= max_tokens:
+                    raise
+                response = await with_retries(call_with(self._truncation_retry_max_tokens), on_error=on_error, **retry)
+        except (RateLimitError, NetworkError) as exc:
+            if budget is not None:
+                budget.gave_up.append(f"{spec.role}: {exc.error_type}")
+            raise
         if budget is not None:
             budget.billed[spec.role] = budget.billed.get(spec.role, 0) + 1
         return response.model_copy(update={"latency_ms": round((perf_counter() - start) * 1000, 1)})

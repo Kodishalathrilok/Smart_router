@@ -84,10 +84,22 @@ def test_rate_limits_and_connection_failures_stop_the_run_but_other_errors_do_no
     from types import SimpleNamespace as NS
 
     ok = NS(error_type=None, second_opinion=None)
-    assert stop_reason(NS(attempts=[ok])) is None
-    assert stop_reason(NS(attempts=[ok, NS(error_type="RateLimitError", error="groq HTTP 429", second_opinion=None)]))
-    assert stop_reason(NS(attempts=[NS(error_type=None, second_opinion=NS(error="RateLimitError: groq HTTP 429"))]))
-    assert stop_reason(NS(attempts=[ok, NS(error_type="NetworkError", error="groq network error: ConnectError", second_opinion=None)]))
-    assert stop_reason(NS(attempts=[NS(error_type=None, second_opinion=NS(error="NetworkError: groq network error: ConnectError"))]))
-    assert stop_reason(NS(attempts=[NS(error_type="ProviderTimeoutError", error="slow", second_opinion=None)])) is None
-    assert stop_reason(NS(attempts=[NS(error_type="ProviderServerError", error="503", second_opinion=NS(error=None))])) is None
+    assert stop_reason(NS(gave_up=[], attempts=[ok])) is None
+    assert stop_reason(NS(gave_up=["judge: RateLimitError"], attempts=[ok])) == "judge: RateLimitError"
+    assert stop_reason(NS(gave_up=[], attempts=[ok, NS(error_type="RateLimitError", error="groq HTTP 429", second_opinion=None)]))
+    assert stop_reason(NS(gave_up=[], attempts=[NS(error_type=None, second_opinion=NS(error="RateLimitError: groq HTTP 429"))]))
+    assert stop_reason(NS(gave_up=[], attempts=[ok, NS(error_type="NetworkError", error="groq network error: ConnectError", second_opinion=None)]))
+    assert stop_reason(NS(gave_up=[], attempts=[NS(error_type=None, second_opinion=NS(error="NetworkError: groq network error: ConnectError"))]))
+    assert stop_reason(NS(gave_up=[], attempts=[NS(error_type="ProviderTimeoutError", error="slow", second_opinion=None)])) is None
+    assert stop_reason(NS(gave_up=[], attempts=[NS(error_type="ProviderServerError", error="503", second_opinion=NS(error=None))])) is None
+
+
+async def test_a_rate_limited_primary_judge_stops_the_run_even_when_the_fallback_judge_answers(tmp_path):
+    from tests.integration.test_pipeline import ANSWERS, EASY, TwoJudges
+
+    limited = RateLimitError("gemini HTTP 429", provider="mock", retry_after=0)
+    provider = TwoJudges({**ANSWERS, "mock-backup": ""}, {"ANS-cheap": {"mock-judge": limited, "mock-backup": 0.95}})
+    runtime = await build_runtime(make_settings(tmp_path, judge_fallback_model="mock-backup", second_opinion=False), providers={"mock": provider})
+    record = await runtime.pipeline.run(EASY)
+    assert record.final_status == "accepted" and record.attempts[0].judge_model == "mock-backup"  # serving is unaffected
+    assert record.gave_up == ["judge: RateLimitError"] and stop_reason(record) == "judge: RateLimitError"

@@ -125,6 +125,10 @@ class QueryRecord(BaseModel):
     billed_calls: dict[str, int] = Field(
         default_factory=dict, description="Successful responses per model role (cheap/mid/strong/judge/...): the calls a provider bills."
     )
+    gave_up: list[str] = Field(
+        default_factory=list,
+        description="'role: ErrorType' for each call still rate limited or unreachable after its last retry, even if a fallback answered.",
+    )
     usage_recorded: bool = Field(False, description="Attempts carry per-role token usage (records made before this have none).")
     trace: list[TraceStep]
 

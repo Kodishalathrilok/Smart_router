@@ -66,7 +66,9 @@ STOP_ERRORS = ("RateLimitError", "NetworkError")  # quota exhausted / no connect
 
 
 def stop_reason(record: QueryRecord) -> str | None:
-    """The rate-limit or connection error that survived every retry in this query (generation, judge or second opinion), if any."""
+    """The rate-limit or connection error that survived every retry in this query (generation, any judge or second opinion), if any."""
+    if record.gave_up:  # includes a primary judge that gave up before a fallback judge answered
+        return "; ".join(record.gave_up)
     for a in record.attempts:
         if a.error_type in STOP_ERRORS:
             return f"{a.error_type}: {a.error or ''}"

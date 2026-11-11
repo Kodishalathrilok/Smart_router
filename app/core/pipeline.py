@@ -420,6 +420,7 @@ class SmartRouterPipeline:
             judge_calls=sum(a.judge_calls for a in attempts),
             provider_calls=budget.used,
             billed_calls=dict(budget.billed),
+            gave_up=list(budget.gave_up),
             usage_recorded=True,
             trace=trace,
         )
