@@ -4,38 +4,77 @@
 
 SmartRouter picks a starting model tier (cheap / mid / strong) for each query with a keyword heuristic, checks the answer with deterministic checks and an independent LLM judge, and escalates to a stronger tier when the answer is not accepted. Every decision is logged, and a reproducible benchmark compares it against always-cheap, always-mid, always-strong and static-routing baselines on exactly checkable questions.
 
-> Research hypothesis: *adaptive routing can reduce cost without reducing answer quality.* This is the question the project is built to test. **On the recorded real-model runs it is not supported**: the cheap model alone was as accurate as SmartRouter at about 1/7 of the cost. See [Results](#results).
+> Research hypothesis: *adaptive routing can reduce cost without reducing answer quality.* This is the question the project is built to test. **On the pre-registered real-model runs it is not supported**: SmartRouter was not measurably more accurate than the cheap model alone, and cost about 6x as much in normalized units. See [Results](#results).
 
 ---
 
 ## Results
 
-Measured on the 30-item `hard` set (12 math, 9 reasoning, 9 coding; every item checked exactly), three complete real-model
-runs with one lineup (cheap `openai/gpt-oss-20b`, mid `openai/gpt-oss-120b`, strong `nvidia/nemotron-3-ultra-550b-a55b`,
-judge `gemini-3.5-flash-lite`), pooled. Re-scored with the current methodology by `python -m benchmark.reanalyze`
+Measured on the 30-item `hard` set (12 math, 9 reasoning, 9 coding; every item checked exactly), all five systems,
+three complete real-model runs (20261111T013331Z, 20261111T021401Z, 20261111T024904Z) with one lineup: cheap
+`openai/gpt-oss-20b`, mid `openai/gpt-oss-120b`, strong `nvidia/nemotron-3-ultra-550b-a55b`, judge
+`gemini-3.5-flash-lite`. The plan was written down before the runs
+([`benchmark/PREREGISTRATION.md`](benchmark/PREREGISTRATION.md), including what went wrong on the way), the per-item
+results are committed, and `python -m benchmark.reanalyze` on a fresh clone reproduces this table
 (full tables: [`benchmark/results/reanalysis.md`](benchmark/results/reanalysis.md)).
 
-| System | Strict exact accuracy | 95% CI | Cost incl. judge | vs Always Cheap | Calls / query | Escalation |
-|---|---|---|---|---|---|---|
-| Always Cheap | 85/90 = 94.4% | 87.6–97.6% | 0.97 | 1.0x | 0.97 | – |
-| Static Router | 86/90 = 95.6% | 89.1–98.3% | 2.70 | 2.8x | 0.99 | – |
-| Always Strong | 86/90 = 95.6% | 89.1–98.3% | 9.89 | 10.2x | 0.99 | – |
-| SmartRouter | 88/90 = 97.8% | 92.3–99.4% | 6.94 | 7.2x | 2.22 | 7.8% |
+| System | Strict exact accuracy | 95% CI | Accuracy among readable answers | Plumbing failures | Cost incl. judge (normalized) | vs Always Cheap | USD per 1,000 queries |
+|---|---|---|---|---|---|---|---|
+| Always Cheap | 81/90 = 90.0% | 82.1–94.7% | 96.4% | 6/90 = 6.7% | 0.97 | 1.0x | $0.22 |
+| Always Mid | 85/90 = 94.4% | 87.6–97.6% | 94.4% | 0/90 = 0.0% | 3.00 | 3.1x | $0.40 |
+| Always Strong | 89/90 = 98.9% | 94.0–99.8% | 100.0% | 1/90 = 1.1% | 10.00 | 10.3x | unknown |
+| Static Router | 84/90 = 93.3% | 86.2–96.9% | 95.5% | 2/90 = 2.2% | 2.73 | 2.8x | $0.33 |
+| SmartRouter | 87/90 = 96.7% | 90.6–98.9% | 97.8% | 1/90 = 1.1% | 6.14 | 6.4x | unknown |
 
-Paired on the same items, SmartRouter beat Always Cheap 5 times and lost 2 (sign test p = 0.45): **no detectable
-accuracy difference**, at about 7x the cost once its own judge calls are counted (a lower bound: these older records did not
-store judge parse retries; runs made now record every billed call). Calls below 1.00 are generation calls that failed. Of SmartRouter's 7 escalations, 6 were
-*unnecessary* (the answer it replaced was already correct). Always Strong was not more accurate than Always Cheap either.
+How to read it:
+
+- **Strict exact accuracy is the primary metric**: correct / every checkable item, with a missing, cut-off or unreadable
+  answer counted as wrong. The x/90 counts and intervals treat each repeat as an item and are descriptive only; three
+  runs of 30 questions are not 90 independent samples.
+- **Plumbing failures** are misses that say nothing about the model: an empty reply, an answer cut off by the output
+  limit, a final number the checker cannot read, a provider error. *Accuracy among readable answers* leaves them out.
+- **Normalized cost** is an experiment weight per call (cheap 1, mid 3, strong 10, judge 3). **Dollars** come from the
+  tokens stored for every call at the list prices in `config/models.json` (looked up 2026-11-10), with the same rule
+  that only SmartRouter pays for a judge when serving. The two are never mixed. NVIDIA publishes no per-token price
+  for the strong model or the fallback judge, so any system that used them is "unknown", never a partial sum:
+  Always Strong on every query, SmartRouter on 2 of its 90 (one escalation to strong, one fallback-judge call).
+
+**The hypothesis is still not supported.** The test that decides it uses one result per question (correct when at
+least 2 of the 3 runs were). On those 30 questions SmartRouter beat Always Cheap on 3 and lost on none (sign test
+p = 0.25): no detectable difference, at 6.4x the normalized cost, so Always Cheap dominates. SmartRouter matched Always
+Strong on every question (0 wins, 0 losses) at 6.14 against 10.00, so two of the three pre-registered conditions hold;
+the one that fails is the one that matters. Removing plumbing failures does not change this. They fell from 11 of 360
+item-runs in the earlier runs to 10 of 450, and setting them aside lifts Always Cheap from 90.0% to 96.4%, which
+narrows its gap to SmartRouter (97.8%) rather than widening it. The pre-registered target of zero empty-reply misses
+was missed by one: the truncation retry fired ten times and recovered nine answers, and one cheap-model reply was
+empty at 4,096 tokens and again at 8,192. Whether "the judge costs more than the tier gap" holds in dollars cannot be
+answered by the registered rule, because SmartRouter's judge-side spend is unknown (one call went to the unpriced
+fallback judge). What can be said: stepping from Always Cheap to Always Mid costs $0.18 per 1,000 queries, while a
+single judge call per query cost $0.47 to $0.57 per 1,000 in the baseline runs, and SmartRouter's judge-side spend on
+its 89 fully priced queries was $0.65 per 1,000. So the judge cost roughly three times the cheap-to-mid gap here; the
+strong tier's price is not public, so the same comparison against it cannot be made.
+
+Other things these runs show:
+
+- SmartRouter escalated once in 90 queries, and that one was unnecessary (the answer it replaced was already correct).
+  Its accuracy comes from where the heuristic sent each query first, not from the judge.
+- Always Strong beat Always Cheap on 9 item-runs and lost on 1, but by question that is 3 wins and 0 losses (p = 0.25).
+  30 questions cannot separate these tiers.
+- The remaining plumbing failures are of kinds the retry does not touch: 5 correct-looking answers without a readable
+  "Final answer" line, 2 answers cut off mid-text at 4,096 tokens, and 2 requests Groq rejected because the cheap
+  model tried to call a tool. The answer prompt, number reader and `GENERATION_MAX_TOKENS` were deliberately left
+  unchanged for this run.
 
 What this proves: the pipeline, verification and escalation machinery work end to end on real providers, and the
 benchmark can tell when routing does **not** pay off. What it does not prove: that routing saves money at equal quality.
-The `hard` set is saturated for this lineup (the cheap model already scores ~94%), and 30 items cannot detect small
-differences. `benchmark/datasets/hard_v2.jsonl` (22 harder, generator-verified items) is the next experiment; whether it
-separates the tiers is unknown until it is run. The earlier "68% cheaper than always-strong" figure was true but
-misleading, because Always Cheap was cheaper still and just as accurate; reports now always compare against Always Cheap.
+The `hard` set is close to saturated for this lineup, and 30 questions cannot detect small differences.
+`benchmark/datasets/hard_v2.jsonl` (22 harder, generator-verified items) is the next experiment; whether it separates
+the tiers is unknown until it is run.
 
-Pre-audit `benchmark/results/latest.json` was re-scored in place; mock runs are labeled synthetic everywhere and are never
-used for a verdict.
+The three earlier runs (four systems, no Always Mid, before the truncation retry) are still committed and re-analysed
+separately in `reanalysis.md`: Always Cheap 85/90, Static Router 86/90, Always Strong 86/90, SmartRouter 88/90, with the
+same verdict. Their dollar cost is unknown because they did not store judge tokens. Mock runs are labeled synthetic
+everywhere and are never used for a verdict.
 
 ---
 
@@ -203,7 +242,7 @@ An optional **fallback judge** (`JUDGE_FALLBACK_PROVIDER` / `JUDGE_FALLBACK_MODE
 
 `benchmark/datasets/benchmark.jsonl` holds **100 fixed, hand-written items**: 20 each of `general_qa`, `reasoning`, `coding`, `math` and `summarization`, labeled easy, medium or hard. Each item has a reference answer. Math items (and a few numeric reasoning items) have an exact expected value. Function-style coding items ship with unit tests.
 
-`benchmark/datasets/hard.jsonl` adds **30 hard items** (12 math, 9 reasoning, 9 coding), every one of them checked exactly: numeric answers computed in Python, and coding tasks with unit tests verified against a reference solution. The main set turned out too easy for current models, so every system tied; the hard set was meant to separate them, but the cheap model still scores ~94% on it (see Results). Run it with `--dataset hard --exec-code`.
+`benchmark/datasets/hard.jsonl` adds **30 hard items** (12 math, 9 reasoning, 9 coding), every one of them checked exactly: numeric answers computed in Python, and coding tasks with unit tests verified against a reference solution. The main set turned out too easy for current models, so every system tied; the hard set was meant to separate them, but the cheap model still scores 90% on it, 96% once plumbing failures are set aside (see Results). Run it with `--dataset hard --exec-code`.
 
 `benchmark/datasets/hard_v2.jsonl` adds **22 harder items** (12 math, 5 reasoning, 5 coding with edge-case and performance
 tests). Every expected value is computed by `benchmark/build_hard_v2.py`, and a test checks that the file matches the
@@ -224,7 +263,10 @@ How answers are graded:
 - **Primary metric: strict exact accuracy** = correct / every deterministically checkable item. Numeric answers must match
   exactly when the expected value is an integer (a relative tolerance used to accept 76120 for 76127); an answer with no
   readable final number counts as wrong instead of being dropped from the denominator. 95% Wilson intervals are reported.
-- **Paired sign tests** compare systems item by item (SmartRouter vs Cheap / Mid / Strong). The report generates a claim
+- **Accuracy among readable answers** and the **plumbing failure rate** (empty reply, cut-off answer, unreadable final
+  number, provider error) are reported beside strict accuracy, never in place of it.
+- **Paired sign tests** compare systems item by item (SmartRouter vs Cheap / Mid / Strong). When runs are pooled, the
+  deciding test uses one majority result per question, because repeats are not independent. The report generates a claim
   verdict from them: *supported* only if SmartRouter is significantly more accurate than Always Cheap, cheaper than Always
   Strong including its judge calls, and not significantly less accurate than Always Strong.
 - The **in-loop judge**, which drives escalation, never sees the reference answer. LLM-judge scores (with and without the
@@ -235,18 +277,20 @@ How answers are graded:
 - With `--exec-code`, code answers are run against the item's tests in a subprocess with a timeout. This executes
   model-written code on your machine (see Security model).
 - `python -m benchmark.reanalyze` re-scores every recorded real run in `data/benchmarks/` with the current methodology,
-  pools runs that used the same model lineup, and refreshes `latest.json` / `latest.md`.
+  pools runs that used the same model lineup and the same set of systems, and refreshes `latest.json` / `latest.md`.
+  The per-item files of the runs reported in Results are committed, so this works on a fresh clone.
 
 The metrics cover:
 
 - quality: mean, median and per category
 - normalized cost, with and without SmartRouter's serving-time judge calls
+- US dollars per 1,000 queries from stored tokens and list prices ("unknown" when a model that ran has no public price)
 - utilization of each tier
 - escalation rate
 - latency: mean, median, p95, and generation-only
 - the share of queries below the threshold, and the share that failed
 
-**Normalized cost** is an experiment weight (cheap = 1, mid = 3, strong = 10, set in `config/models.json`). It is not money. It shows relative model usage. Real per-token pricing fields exist but are never mixed into it.
+**Normalized cost** is an experiment weight (cheap = 1, mid = 3, strong = 10, set in `config/models.json`). It is not money. It shows relative model usage. Dollar cost is computed separately from the tokens each attempt stores (generation, judge, fallback judge and second opinion, billed failures included) and the list prices in `config/models.json`; each price is tied to one model ID and the two measures are never mixed.
 
 ## Getting started
 
@@ -363,6 +407,10 @@ Useful flags:
 - `--delay 2`: pause between queries to stay under rate limits
 - `--exec-code`: run code tests
 - `--no-reference-eval`: save judge calls
+- `--resume RUN_ID`: continue an interrupted run with the same other arguments. Every item is saved as it finishes; if a
+  provider is still rate limiting (usually a daily quota) or unreachable after all retries, the run stops with exit
+  code 3 and prints this command. The free Gemini tier allowed 500 judge requests per day when this was run; one
+  five-system pass over the hard set needs about 150
 
 To regenerate the Markdown from the latest JSON, or to re-score every recorded real run with the current methodology:
 
@@ -451,17 +499,18 @@ implemented: the deployment boundary is one user on loopback.
 
 - **The LLM judge is not ground truth.** Scores are a noisy evaluation signal and can be biased toward longer answers or toward models similar to the judge.
 - **Ground truth is partial.** Only numeric and unit-tested items have deterministic checks. Open-ended answers rely on the judge plus a short reference.
-- **The benchmark is small and saturated.** 30 hard items give wide confidence intervals, and the cheap model already scores ~94% on them, so there is little room for routing to help. Re-running the same items measures run-to-run variance, not new samples.
+- **The benchmark is small and saturated.** 30 hard items give wide confidence intervals, and the cheap model already gets about 96% of its readable answers right on them, so there is little room for routing to help. Re-running the same items measures run-to-run variance, not new samples.
 - **Rate limits.** Free tiers throttle aggressively. Retries honor `Retry-After`, but runs can be slow, and errors are recorded as failures.
 - **Provider models change.** Results apply only to the model IDs and date in a report.
-- **Normalized cost is an experimental metric**, not a bill.
+- **Normalized cost is an experimental metric**, not a bill. Dollar figures use list prices, not an invoice, and are unknown for the NVIDIA-hosted models, which have no public per-token price.
+- **Plumbing still costs accuracy.** A truncated empty reply is retried once with a larger limit, but an answer cut off mid-text, an answer without a readable final number and a provider error still count as wrong.
 - **Second opinions cost latency and judge calls**, and a lenient second judge can let a wrong answer through.
   The self-example check only helps when an answer shows examples; a confident wrong acceptance with no
   contradicting evidence is still accepted.
 - **Mixed judges.** When the fallback judge is used, some answers are graded by a different model; compare judge usage before comparing quality.
 - **Tier order is an assumption until measured.** The report's *Accuracy by answering tier* table checks it; an early lineup had a "mid" model less accurate than the "cheap" one, which made routing upward counter-productive.
 - **The analyzer is a keyword heuristic, and it barely tracks difficulty.** On the 130 labeled items it gets the category right 76% of the time, sends *no* item to the strong tier, and routes 18 of the 66 items labeled "hard" to the cheap tier. Keyword stuffing ("prove rigorously, design an architecture…") forces an expensive tier; a hard question without keywords goes to cheap. Escalation only corrects under-routing, never over-routing.
-- **Most escalations were unnecessary** in the recorded runs (6 of 7): the judge rejected correct answers more often than it caught wrong ones.
+- **Escalation did not earn its cost** in the recorded runs: 1 escalation in 90 queries in the pre-registered runs (unnecessary), and 6 of 7 unnecessary in the earlier ones. The judge rejected correct answers more often than it caught wrong ones.
 - **Storage is a single local SQLite file**: fine for one process; not shared across several API workers.
 
 ## Extending
