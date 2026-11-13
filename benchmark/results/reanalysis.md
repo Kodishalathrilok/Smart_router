@@ -62,6 +62,72 @@ SmartRouter judge-side spend (judge, fallback judge, second opinions): unknown p
 
 SmartRouter judge-side spend (judge, fallback judge, second opinions): unknown per 1,000 queries.
 
+## `hard` run 20261111T013331Z (30 items)
+
+**Verdict: NOT SUPPORTED (Always Cheap dominates).** SmartRouter is cheaper than Always Strong without a measurable accuracy loss, but Always Cheap matches it for less money, so routing adds cost without a measurable benefit on this dataset (strict accuracy SmartRouter 96.7%, Always Cheap 90.0%, Always Strong 100.0%; cost incl. judge 6.57 vs 0.97 vs 10.00; paired vs cheap 3 wins / 1 losses (p=0.625)).
+
+| System | Correct | Strict acc. | 95% CI | Acc. among readable | Plumbing failures | Gen cost | Cost incl. judge | $ / 1k queries | vs cheap | Calls/query | p50 ms | Escalation | Escalations (nec/unnec/unknown) |
+|---|---|---|---|---|---|---|---|---|---|---|---|---|---|
+| Always Mid | 28/30 | 93.3% | 78.7%-98.2% | 93.3% | 0.0% (0/30) | 3.00 | 3.00 | $0.47 | 3.10x | 1.00 | 4248 | 0.0% | 0 (0/0/0) |
+| Always Strong | 30/30 | 100.0% | 88.6%-100.0% | 100.0% | 0.0% (0/30) | 10.00 | 10.00 | unknown | 10.34x | 1.00 | 14978 | 0.0% | 0 (0/0/0) |
+| Always Cheap | 27/30 | 90.0% | 74.4%-96.5% | 96.4% | 6.7% (2/30) | 0.97 | 0.97 | $0.27 | 1.00x | 0.97 | 3689 | 0.0% | 0 (0/0/0) |
+| SmartRouter | 29/30 | 96.7% | 83.3%-99.4% | 96.7% | 0.0% (0/30) | 3.07 | 6.57 | unknown | 6.79x | 2.20 | 9507 | 3.3% | 1 (0/1/0) |
+| Static Router | 28/30 | 93.3% | 78.7%-98.2% | 96.5% | 3.3% (1/30) | 2.73 | 2.73 | $0.34 | 2.83x | 1.00 | 7158 | 0.0% | 0 (0/0/0) |
+
+| Paired comparison | Items | Wins | Losses | Sign-test p |
+|---|---|---|---|---|
+| smart_vs_cheap | 30 | 3 | 1 | 0.625 |
+| smart_vs_mid | 30 | 1 | 0 | 1.000 |
+| smart_vs_strong | 30 | 0 | 1 | 1.000 |
+| static_vs_cheap | 30 | 2 | 1 | 1.000 |
+| strong_vs_cheap | 30 | 3 | 0 | 0.250 |
+
+SmartRouter judge-side spend (judge, fallback judge, second opinions): unknown per 1,000 queries.
+
+## `hard` run 20261111T021401Z (30 items)
+
+**Verdict: NOT SUPPORTED (Always Cheap dominates).** SmartRouter is cheaper than Always Strong without a measurable accuracy loss, but Always Cheap matches it for less money, so routing adds cost without a measurable benefit on this dataset (strict accuracy SmartRouter 96.7%, Always Cheap 90.0%, Always Strong 96.7%; cost incl. judge 5.93 vs 0.97 vs 10.00; paired vs cheap 3 wins / 1 losses (p=0.625)).
+
+| System | Correct | Strict acc. | 95% CI | Acc. among readable | Plumbing failures | Gen cost | Cost incl. judge | $ / 1k queries | vs cheap | Calls/query | p50 ms | Escalation | Escalations (nec/unnec/unknown) |
+|---|---|---|---|---|---|---|---|---|---|---|---|---|---|
+| Always Mid | 28/30 | 93.3% | 78.7%-98.2% | 93.3% | 0.0% (0/30) | 3.00 | 3.00 | $0.34 | 3.10x | 1.00 | 9575 | 0.0% | 0 (0/0/0) |
+| Always Strong | 29/30 | 96.7% | 83.3%-99.4% | 100.0% | 3.3% (1/30) | 10.00 | 10.00 | unknown | 10.34x | 1.00 | 16555 | 0.0% | 0 (0/0/0) |
+| Always Cheap | 27/30 | 90.0% | 74.4%-96.5% | 96.4% | 6.7% (2/30) | 0.97 | 0.97 | $0.20 | 1.00x | 0.97 | 9058 | 0.0% | 0 (0/0/0) |
+| SmartRouter | 29/30 | 96.7% | 83.3%-99.4% | 100.0% | 3.3% (1/30) | 2.73 | 5.93 | $1.15 | 6.14x | 2.07 | 8440 | 0.0% | 0 (0/0/0) |
+| Static Router | 29/30 | 96.7% | 83.3%-99.4% | 100.0% | 3.3% (1/30) | 2.73 | 2.73 | $0.35 | 2.83x | 1.00 | 7808 | 0.0% | 0 (0/0/0) |
+
+| Paired comparison | Items | Wins | Losses | Sign-test p |
+|---|---|---|---|---|
+| smart_vs_cheap | 30 | 3 | 1 | 0.625 |
+| smart_vs_mid | 30 | 2 | 1 | 1.000 |
+| smart_vs_strong | 30 | 1 | 1 | 1.000 |
+| static_vs_cheap | 30 | 3 | 1 | 0.625 |
+| strong_vs_cheap | 30 | 3 | 1 | 0.625 |
+
+SmartRouter judge-side spend (judge, fallback judge, second opinions): $0.71 per 1,000 queries.
+
+## `hard` run 20261111T024904Z (30 items)
+
+**Verdict: NOT SUPPORTED (Always Cheap dominates).** SmartRouter is cheaper than Always Strong without a measurable accuracy loss, but Always Cheap matches it for less money, so routing adds cost without a measurable benefit on this dataset (strict accuracy SmartRouter 96.7%, Always Cheap 90.0%, Always Strong 100.0%; cost incl. judge 5.93 vs 0.97 vs 10.00; paired vs cheap 3 wins / 1 losses (p=0.625)).
+
+| System | Correct | Strict acc. | 95% CI | Acc. among readable | Plumbing failures | Gen cost | Cost incl. judge | $ / 1k queries | vs cheap | Calls/query | p50 ms | Escalation | Escalations (nec/unnec/unknown) |
+|---|---|---|---|---|---|---|---|---|---|---|---|---|---|
+| Always Mid | 29/30 | 96.7% | 83.3%-99.4% | 96.7% | 0.0% (0/30) | 3.00 | 3.00 | $0.38 | 3.10x | 1.00 | 7820 | 0.0% | 0 (0/0/0) |
+| Always Strong | 30/30 | 100.0% | 88.6%-100.0% | 100.0% | 0.0% (0/30) | 10.00 | 10.00 | unknown | 10.34x | 1.00 | 18040 | 0.0% | 0 (0/0/0) |
+| Always Cheap | 27/30 | 90.0% | 74.4%-96.5% | 96.4% | 6.7% (2/30) | 0.97 | 0.97 | $0.19 | 1.00x | 0.97 | 7938 | 0.0% | 0 (0/0/0) |
+| SmartRouter | 29/30 | 96.7% | 83.3%-99.4% | 96.7% | 0.0% (0/30) | 2.73 | 5.93 | $1.04 | 6.14x | 2.07 | 2885 | 0.0% | 0 (0/0/0) |
+| Static Router | 27/30 | 90.0% | 74.4%-96.5% | 90.0% | 0.0% (0/30) | 2.73 | 2.73 | $0.31 | 2.83x | 1.00 | 2878 | 0.0% | 0 (0/0/0) |
+
+| Paired comparison | Items | Wins | Losses | Sign-test p |
+|---|---|---|---|---|
+| smart_vs_cheap | 30 | 3 | 1 | 0.625 |
+| smart_vs_mid | 30 | 0 | 0 | n/a |
+| smart_vs_strong | 30 | 0 | 1 | 1.000 |
+| static_vs_cheap | 30 | 2 | 2 | 1.000 |
+| strong_vs_cheap | 30 | 3 | 0 | 0.250 |
+
+SmartRouter judge-side spend (judge, fallback judge, second opinions): $0.60 per 1,000 queries.
+
 ## `hard` pooled over 3 complete runs of 4 systems with one model lineup (cheap=`openai/gpt-oss-20b`, mid=`openai/gpt-oss-120b`, strong=`nvidia/nemotron-3-ultra-550b-a55b`); repeated measurements of the same items
 
 **Verdict: NOT SUPPORTED (Always Cheap dominates).** Paired by question (majority of 3 runs). SmartRouter is cheaper than Always Strong without a measurable accuracy loss, but Always Cheap matches it for less money, so routing adds cost without a measurable benefit on this dataset (strict accuracy SmartRouter 97.8%, Always Cheap 94.4%, Always Strong 95.6%; cost incl. judge 6.94 vs 0.97 vs 9.89; paired vs cheap 1 wins / 0 losses (p=1.0)).
@@ -88,5 +154,37 @@ The table above counts every repeat as its own item (descriptive only: repeats o
 | smart_vs_strong | 30 | 1 | 0 | 1.000 |
 | static_vs_cheap | 30 | 1 | 0 | 1.000 |
 | strong_vs_cheap | 30 | 0 | 0 | n/a |
+
+SmartRouter judge-side spend (judge, fallback judge, second opinions): unknown per 1,000 queries.
+
+## `hard` pooled over 3 complete runs of 5 systems with one model lineup (cheap=`openai/gpt-oss-20b`, mid=`openai/gpt-oss-120b`, strong=`nvidia/nemotron-3-ultra-550b-a55b`); repeated measurements of the same items
+
+**Verdict: NOT SUPPORTED (Always Cheap dominates).** Paired by question (majority of 3 runs). SmartRouter is cheaper than Always Strong without a measurable accuracy loss, but Always Cheap matches it for less money, so routing adds cost without a measurable benefit on this dataset (strict accuracy SmartRouter 96.7%, Always Cheap 90.0%, Always Strong 98.9%; cost incl. judge 6.14 vs 0.97 vs 10.00; paired vs cheap 3 wins / 0 losses (p=0.25)).
+
+| System | Correct | Strict acc. | 95% CI | Acc. among readable | Plumbing failures | Gen cost | Cost incl. judge | $ / 1k queries | vs cheap | Calls/query | p50 ms | Escalation | Escalations (nec/unnec/unknown) |
+|---|---|---|---|---|---|---|---|---|---|---|---|---|---|
+| Always Cheap | 81/90 | 90.0% | 82.1%-94.7% | 96.4% | 6.7% (6/90) | 0.97 | 0.97 | $0.22 | 1.00x | 0.97 | 7126 | 0.0% | 0 (0/0/0) |
+| Always Mid | 85/90 | 94.4% | 87.6%-97.6% | 94.4% | 0.0% (0/90) | 3.00 | 3.00 | $0.40 | 3.10x | 1.00 | 7370 | 0.0% | 0 (0/0/0) |
+| Always Strong | 89/90 | 98.9% | 94.0%-99.8% | 100.0% | 1.1% (1/90) | 10.00 | 10.00 | unknown | 10.34x | 1.00 | 16272 | 0.0% | 0 (0/0/0) |
+| Static Router | 84/90 | 93.3% | 86.2%-96.9% | 95.5% | 2.2% (2/90) | 2.73 | 2.73 | $0.33 | 2.83x | 1.00 | 4807 | 0.0% | 0 (0/0/0) |
+| SmartRouter | 87/90 | 96.7% | 90.6%-98.9% | 97.8% | 1.1% (1/90) | 2.84 | 6.14 | unknown | 6.36x | 2.11 | 6205 | 1.1% | 1 (0/1/0) |
+
+| Paired comparison | Items | Wins | Losses | Sign-test p |
+|---|---|---|---|---|
+| smart_vs_cheap | 90 | 9 | 3 | 0.146 |
+| smart_vs_mid | 90 | 3 | 1 | 0.625 |
+| smart_vs_strong | 90 | 1 | 3 | 0.625 |
+| static_vs_cheap | 90 | 7 | 4 | 0.549 |
+| strong_vs_cheap | 90 | 9 | 1 | 0.021 |
+
+The table above counts every repeat as its own item (descriptive only: repeats of a question are not independent). The test that decides the verdict uses one result per question, correct when most runs got it right:
+
+| Paired by question | Questions | Wins | Losses | Sign-test p |
+|---|---|---|---|---|
+| smart_vs_cheap | 30 | 3 | 0 | 0.250 |
+| smart_vs_mid | 30 | 2 | 0 | 0.500 |
+| smart_vs_strong | 30 | 0 | 0 | n/a |
+| static_vs_cheap | 30 | 3 | 0 | 0.250 |
+| strong_vs_cheap | 30 | 3 | 0 | 0.250 |
 
 SmartRouter judge-side spend (judge, fallback judge, second opinions): unknown per 1,000 queries.

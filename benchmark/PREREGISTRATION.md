@@ -141,3 +141,25 @@ If the target is missed, the numbers are still reported in full and the miss is 
    - one resume attempt with `--delay 5` was made before the quota was identified; it hit the same limit on its first
      item and saved nothing. The run is resumed with the registered command (`--delay 2`) once the quota resets.
    No accuracy figure had been computed or looked at for any new run when this was decided.
+   Outcome: an automatic resume at 04:22 UTC the same day found the judge answering again, saved one more Static
+   Router item and was stopped by the same quota (cleanly this time, by the new rule). The run was completed on
+   2026-11-13 with the registered command: Static Router items 8-30 and all of SmartRouter. So the third run's
+   Always Cheap, Always Mid, Always Strong and first seven Static Router items date from 2026-11-11, the rest from
+   2026-11-13. No item was answered twice except `math_hard_06` (see above).
+
+## Outcome (added 2026-11-13, after the runs)
+
+Pooled runs: `20261111T013331Z`, `20261111T021401Z`, `20261111T024904Z`. Numbers are in
+`benchmark/results/reanalysis.md` and the README.
+
+- **Verdict: not supported (Always Cheap dominates).** By question, SmartRouter vs Always Cheap: 3 wins, 0 losses,
+  p = 0.25 (condition 1 fails). SmartRouter vs Always Strong: 0 wins, 0 losses (condition 2 holds). Normalized cost
+  including judge 6.14 vs 10.00 (condition 3 holds).
+- **Target missed by one.** 1 empty-reply miss in 450 item-runs (Always Cheap, `math_hard_07`, first run: empty at
+  4,096 tokens and again at 8,192). The retry fired 10 times and recovered 9 answers.
+- **Plumbing failures, reported not targeted:** 10 of 450 (5 unreadable final numbers, 2 answers cut off mid-text,
+  2 provider errors, plus the empty reply above), against 11 of 360 before. The verdict is the same with them counted
+  as wrong or left out.
+- **Judge cost vs tier gap in dollars: cannot be determined by the registered rule** (one SmartRouter judge call went
+  to the unpriced fallback judge). Exploratory: on the 89 fully priced queries the judge side cost $0.65 per 1,000
+  queries, against a $0.18 gap between Always Mid and Always Cheap.

@@ -2455,6 +2455,2963 @@
       }
     },
     {
+      "title": "`hard` run 20261111T013331Z (30 items)",
+      "summary": {
+        "comparisons": {
+          "always_mid": {
+            "cost_incl_judge_vs_cheap_x": 3.1,
+            "cost_reduction_pct_vs_strong": 70.0,
+            "cost_incl_judge_reduction_pct_vs_strong": 70.0,
+            "strong_call_reduction_pct": 100.0,
+            "reference_quality_delta_vs_strong": null,
+            "median_latency_delta_ms_vs_strong": -10730.2
+          },
+          "always_strong": {
+            "cost_incl_judge_vs_cheap_x": 10.34,
+            "cost_reduction_pct_vs_strong": 0.0,
+            "cost_incl_judge_reduction_pct_vs_strong": 0.0,
+            "strong_call_reduction_pct": 0.0,
+            "reference_quality_delta_vs_strong": null,
+            "median_latency_delta_ms_vs_strong": 0.0
+          },
+          "always_weak": {
+            "cost_incl_judge_vs_cheap_x": 1.0,
+            "cost_reduction_pct_vs_strong": 90.3,
+            "cost_incl_judge_reduction_pct_vs_strong": 90.3,
+            "strong_call_reduction_pct": 100.0,
+            "reference_quality_delta_vs_strong": null,
+            "median_latency_delta_ms_vs_strong": -11289.0
+          },
+          "smart_router": {
+            "cost_incl_judge_vs_cheap_x": 6.79,
+            "cost_reduction_pct_vs_strong": 69.3,
+            "cost_incl_judge_reduction_pct_vs_strong": 34.3,
+            "strong_call_reduction_pct": 96.7,
+            "reference_quality_delta_vs_strong": null,
+            "median_latency_delta_ms_vs_strong": -5471.2
+          },
+          "static_router": {
+            "cost_incl_judge_vs_cheap_x": 2.83,
+            "cost_reduction_pct_vs_strong": 72.7,
+            "cost_incl_judge_reduction_pct_vs_strong": 72.7,
+            "strong_call_reduction_pct": 100.0,
+            "reference_quality_delta_vs_strong": null,
+            "median_latency_delta_ms_vs_strong": -7820.0
+          }
+        },
+        "paired": {
+          "smart_vs_cheap": {
+            "items": 30,
+            "wins": 3,
+            "losses": 1,
+            "both_correct": 26,
+            "both_wrong": 0,
+            "sign_test_p": 0.625
+          },
+          "smart_vs_mid": {
+            "items": 30,
+            "wins": 1,
+            "losses": 0,
+            "both_correct": 28,
+            "both_wrong": 1,
+            "sign_test_p": 1.0
+          },
+          "smart_vs_strong": {
+            "items": 30,
+            "wins": 0,
+            "losses": 1,
+            "both_correct": 29,
+            "both_wrong": 0,
+            "sign_test_p": 1.0
+          },
+          "static_vs_cheap": {
+            "items": 30,
+            "wins": 2,
+            "losses": 1,
+            "both_correct": 26,
+            "both_wrong": 1,
+            "sign_test_p": 1.0
+          },
+          "strong_vs_cheap": {
+            "items": 30,
+            "wins": 3,
+            "losses": 0,
+            "both_correct": 27,
+            "both_wrong": 0,
+            "sign_test_p": 0.25
+          }
+        },
+        "claim": {
+          "verdict": "not_supported_cheap_dominates",
+          "explanation": "SmartRouter is cheaper than Always Strong without a measurable accuracy loss, but Always Cheap matches it for less money, so routing adds cost without a measurable benefit on this dataset (strict accuracy SmartRouter 96.7%, Always Cheap 90.0%, Always Strong 100.0%; cost incl. judge 6.57 vs 0.97 vs 10.00; paired vs cheap 3 wins / 1 losses (p=0.625))."
+        },
+        "systems": {
+          "always_mid": {
+            "n": 30,
+            "quality": {
+              "mean": 0.975,
+              "median": 1.0,
+              "scored": 30
+            },
+            "cost": {
+              "mean": 3.0,
+              "total": 90.0
+            },
+            "utilization": {
+              "calls": {
+                "cheap": 0,
+                "mid": 30,
+                "strong": 0
+              },
+              "calls_pct": {
+                "cheap": 0.0,
+                "mid": 1.0,
+                "strong": 0.0
+              },
+              "final_pct": {
+                "cheap": 0.0,
+                "mid": 1.0,
+                "strong": 0.0
+              }
+            },
+            "escalation": {
+              "rate": 0.0,
+              "mean_count": 0.0
+            },
+            "latency_ms": {
+              "mean": 5401.57,
+              "median": 4247.7,
+              "p95": 14469.6,
+              "generation_median": 1303.35
+            },
+            "judge_calls": 30,
+            "failure_groups": {
+              "Incorrect": 1,
+              "Reasoning weakness": 1
+            },
+            "routing_flow": [
+              {
+                "from": "mid",
+                "to": "accepted",
+                "count": 29
+              },
+              {
+                "from": "mid",
+                "to": "best_effort",
+                "count": 1
+              }
+            ],
+            "failure_rate": 0.0,
+            "below_threshold_rate": 0.0333,
+            "per_category": {
+              "coding": {
+                "n": 9,
+                "quality_mean": 1.0,
+                "cost_mean": 3.0,
+                "escalation_rate": 0.0,
+                "reference_quality_mean": null
+              },
+              "math": {
+                "n": 12,
+                "quality_mean": 0.9375,
+                "cost_mean": 3.0,
+                "escalation_rate": 0.0,
+                "reference_quality_mean": null
+              },
+              "reasoning": {
+                "n": 9,
+                "quality_mean": 1.0,
+                "cost_mean": 3.0,
+                "escalation_rate": 0.0,
+                "reference_quality_mean": null
+              }
+            },
+            "label": "Always Mid",
+            "mode": "always_mid",
+            "description": "Every query goes to the mid tier.",
+            "reference_quality": {
+              "mean": null,
+              "median": null,
+              "scored": 0,
+              "errors": 0
+            },
+            "strict": {
+              "checked": 30,
+              "correct": 28,
+              "accuracy": 0.9333,
+              "ci95": [
+                0.7868,
+                0.9815
+              ],
+              "unparseable": 0
+            },
+            "capability": {
+              "checked": 30,
+              "plumbing_failures": 0,
+              "plumbing_rate": 0.0,
+              "by_kind": {},
+              "readable": 30,
+              "readable_correct": 28,
+              "readable_accuracy": 0.9333
+            },
+            "deterministic": {
+              "checked": 30,
+              "accuracy": 0.9333
+            },
+            "serving_calls_mean": 1.0,
+            "cost_method": "exact",
+            "generation_failures": 0,
+            "provider_calls_mean": 2.2667,
+            "serving_judge_calls": 0,
+            "judge_failures": 0,
+            "judge_usage": {
+              "gemini-3.5-flash-lite": 30
+            },
+            "tier_accuracy": {
+              "mid": {
+                "correct": 28,
+                "checked": 30
+              }
+            },
+            "strong_calls": 0,
+            "escalations": {
+              "total": 0,
+              "necessary": 0,
+              "unnecessary": 0,
+              "unknown": 0
+            },
+            "judge_accuracy": {
+              "primary_judge": {
+                "checked": 30,
+                "agree": 27,
+                "false_accept": 2,
+                "false_reject": 1
+              },
+              "decision": {
+                "checked": 30,
+                "agree": 27,
+                "false_accept": 2,
+                "false_reject": 1
+              }
+            },
+            "second_opinions": {
+              "requested": 0,
+              "succeeded": 0,
+              "failed": 0,
+              "success_rate": null,
+              "latency_ms_median": null,
+              "latency_ms_max": null,
+              "by_trigger": {
+                "primary_rejection": 0,
+                "low_confidence_acceptance": 0
+              }
+            },
+            "cost_incl_judge": {
+              "mean": 3.0
+            },
+            "judge_usd": {
+              "per_1k_queries": 0.6234,
+              "priced_queries": 30,
+              "queries": 30
+            },
+            "cost_usd": {
+              "per_1k_queries": 0.4725,
+              "priced_queries": 30,
+              "queries": 30
+            }
+          },
+          "always_strong": {
+            "n": 30,
+            "quality": {
+              "mean": 1.0,
+              "median": 1.0,
+              "scored": 30
+            },
+            "cost": {
+              "mean": 10.0,
+              "total": 300.0
+            },
+            "utilization": {
+              "calls": {
+                "cheap": 0,
+                "mid": 0,
+                "strong": 30
+              },
+              "calls_pct": {
+                "cheap": 0.0,
+                "mid": 0.0,
+                "strong": 1.0
+              },
+              "final_pct": {
+                "cheap": 0.0,
+                "mid": 0.0,
+                "strong": 1.0
+              }
+            },
+            "escalation": {
+              "rate": 0.0,
+              "mean_count": 0.0
+            },
+            "latency_ms": {
+              "mean": 26364.6333,
+              "median": 14977.9,
+              "p95": 133305.5,
+              "generation_median": 10860.45
+            },
+            "judge_calls": 30,
+            "failure_groups": {},
+            "routing_flow": [
+              {
+                "from": "strong",
+                "to": "accepted",
+                "count": 30
+              }
+            ],
+            "failure_rate": 0.0,
+            "below_threshold_rate": 0.0,
+            "per_category": {
+              "coding": {
+                "n": 9,
+                "quality_mean": 1.0,
+                "cost_mean": 10.0,
+                "escalation_rate": 0.0,
+                "reference_quality_mean": null
+              },
+              "math": {
+                "n": 12,
+                "quality_mean": 1.0,
+                "cost_mean": 10.0,
+                "escalation_rate": 0.0,
+                "reference_quality_mean": null
+              },
+              "reasoning": {
+                "n": 9,
+                "quality_mean": 1.0,
+                "cost_mean": 10.0,
+                "escalation_rate": 0.0,
+                "reference_quality_mean": null
+              }
+            },
+            "label": "Always Strong",
+            "mode": "always_strong",
+            "description": "Every query goes to the strong tier (quality ceiling / cost reference).",
+            "reference_quality": {
+              "mean": null,
+              "median": null,
+              "scored": 0,
+              "errors": 0
+            },
+            "strict": {
+              "checked": 30,
+              "correct": 30,
+              "accuracy": 1.0,
+              "ci95": [
+                0.8865,
+                1.0
+              ],
+              "unparseable": 0
+            },
+            "capability": {
+              "checked": 30,
+              "plumbing_failures": 0,
+              "plumbing_rate": 0.0,
+              "by_kind": {},
+              "readable": 30,
+              "readable_correct": 30,
+              "readable_accuracy": 1.0
+            },
+            "deterministic": {
+              "checked": 30,
+              "accuracy": 1.0
+            },
+            "serving_calls_mean": 1.0,
+            "cost_method": "exact",
+            "generation_failures": 0,
+            "provider_calls_mean": 2.1667,
+            "serving_judge_calls": 0,
+            "judge_failures": 0,
+            "judge_usage": {
+              "gemini-3.5-flash-lite": 30
+            },
+            "tier_accuracy": {
+              "strong": {
+                "correct": 30,
+                "checked": 30
+              }
+            },
+            "strong_calls": 30,
+            "escalations": {
+              "total": 0,
+              "necessary": 0,
+              "unnecessary": 0,
+              "unknown": 0
+            },
+            "judge_accuracy": {
+              "primary_judge": {
+                "checked": 30,
+                "agree": 30,
+                "false_accept": 0,
+                "false_reject": 0
+              },
+              "decision": {
+                "checked": 30,
+                "agree": 30,
+                "false_accept": 0,
+                "false_reject": 0
+              }
+            },
+            "second_opinions": {
+              "requested": 0,
+              "succeeded": 0,
+              "failed": 0,
+              "success_rate": null,
+              "latency_ms_median": null,
+              "latency_ms_max": null,
+              "by_trigger": {
+                "primary_rejection": 0,
+                "low_confidence_acceptance": 0
+              }
+            },
+            "cost_incl_judge": {
+              "mean": 10.0
+            },
+            "judge_usd": {
+              "per_1k_queries": 0.5012,
+              "priced_queries": 30,
+              "queries": 30
+            },
+            "cost_usd": {
+              "per_1k_queries": null,
+              "priced_queries": 0,
+              "queries": 30
+            }
+          },
+          "always_weak": {
+            "n": 30,
+            "quality": {
+              "mean": 0.9517,
+              "median": 1.0,
+              "scored": 29
+            },
+            "cost": {
+              "mean": 0.9667,
+              "total": 29.0
+            },
+            "utilization": {
+              "calls": {
+                "cheap": 30,
+                "mid": 0,
+                "strong": 0
+              },
+              "calls_pct": {
+                "cheap": 1.0,
+                "mid": 0.0,
+                "strong": 0.0
+              },
+              "final_pct": {
+                "cheap": 0.9667,
+                "mid": 0.0,
+                "strong": 0.0
+              }
+            },
+            "escalation": {
+              "rate": 0.0,
+              "mean_count": 0.0
+            },
+            "latency_ms": {
+              "mean": 5533.4,
+              "median": 3688.9,
+              "p95": 14342.6,
+              "generation_median": 811.45
+            },
+            "judge_calls": 29,
+            "failure_groups": {
+              "Incorrect": 2,
+              "Reasoning weakness": 1,
+              "Provider error": 1
+            },
+            "routing_flow": [
+              {
+                "from": "cheap",
+                "to": "accepted",
+                "count": 27
+              },
+              {
+                "from": "cheap",
+                "to": "best_effort",
+                "count": 2
+              },
+              {
+                "from": "cheap",
+                "to": "failed",
+                "count": 1
+              }
+            ],
+            "failure_rate": 0.0333,
+            "below_threshold_rate": 0.1,
+            "per_category": {
+              "coding": {
+                "n": 9,
+                "quality_mean": 1.0,
+                "cost_mean": 1.0,
+                "escalation_rate": 0.0,
+                "reference_quality_mean": null
+              },
+              "math": {
+                "n": 12,
+                "quality_mean": 0.8727,
+                "cost_mean": 0.9167,
+                "escalation_rate": 0.0,
+                "reference_quality_mean": null
+              },
+              "reasoning": {
+                "n": 9,
+                "quality_mean": 1.0,
+                "cost_mean": 1.0,
+                "escalation_rate": 0.0,
+                "reference_quality_mean": null
+              }
+            },
+            "label": "Always Cheap",
+            "mode": "always_cheap",
+            "description": "Every query goes to the cheap tier; no judge needed in production.",
+            "reference_quality": {
+              "mean": null,
+              "median": null,
+              "scored": 0,
+              "errors": 0
+            },
+            "strict": {
+              "checked": 30,
+              "correct": 27,
+              "accuracy": 0.9,
+              "ci95": [
+                0.7438,
+                0.9654
+              ],
+              "unparseable": 1
+            },
+            "capability": {
+              "checked": 30,
+              "plumbing_failures": 2,
+              "plumbing_rate": 0.0667,
+              "by_kind": {
+                "truncation": 1,
+                "unreadable_final_number": 1
+              },
+              "readable": 28,
+              "readable_correct": 27,
+              "readable_accuracy": 0.9643
+            },
+            "deterministic": {
+              "checked": 29,
+              "accuracy": 0.931
+            },
+            "serving_calls_mean": 0.967,
+            "cost_method": "estimated_lower_bound",
+            "generation_failures": 1,
+            "provider_calls_mean": 2.1333,
+            "serving_judge_calls": 0,
+            "judge_failures": 0,
+            "judge_usage": {
+              "gemini-3.5-flash-lite": 29
+            },
+            "tier_accuracy": {
+              "cheap": {
+                "correct": 27,
+                "checked": 29
+              }
+            },
+            "strong_calls": 0,
+            "escalations": {
+              "total": 0,
+              "necessary": 0,
+              "unnecessary": 0,
+              "unknown": 0
+            },
+            "judge_accuracy": {
+              "primary_judge": {
+                "checked": 28,
+                "agree": 25,
+                "false_accept": 1,
+                "false_reject": 2
+              },
+              "decision": {
+                "checked": 28,
+                "agree": 25,
+                "false_accept": 1,
+                "false_reject": 2
+              }
+            },
+            "second_opinions": {
+              "requested": 0,
+              "succeeded": 0,
+              "failed": 0,
+              "success_rate": null,
+              "latency_ms_median": null,
+              "latency_ms_max": null,
+              "by_trigger": {
+                "primary_rejection": 0,
+                "low_confidence_acceptance": 0
+              }
+            },
+            "cost_incl_judge": {
+              "mean": 0.9667
+            },
+            "judge_usd": {
+              "per_1k_queries": 0.4774,
+              "priced_queries": 30,
+              "queries": 30
+            },
+            "cost_usd": {
+              "per_1k_queries": 0.2726,
+              "priced_queries": 30,
+              "queries": 30
+            }
+          },
+          "smart_router": {
+            "n": 30,
+            "quality": {
+              "mean": 0.95,
+              "median": 1.0,
+              "scored": 30
+            },
+            "cost": {
+              "mean": 3.0667,
+              "total": 92.0
+            },
+            "utilization": {
+              "calls": {
+                "cheap": 4,
+                "mid": 26,
+                "strong": 1
+              },
+              "calls_pct": {
+                "cheap": 0.129,
+                "mid": 0.8387,
+                "strong": 0.0323
+              },
+              "final_pct": {
+                "cheap": 0.1333,
+                "mid": 0.8333,
+                "strong": 0.0333
+              }
+            },
+            "escalation": {
+              "rate": 0.0333,
+              "mean_count": 0.0333
+            },
+            "latency_ms": {
+              "mean": 26172.1167,
+              "median": 9506.65,
+              "p95": 31901.5,
+              "generation_median": 1456.55
+            },
+            "judge_calls": 34,
+            "failure_groups": {
+              "Incorrect": 1
+            },
+            "routing_flow": [
+              {
+                "from": "cheap",
+                "to": "accepted",
+                "count": 4
+              },
+              {
+                "from": "mid",
+                "to": "accepted",
+                "count": 25
+              },
+              {
+                "from": "mid",
+                "to": "strong",
+                "count": 1
+              },
+              {
+                "from": "strong",
+                "to": "accepted",
+                "count": 1
+              }
+            ],
+            "failure_rate": 0.0,
+            "below_threshold_rate": 0.0,
+            "per_category": {
+              "coding": {
+                "n": 9,
+                "quality_mean": 1.0,
+                "cost_mean": 3.0,
+                "escalation_rate": 0.0,
+                "reference_quality_mean": null
+              },
+              "math": {
+                "n": 12,
+                "quality_mean": 0.9375,
+                "cost_mean": 3.6667,
+                "escalation_rate": 0.0833,
+                "reference_quality_mean": null
+              },
+              "reasoning": {
+                "n": 9,
+                "quality_mean": 0.9167,
+                "cost_mean": 2.3333,
+                "escalation_rate": 0.0,
+                "reference_quality_mean": null
+              }
+            },
+            "label": "SmartRouter",
+            "mode": "smart",
+            "description": "Heuristic routing + answer checks + judge-driven escalation.",
+            "reference_quality": {
+              "mean": null,
+              "median": null,
+              "scored": 0,
+              "errors": 0
+            },
+            "strict": {
+              "checked": 30,
+              "correct": 29,
+              "accuracy": 0.9667,
+              "ci95": [
+                0.8333,
+                0.9941
+              ],
+              "unparseable": 0
+            },
+            "capability": {
+              "checked": 30,
+              "plumbing_failures": 0,
+              "plumbing_rate": 0.0,
+              "by_kind": {},
+              "readable": 30,
+              "readable_correct": 29,
+              "readable_accuracy": 0.9667
+            },
+            "deterministic": {
+              "checked": 30,
+              "accuracy": 0.9667
+            },
+            "serving_calls_mean": 2.2,
+            "cost_method": "exact",
+            "generation_failures": 0,
+            "provider_calls_mean": 2.4,
+            "serving_judge_calls": 35,
+            "judge_failures": 0,
+            "judge_usage": {
+              "gemini-3.5-flash-lite": 30,
+              "z-ai/glm-5.3-flash": 1
+            },
+            "tier_accuracy": {
+              "mid": {
+                "correct": 24,
+                "checked": 25
+              },
+              "strong": {
+                "correct": 1,
+                "checked": 1
+              },
+              "cheap": {
+                "correct": 4,
+                "checked": 4
+              }
+            },
+            "strong_calls": 1,
+            "escalations": {
+              "total": 1,
+              "necessary": 0,
+              "unnecessary": 1,
+              "unknown": 0
+            },
+            "judge_accuracy": {
+              "primary_judge": {
+                "checked": 31,
+                "agree": 27,
+                "false_accept": 1,
+                "false_reject": 3
+              },
+              "decision": {
+                "checked": 31,
+                "agree": 29,
+                "false_accept": 1,
+                "false_reject": 1
+              }
+            },
+            "second_opinions": {
+              "requested": 3,
+              "succeeded": 2,
+              "failed": 1,
+              "success_rate": 0.6667,
+              "latency_ms_median": 422.6,
+              "latency_ms_max": 1704.8,
+              "by_trigger": {
+                "primary_rejection": 3,
+                "low_confidence_acceptance": 0
+              }
+            },
+            "cost_incl_judge": {
+              "mean": 6.5667
+            },
+            "judge_usd": {
+              "per_1k_queries": null,
+              "priced_queries": 29,
+              "queries": 30
+            },
+            "cost_usd": {
+              "per_1k_queries": null,
+              "priced_queries": 28,
+              "queries": 30
+            }
+          },
+          "static_router": {
+            "n": 30,
+            "quality": {
+              "mean": 0.945,
+              "median": 1.0,
+              "scored": 30
+            },
+            "cost": {
+              "mean": 2.7333,
+              "total": 82.0
+            },
+            "utilization": {
+              "calls": {
+                "cheap": 4,
+                "mid": 26,
+                "strong": 0
+              },
+              "calls_pct": {
+                "cheap": 0.1333,
+                "mid": 0.8667,
+                "strong": 0.0
+              },
+              "final_pct": {
+                "cheap": 0.1333,
+                "mid": 0.8667,
+                "strong": 0.0
+              }
+            },
+            "escalation": {
+              "rate": 0.0,
+              "mean_count": 0.0
+            },
+            "latency_ms": {
+              "mean": 6848.9033,
+              "median": 7157.9,
+              "p95": 10146.6,
+              "generation_median": 1290.0
+            },
+            "judge_calls": 30,
+            "failure_groups": {
+              "Incorrect": 2,
+              "Reasoning weakness": 2
+            },
+            "routing_flow": [
+              {
+                "from": "cheap",
+                "to": "accepted",
+                "count": 4
+              },
+              {
+                "from": "mid",
+                "to": "accepted",
+                "count": 24
+              },
+              {
+                "from": "mid",
+                "to": "best_effort",
+                "count": 2
+              }
+            ],
+            "failure_rate": 0.0,
+            "below_threshold_rate": 0.0667,
+            "per_category": {
+              "coding": {
+                "n": 9,
+                "quality_mean": 1.0,
+                "cost_mean": 3.0,
+                "escalation_rate": 0.0,
+                "reference_quality_mean": null
+              },
+              "math": {
+                "n": 12,
+                "quality_mean": 0.9375,
+                "cost_mean": 2.8333,
+                "escalation_rate": 0.0,
+                "reference_quality_mean": null
+              },
+              "reasoning": {
+                "n": 9,
+                "quality_mean": 0.9,
+                "cost_mean": 2.3333,
+                "escalation_rate": 0.0,
+                "reference_quality_mean": null
+              }
+            },
+            "label": "Static Router",
+            "mode": "static",
+            "description": "Heuristic difficulty routing; no judge-driven escalation.",
+            "reference_quality": {
+              "mean": null,
+              "median": null,
+              "scored": 0,
+              "errors": 0
+            },
+            "strict": {
+              "checked": 30,
+              "correct": 28,
+              "accuracy": 0.9333,
+              "ci95": [
+                0.7868,
+                0.9815
+              ],
+              "unparseable": 1
+            },
+            "capability": {
+              "checked": 30,
+              "plumbing_failures": 1,
+              "plumbing_rate": 0.0333,
+              "by_kind": {
+                "unreadable_final_number": 1
+              },
+              "readable": 29,
+              "readable_correct": 28,
+              "readable_accuracy": 0.9655
+            },
+            "deterministic": {
+              "checked": 29,
+              "accuracy": 0.9655
+            },
+            "serving_calls_mean": 1.0,
+            "cost_method": "exact",
+            "generation_failures": 0,
+            "provider_calls_mean": 2.1333,
+            "serving_judge_calls": 0,
+            "judge_failures": 0,
+            "judge_usage": {
+              "gemini-3.5-flash-lite": 30
+            },
+            "tier_accuracy": {
+              "mid": {
+                "correct": 24,
+                "checked": 25
+              },
+              "cheap": {
+                "correct": 4,
+                "checked": 4
+              }
+            },
+            "strong_calls": 0,
+            "escalations": {
+              "total": 0,
+              "necessary": 0,
+              "unnecessary": 0,
+              "unknown": 0
+            },
+            "judge_accuracy": {
+              "primary_judge": {
+                "checked": 29,
+                "agree": 27,
+                "false_accept": 1,
+                "false_reject": 1
+              },
+              "decision": {
+                "checked": 29,
+                "agree": 27,
+                "false_accept": 1,
+                "false_reject": 1
+              }
+            },
+            "second_opinions": {
+              "requested": 0,
+              "succeeded": 0,
+              "failed": 0,
+              "success_rate": null,
+              "latency_ms_median": null,
+              "latency_ms_max": null,
+              "by_trigger": {
+                "primary_rejection": 0,
+                "low_confidence_acceptance": 0
+              }
+            },
+            "cost_incl_judge": {
+              "mean": 2.7333
+            },
+            "judge_usd": {
+              "per_1k_queries": 0.54,
+              "priced_queries": 30,
+              "queries": 30
+            },
+            "cost_usd": {
+              "per_1k_queries": 0.3352,
+              "priced_queries": 30,
+              "queries": 30
+            }
+          }
+        }
+      }
+    },
+    {
+      "title": "`hard` run 20261111T021401Z (30 items)",
+      "summary": {
+        "comparisons": {
+          "always_mid": {
+            "cost_incl_judge_vs_cheap_x": 3.1,
+            "cost_reduction_pct_vs_strong": 70.0,
+            "cost_incl_judge_reduction_pct_vs_strong": 70.0,
+            "strong_call_reduction_pct": 100.0,
+            "reference_quality_delta_vs_strong": null,
+            "median_latency_delta_ms_vs_strong": -6980.1
+          },
+          "always_strong": {
+            "cost_incl_judge_vs_cheap_x": 10.34,
+            "cost_reduction_pct_vs_strong": 0.0,
+            "cost_incl_judge_reduction_pct_vs_strong": 0.0,
+            "strong_call_reduction_pct": 0.0,
+            "reference_quality_delta_vs_strong": null,
+            "median_latency_delta_ms_vs_strong": 0.0
+          },
+          "always_weak": {
+            "cost_incl_judge_vs_cheap_x": 1.0,
+            "cost_reduction_pct_vs_strong": 90.3,
+            "cost_incl_judge_reduction_pct_vs_strong": 90.3,
+            "strong_call_reduction_pct": 100.0,
+            "reference_quality_delta_vs_strong": null,
+            "median_latency_delta_ms_vs_strong": -7497.2
+          },
+          "smart_router": {
+            "cost_incl_judge_vs_cheap_x": 6.14,
+            "cost_reduction_pct_vs_strong": 72.7,
+            "cost_incl_judge_reduction_pct_vs_strong": 40.7,
+            "strong_call_reduction_pct": 100.0,
+            "reference_quality_delta_vs_strong": null,
+            "median_latency_delta_ms_vs_strong": -8115.1
+          },
+          "static_router": {
+            "cost_incl_judge_vs_cheap_x": 2.83,
+            "cost_reduction_pct_vs_strong": 72.7,
+            "cost_incl_judge_reduction_pct_vs_strong": 72.7,
+            "strong_call_reduction_pct": 100.0,
+            "reference_quality_delta_vs_strong": null,
+            "median_latency_delta_ms_vs_strong": -8747.8
+          }
+        },
+        "paired": {
+          "smart_vs_cheap": {
+            "items": 30,
+            "wins": 3,
+            "losses": 1,
+            "both_correct": 26,
+            "both_wrong": 0,
+            "sign_test_p": 0.625
+          },
+          "smart_vs_mid": {
+            "items": 30,
+            "wins": 2,
+            "losses": 1,
+            "both_correct": 27,
+            "both_wrong": 0,
+            "sign_test_p": 1.0
+          },
+          "smart_vs_strong": {
+            "items": 30,
+            "wins": 1,
+            "losses": 1,
+            "both_correct": 28,
+            "both_wrong": 0,
+            "sign_test_p": 1.0
+          },
+          "static_vs_cheap": {
+            "items": 30,
+            "wins": 3,
+            "losses": 1,
+            "both_correct": 26,
+            "both_wrong": 0,
+            "sign_test_p": 0.625
+          },
+          "strong_vs_cheap": {
+            "items": 30,
+            "wins": 3,
+            "losses": 1,
+            "both_correct": 26,
+            "both_wrong": 0,
+            "sign_test_p": 0.625
+          }
+        },
+        "claim": {
+          "verdict": "not_supported_cheap_dominates",
+          "explanation": "SmartRouter is cheaper than Always Strong without a measurable accuracy loss, but Always Cheap matches it for less money, so routing adds cost without a measurable benefit on this dataset (strict accuracy SmartRouter 96.7%, Always Cheap 90.0%, Always Strong 96.7%; cost incl. judge 5.93 vs 0.97 vs 10.00; paired vs cheap 3 wins / 1 losses (p=0.625))."
+        },
+        "systems": {
+          "always_mid": {
+            "n": 30,
+            "quality": {
+              "mean": 0.975,
+              "median": 1.0,
+              "scored": 30
+            },
+            "cost": {
+              "mean": 3.0,
+              "total": 90.0
+            },
+            "utilization": {
+              "calls": {
+                "cheap": 0,
+                "mid": 30,
+                "strong": 0
+              },
+              "calls_pct": {
+                "cheap": 0.0,
+                "mid": 1.0,
+                "strong": 0.0
+              },
+              "final_pct": {
+                "cheap": 0.0,
+                "mid": 1.0,
+                "strong": 0.0
+              }
+            },
+            "escalation": {
+              "rate": 0.0,
+              "mean_count": 0.0
+            },
+            "latency_ms": {
+              "mean": 8802.9167,
+              "median": 9575.15,
+              "p95": 14283.2,
+              "generation_median": 1313.0
+            },
+            "judge_calls": 30,
+            "failure_groups": {
+              "Incorrect": 1,
+              "Reasoning weakness": 1
+            },
+            "routing_flow": [
+              {
+                "from": "mid",
+                "to": "accepted",
+                "count": 29
+              },
+              {
+                "from": "mid",
+                "to": "best_effort",
+                "count": 1
+              }
+            ],
+            "failure_rate": 0.0,
+            "below_threshold_rate": 0.0333,
+            "per_category": {
+              "coding": {
+                "n": 9,
+                "quality_mean": 1.0,
+                "cost_mean": 3.0,
+                "escalation_rate": 0.0,
+                "reference_quality_mean": null
+              },
+              "math": {
+                "n": 12,
+                "quality_mean": 0.9375,
+                "cost_mean": 3.0,
+                "escalation_rate": 0.0,
+                "reference_quality_mean": null
+              },
+              "reasoning": {
+                "n": 9,
+                "quality_mean": 1.0,
+                "cost_mean": 3.0,
+                "escalation_rate": 0.0,
+                "reference_quality_mean": null
+              }
+            },
+            "label": "Always Mid",
+            "mode": "always_mid",
+            "description": "Every query goes to the mid tier.",
+            "reference_quality": {
+              "mean": null,
+              "median": null,
+              "scored": 0,
+              "errors": 0
+            },
+            "strict": {
+              "checked": 30,
+              "correct": 28,
+              "accuracy": 0.9333,
+              "ci95": [
+                0.7868,
+                0.9815
+              ],
+              "unparseable": 0
+            },
+            "capability": {
+              "checked": 30,
+              "plumbing_failures": 0,
+              "plumbing_rate": 0.0,
+              "by_kind": {},
+              "readable": 30,
+              "readable_correct": 28,
+              "readable_accuracy": 0.9333
+            },
+            "deterministic": {
+              "checked": 30,
+              "accuracy": 0.9333
+            },
+            "serving_calls_mean": 1.0,
+            "cost_method": "exact",
+            "generation_failures": 0,
+            "provider_calls_mean": 2.1333,
+            "serving_judge_calls": 0,
+            "judge_failures": 0,
+            "judge_usage": {
+              "gemini-3.5-flash-lite": 30
+            },
+            "tier_accuracy": {
+              "mid": {
+                "correct": 28,
+                "checked": 30
+              }
+            },
+            "strong_calls": 0,
+            "escalations": {
+              "total": 0,
+              "necessary": 0,
+              "unnecessary": 0,
+              "unknown": 0
+            },
+            "judge_accuracy": {
+              "primary_judge": {
+                "checked": 30,
+                "agree": 27,
+                "false_accept": 2,
+                "false_reject": 1
+              },
+              "decision": {
+                "checked": 30,
+                "agree": 27,
+                "false_accept": 2,
+                "false_reject": 1
+              }
+            },
+            "second_opinions": {
+              "requested": 0,
+              "succeeded": 0,
+              "failed": 0,
+              "success_rate": null,
+              "latency_ms_median": null,
+              "latency_ms_max": null,
+              "by_trigger": {
+                "primary_rejection": 0,
+                "low_confidence_acceptance": 0
+              }
+            },
+            "cost_incl_judge": {
+              "mean": 3.0
+            },
+            "judge_usd": {
+              "per_1k_queries": 0.5262,
+              "priced_queries": 30,
+              "queries": 30
+            },
+            "cost_usd": {
+              "per_1k_queries": 0.3442,
+              "priced_queries": 30,
+              "queries": 30
+            }
+          },
+          "always_strong": {
+            "n": 30,
+            "quality": {
+              "mean": 0.9883,
+              "median": 1.0,
+              "scored": 30
+            },
+            "cost": {
+              "mean": 10.0,
+              "total": 300.0
+            },
+            "utilization": {
+              "calls": {
+                "cheap": 0,
+                "mid": 0,
+                "strong": 30
+              },
+              "calls_pct": {
+                "cheap": 0.0,
+                "mid": 0.0,
+                "strong": 1.0
+              },
+              "final_pct": {
+                "cheap": 0.0,
+                "mid": 0.0,
+                "strong": 1.0
+              }
+            },
+            "escalation": {
+              "rate": 0.0,
+              "mean_count": 0.0
+            },
+            "latency_ms": {
+              "mean": 27712.4267,
+              "median": 16555.25,
+              "p95": 84942.9,
+              "generation_median": 8611.35
+            },
+            "judge_calls": 30,
+            "failure_groups": {
+              "Incomplete": 1
+            },
+            "routing_flow": [
+              {
+                "from": "strong",
+                "to": "accepted",
+                "count": 29
+              },
+              {
+                "from": "strong",
+                "to": "best_effort",
+                "count": 1
+              }
+            ],
+            "failure_rate": 0.0,
+            "below_threshold_rate": 0.0333,
+            "per_category": {
+              "coding": {
+                "n": 9,
+                "quality_mean": 0.9611,
+                "cost_mean": 10.0,
+                "escalation_rate": 0.0,
+                "reference_quality_mean": null
+              },
+              "math": {
+                "n": 12,
+                "quality_mean": 1.0,
+                "cost_mean": 10.0,
+                "escalation_rate": 0.0,
+                "reference_quality_mean": null
+              },
+              "reasoning": {
+                "n": 9,
+                "quality_mean": 1.0,
+                "cost_mean": 10.0,
+                "escalation_rate": 0.0,
+                "reference_quality_mean": null
+              }
+            },
+            "label": "Always Strong",
+            "mode": "always_strong",
+            "description": "Every query goes to the strong tier (quality ceiling / cost reference).",
+            "reference_quality": {
+              "mean": null,
+              "median": null,
+              "scored": 0,
+              "errors": 0
+            },
+            "strict": {
+              "checked": 30,
+              "correct": 29,
+              "accuracy": 0.9667,
+              "ci95": [
+                0.8333,
+                0.9941
+              ],
+              "unparseable": 0
+            },
+            "capability": {
+              "checked": 30,
+              "plumbing_failures": 1,
+              "plumbing_rate": 0.0333,
+              "by_kind": {
+                "truncation": 1
+              },
+              "readable": 29,
+              "readable_correct": 29,
+              "readable_accuracy": 1.0
+            },
+            "deterministic": {
+              "checked": 30,
+              "accuracy": 0.9667
+            },
+            "serving_calls_mean": 1.0,
+            "cost_method": "exact",
+            "generation_failures": 0,
+            "provider_calls_mean": 2.0667,
+            "serving_judge_calls": 0,
+            "judge_failures": 0,
+            "judge_usage": {
+              "gemini-3.5-flash-lite": 30
+            },
+            "tier_accuracy": {
+              "strong": {
+                "correct": 29,
+                "checked": 30
+              }
+            },
+            "strong_calls": 30,
+            "escalations": {
+              "total": 0,
+              "necessary": 0,
+              "unnecessary": 0,
+              "unknown": 0
+            },
+            "judge_accuracy": {
+              "primary_judge": {
+                "checked": 30,
+                "agree": 30,
+                "false_accept": 0,
+                "false_reject": 0
+              },
+              "decision": {
+                "checked": 30,
+                "agree": 30,
+                "false_accept": 0,
+                "false_reject": 0
+              }
+            },
+            "second_opinions": {
+              "requested": 0,
+              "succeeded": 0,
+              "failed": 0,
+              "success_rate": null,
+              "latency_ms_median": null,
+              "latency_ms_max": null,
+              "by_trigger": {
+                "primary_rejection": 0,
+                "low_confidence_acceptance": 0
+              }
+            },
+            "cost_incl_judge": {
+              "mean": 10.0
+            },
+            "judge_usd": {
+              "per_1k_queries": 0.4957,
+              "priced_queries": 30,
+              "queries": 30
+            },
+            "cost_usd": {
+              "per_1k_queries": null,
+              "priced_queries": 0,
+              "queries": 30
+            }
+          },
+          "always_weak": {
+            "n": 30,
+            "quality": {
+              "mean": 0.9741,
+              "median": 1.0,
+              "scored": 29
+            },
+            "cost": {
+              "mean": 0.9667,
+              "total": 29.0
+            },
+            "utilization": {
+              "calls": {
+                "cheap": 30,
+                "mid": 0,
+                "strong": 0
+              },
+              "calls_pct": {
+                "cheap": 1.0,
+                "mid": 0.0,
+                "strong": 0.0
+              },
+              "final_pct": {
+                "cheap": 0.9667,
+                "mid": 0.0,
+                "strong": 0.0
+              }
+            },
+            "escalation": {
+              "rate": 0.0,
+              "mean_count": 0.0
+            },
+            "latency_ms": {
+              "mean": 7798.89,
+              "median": 9058.05,
+              "p95": 14690.6,
+              "generation_median": 785.95
+            },
+            "judge_calls": 29,
+            "failure_groups": {
+              "Incorrect": 1,
+              "Provider error": 1
+            },
+            "routing_flow": [
+              {
+                "from": "cheap",
+                "to": "accepted",
+                "count": 28
+              },
+              {
+                "from": "cheap",
+                "to": "best_effort",
+                "count": 1
+              },
+              {
+                "from": "cheap",
+                "to": "failed",
+                "count": 1
+              }
+            ],
+            "failure_rate": 0.0333,
+            "below_threshold_rate": 0.0667,
+            "per_category": {
+              "coding": {
+                "n": 9,
+                "quality_mean": 1.0,
+                "cost_mean": 1.0,
+                "escalation_rate": 0.0,
+                "reference_quality_mean": null
+              },
+              "math": {
+                "n": 12,
+                "quality_mean": 0.9318,
+                "cost_mean": 0.9167,
+                "escalation_rate": 0.0,
+                "reference_quality_mean": null
+              },
+              "reasoning": {
+                "n": 9,
+                "quality_mean": 1.0,
+                "cost_mean": 1.0,
+                "escalation_rate": 0.0,
+                "reference_quality_mean": null
+              }
+            },
+            "label": "Always Cheap",
+            "mode": "always_cheap",
+            "description": "Every query goes to the cheap tier; no judge needed in production.",
+            "reference_quality": {
+              "mean": null,
+              "median": null,
+              "scored": 0,
+              "errors": 0
+            },
+            "strict": {
+              "checked": 30,
+              "correct": 27,
+              "accuracy": 0.9,
+              "ci95": [
+                0.7438,
+                0.9654
+              ],
+              "unparseable": 1
+            },
+            "capability": {
+              "checked": 30,
+              "plumbing_failures": 2,
+              "plumbing_rate": 0.0667,
+              "by_kind": {
+                "unreadable_final_number": 1,
+                "provider_error": 1
+              },
+              "readable": 28,
+              "readable_correct": 27,
+              "readable_accuracy": 0.9643
+            },
+            "deterministic": {
+              "checked": 29,
+              "accuracy": 0.931
+            },
+            "serving_calls_mean": 0.967,
+            "cost_method": "estimated_lower_bound",
+            "generation_failures": 1,
+            "provider_calls_mean": 2.1,
+            "serving_judge_calls": 0,
+            "judge_failures": 0,
+            "judge_usage": {
+              "gemini-3.5-flash-lite": 29
+            },
+            "tier_accuracy": {
+              "cheap": {
+                "correct": 27,
+                "checked": 29
+              }
+            },
+            "strong_calls": 0,
+            "escalations": {
+              "total": 0,
+              "necessary": 0,
+              "unnecessary": 0,
+              "unknown": 0
+            },
+            "judge_accuracy": {
+              "primary_judge": {
+                "checked": 28,
+                "agree": 26,
+                "false_accept": 1,
+                "false_reject": 1
+              },
+              "decision": {
+                "checked": 28,
+                "agree": 26,
+                "false_accept": 1,
+                "false_reject": 1
+              }
+            },
+            "second_opinions": {
+              "requested": 0,
+              "succeeded": 0,
+              "failed": 0,
+              "success_rate": null,
+              "latency_ms_median": null,
+              "latency_ms_max": null,
+              "by_trigger": {
+                "primary_rejection": 0,
+                "low_confidence_acceptance": 0
+              }
+            },
+            "cost_incl_judge": {
+              "mean": 0.9667
+            },
+            "judge_usd": {
+              "per_1k_queries": 0.4603,
+              "priced_queries": 30,
+              "queries": 30
+            },
+            "cost_usd": {
+              "per_1k_queries": 0.2,
+              "priced_queries": 30,
+              "queries": 30
+            }
+          },
+          "smart_router": {
+            "n": 30,
+            "quality": {
+              "mean": 0.95,
+              "median": 1.0,
+              "scored": 30
+            },
+            "cost": {
+              "mean": 2.7333,
+              "total": 82.0
+            },
+            "utilization": {
+              "calls": {
+                "cheap": 4,
+                "mid": 26,
+                "strong": 0
+              },
+              "calls_pct": {
+                "cheap": 0.1333,
+                "mid": 0.8667,
+                "strong": 0.0
+              },
+              "final_pct": {
+                "cheap": 0.1333,
+                "mid": 0.8667,
+                "strong": 0.0
+              }
+            },
+            "escalation": {
+              "rate": 0.0,
+              "mean_count": 0.0
+            },
+            "latency_ms": {
+              "mean": 8245.6233,
+              "median": 8440.1,
+              "p95": 15845.0,
+              "generation_median": 1343.65
+            },
+            "judge_calls": 32,
+            "failure_groups": {},
+            "routing_flow": [
+              {
+                "from": "cheap",
+                "to": "accepted",
+                "count": 4
+              },
+              {
+                "from": "mid",
+                "to": "accepted",
+                "count": 26
+              }
+            ],
+            "failure_rate": 0.0,
+            "below_threshold_rate": 0.0,
+            "per_category": {
+              "coding": {
+                "n": 9,
+                "quality_mean": 1.0,
+                "cost_mean": 3.0,
+                "escalation_rate": 0.0,
+                "reference_quality_mean": null
+              },
+              "math": {
+                "n": 12,
+                "quality_mean": 0.9375,
+                "cost_mean": 2.8333,
+                "escalation_rate": 0.0,
+                "reference_quality_mean": null
+              },
+              "reasoning": {
+                "n": 9,
+                "quality_mean": 0.9167,
+                "cost_mean": 2.3333,
+                "escalation_rate": 0.0,
+                "reference_quality_mean": null
+              }
+            },
+            "label": "SmartRouter",
+            "mode": "smart",
+            "description": "Heuristic routing + answer checks + judge-driven escalation.",
+            "reference_quality": {
+              "mean": null,
+              "median": null,
+              "scored": 0,
+              "errors": 0
+            },
+            "strict": {
+              "checked": 30,
+              "correct": 29,
+              "accuracy": 0.9667,
+              "ci95": [
+                0.8333,
+                0.9941
+              ],
+              "unparseable": 0
+            },
+            "capability": {
+              "checked": 30,
+              "plumbing_failures": 1,
+              "plumbing_rate": 0.0333,
+              "by_kind": {
+                "truncation": 1
+              },
+              "readable": 29,
+              "readable_correct": 29,
+              "readable_accuracy": 1.0
+            },
+            "deterministic": {
+              "checked": 30,
+              "accuracy": 0.9667
+            },
+            "serving_calls_mean": 2.067,
+            "cost_method": "exact",
+            "generation_failures": 0,
+            "provider_calls_mean": 2.2333,
+            "serving_judge_calls": 32,
+            "judge_failures": 0,
+            "judge_usage": {
+              "gemini-3.5-flash-lite": 30
+            },
+            "tier_accuracy": {
+              "mid": {
+                "correct": 25,
+                "checked": 26
+              },
+              "cheap": {
+                "correct": 4,
+                "checked": 4
+              }
+            },
+            "strong_calls": 0,
+            "escalations": {
+              "total": 0,
+              "necessary": 0,
+              "unnecessary": 0,
+              "unknown": 0
+            },
+            "judge_accuracy": {
+              "primary_judge": {
+                "checked": 30,
+                "agree": 27,
+                "false_accept": 1,
+                "false_reject": 2
+              },
+              "decision": {
+                "checked": 30,
+                "agree": 29,
+                "false_accept": 1,
+                "false_reject": 0
+              }
+            },
+            "second_opinions": {
+              "requested": 2,
+              "succeeded": 2,
+              "failed": 0,
+              "success_rate": 1.0,
+              "latency_ms_median": 381.0,
+              "latency_ms_max": 381.0,
+              "by_trigger": {
+                "primary_rejection": 2,
+                "low_confidence_acceptance": 0
+              }
+            },
+            "cost_incl_judge": {
+              "mean": 5.9333
+            },
+            "judge_usd": {
+              "per_1k_queries": 0.7116,
+              "priced_queries": 30,
+              "queries": 30
+            },
+            "cost_usd": {
+              "per_1k_queries": 1.1457,
+              "priced_queries": 30,
+              "queries": 30
+            }
+          },
+          "static_router": {
+            "n": 30,
+            "quality": {
+              "mean": 0.945,
+              "median": 1.0,
+              "scored": 30
+            },
+            "cost": {
+              "mean": 2.7333,
+              "total": 82.0
+            },
+            "utilization": {
+              "calls": {
+                "cheap": 4,
+                "mid": 26,
+                "strong": 0
+              },
+              "calls_pct": {
+                "cheap": 0.1333,
+                "mid": 0.8667,
+                "strong": 0.0
+              },
+              "final_pct": {
+                "cheap": 0.1333,
+                "mid": 0.8667,
+                "strong": 0.0
+              }
+            },
+            "escalation": {
+              "rate": 0.0,
+              "mean_count": 0.0
+            },
+            "latency_ms": {
+              "mean": 6926.82,
+              "median": 7807.5,
+              "p95": 11257.4,
+              "generation_median": 1219.85
+            },
+            "judge_calls": 30,
+            "failure_groups": {
+              "Incorrect": 2,
+              "Reasoning weakness": 1
+            },
+            "routing_flow": [
+              {
+                "from": "cheap",
+                "to": "accepted",
+                "count": 4
+              },
+              {
+                "from": "mid",
+                "to": "accepted",
+                "count": 24
+              },
+              {
+                "from": "mid",
+                "to": "best_effort",
+                "count": 2
+              }
+            ],
+            "failure_rate": 0.0,
+            "below_threshold_rate": 0.0667,
+            "per_category": {
+              "coding": {
+                "n": 9,
+                "quality_mean": 1.0,
+                "cost_mean": 3.0,
+                "escalation_rate": 0.0,
+                "reference_quality_mean": null
+              },
+              "math": {
+                "n": 12,
+                "quality_mean": 0.8625,
+                "cost_mean": 2.8333,
+                "escalation_rate": 0.0,
+                "reference_quality_mean": null
+              },
+              "reasoning": {
+                "n": 9,
+                "quality_mean": 1.0,
+                "cost_mean": 2.3333,
+                "escalation_rate": 0.0,
+                "reference_quality_mean": null
+              }
+            },
+            "label": "Static Router",
+            "mode": "static",
+            "description": "Heuristic difficulty routing; no judge-driven escalation.",
+            "reference_quality": {
+              "mean": null,
+              "median": null,
+              "scored": 0,
+              "errors": 0
+            },
+            "strict": {
+              "checked": 30,
+              "correct": 29,
+              "accuracy": 0.9667,
+              "ci95": [
+                0.8333,
+                0.9941
+              ],
+              "unparseable": 1
+            },
+            "capability": {
+              "checked": 30,
+              "plumbing_failures": 1,
+              "plumbing_rate": 0.0333,
+              "by_kind": {
+                "unreadable_final_number": 1
+              },
+              "readable": 29,
+              "readable_correct": 29,
+              "readable_accuracy": 1.0
+            },
+            "deterministic": {
+              "checked": 29,
+              "accuracy": 1.0
+            },
+            "serving_calls_mean": 1.0,
+            "cost_method": "exact",
+            "generation_failures": 0,
+            "provider_calls_mean": 2.2,
+            "serving_judge_calls": 0,
+            "judge_failures": 0,
+            "judge_usage": {
+              "gemini-3.5-flash-lite": 30
+            },
+            "tier_accuracy": {
+              "mid": {
+                "correct": 25,
+                "checked": 25
+              },
+              "cheap": {
+                "correct": 4,
+                "checked": 4
+              }
+            },
+            "strong_calls": 0,
+            "escalations": {
+              "total": 0,
+              "necessary": 0,
+              "unnecessary": 0,
+              "unknown": 0
+            },
+            "judge_accuracy": {
+              "primary_judge": {
+                "checked": 29,
+                "agree": 27,
+                "false_accept": 0,
+                "false_reject": 2
+              },
+              "decision": {
+                "checked": 29,
+                "agree": 27,
+                "false_accept": 0,
+                "false_reject": 2
+              }
+            },
+            "second_opinions": {
+              "requested": 0,
+              "succeeded": 0,
+              "failed": 0,
+              "success_rate": null,
+              "latency_ms_median": null,
+              "latency_ms_max": null,
+              "by_trigger": {
+                "primary_rejection": 0,
+                "low_confidence_acceptance": 0
+              }
+            },
+            "cost_incl_judge": {
+              "mean": 2.7333
+            },
+            "judge_usd": {
+              "per_1k_queries": 0.5482,
+              "priced_queries": 30,
+              "queries": 30
+            },
+            "cost_usd": {
+              "per_1k_queries": 0.3507,
+              "priced_queries": 30,
+              "queries": 30
+            }
+          }
+        }
+      }
+    },
+    {
+      "title": "`hard` run 20261111T024904Z (30 items)",
+      "summary": {
+        "comparisons": {
+          "always_mid": {
+            "cost_incl_judge_vs_cheap_x": 3.1,
+            "cost_reduction_pct_vs_strong": 70.0,
+            "cost_incl_judge_reduction_pct_vs_strong": 70.0,
+            "strong_call_reduction_pct": 100.0,
+            "reference_quality_delta_vs_strong": null,
+            "median_latency_delta_ms_vs_strong": -10219.6
+          },
+          "always_strong": {
+            "cost_incl_judge_vs_cheap_x": 10.34,
+            "cost_reduction_pct_vs_strong": 0.0,
+            "cost_incl_judge_reduction_pct_vs_strong": 0.0,
+            "strong_call_reduction_pct": 0.0,
+            "reference_quality_delta_vs_strong": null,
+            "median_latency_delta_ms_vs_strong": 0.0
+          },
+          "always_weak": {
+            "cost_incl_judge_vs_cheap_x": 1.0,
+            "cost_reduction_pct_vs_strong": 90.3,
+            "cost_incl_judge_reduction_pct_vs_strong": 90.3,
+            "strong_call_reduction_pct": 100.0,
+            "reference_quality_delta_vs_strong": null,
+            "median_latency_delta_ms_vs_strong": -10101.3
+          },
+          "smart_router": {
+            "cost_incl_judge_vs_cheap_x": 6.14,
+            "cost_reduction_pct_vs_strong": 72.7,
+            "cost_incl_judge_reduction_pct_vs_strong": 40.7,
+            "strong_call_reduction_pct": 100.0,
+            "reference_quality_delta_vs_strong": null,
+            "median_latency_delta_ms_vs_strong": -15154.8
+          },
+          "static_router": {
+            "cost_incl_judge_vs_cheap_x": 2.83,
+            "cost_reduction_pct_vs_strong": 72.7,
+            "cost_incl_judge_reduction_pct_vs_strong": 72.7,
+            "strong_call_reduction_pct": 100.0,
+            "reference_quality_delta_vs_strong": null,
+            "median_latency_delta_ms_vs_strong": -15161.4
+          }
+        },
+        "paired": {
+          "smart_vs_cheap": {
+            "items": 30,
+            "wins": 3,
+            "losses": 1,
+            "both_correct": 26,
+            "both_wrong": 0,
+            "sign_test_p": 0.625
+          },
+          "smart_vs_mid": {
+            "items": 30,
+            "wins": 0,
+            "losses": 0,
+            "both_correct": 29,
+            "both_wrong": 1,
+            "sign_test_p": null
+          },
+          "smart_vs_strong": {
+            "items": 30,
+            "wins": 0,
+            "losses": 1,
+            "both_correct": 29,
+            "both_wrong": 0,
+            "sign_test_p": 1.0
+          },
+          "static_vs_cheap": {
+            "items": 30,
+            "wins": 2,
+            "losses": 2,
+            "both_correct": 25,
+            "both_wrong": 1,
+            "sign_test_p": 1.0
+          },
+          "strong_vs_cheap": {
+            "items": 30,
+            "wins": 3,
+            "losses": 0,
+            "both_correct": 27,
+            "both_wrong": 0,
+            "sign_test_p": 0.25
+          }
+        },
+        "claim": {
+          "verdict": "not_supported_cheap_dominates",
+          "explanation": "SmartRouter is cheaper than Always Strong without a measurable accuracy loss, but Always Cheap matches it for less money, so routing adds cost without a measurable benefit on this dataset (strict accuracy SmartRouter 96.7%, Always Cheap 90.0%, Always Strong 100.0%; cost incl. judge 5.93 vs 0.97 vs 10.00; paired vs cheap 3 wins / 1 losses (p=0.625))."
+        },
+        "systems": {
+          "always_mid": {
+            "n": 30,
+            "quality": {
+              "mean": 0.97,
+              "median": 1.0,
+              "scored": 30
+            },
+            "cost": {
+              "mean": 3.0,
+              "total": 90.0
+            },
+            "utilization": {
+              "calls": {
+                "cheap": 0,
+                "mid": 30,
+                "strong": 0
+              },
+              "calls_pct": {
+                "cheap": 0.0,
+                "mid": 1.0,
+                "strong": 0.0
+              },
+              "final_pct": {
+                "cheap": 0.0,
+                "mid": 1.0,
+                "strong": 0.0
+              }
+            },
+            "escalation": {
+              "rate": 0.0,
+              "mean_count": 0.0
+            },
+            "latency_ms": {
+              "mean": 8901.7933,
+              "median": 7819.85,
+              "p95": 15565.1,
+              "generation_median": 1287.95
+            },
+            "judge_calls": 30,
+            "failure_groups": {
+              "Incorrect": 1
+            },
+            "routing_flow": [
+              {
+                "from": "mid",
+                "to": "accepted",
+                "count": 29
+              },
+              {
+                "from": "mid",
+                "to": "best_effort",
+                "count": 1
+              }
+            ],
+            "failure_rate": 0.0,
+            "below_threshold_rate": 0.0333,
+            "per_category": {
+              "coding": {
+                "n": 9,
+                "quality_mean": 1.0,
+                "cost_mean": 3.0,
+                "escalation_rate": 0.0,
+                "reference_quality_mean": null
+              },
+              "math": {
+                "n": 12,
+                "quality_mean": 0.925,
+                "cost_mean": 3.0,
+                "escalation_rate": 0.0,
+                "reference_quality_mean": null
+              },
+              "reasoning": {
+                "n": 9,
+                "quality_mean": 1.0,
+                "cost_mean": 3.0,
+                "escalation_rate": 0.0,
+                "reference_quality_mean": null
+              }
+            },
+            "label": "Always Mid",
+            "mode": "always_mid",
+            "description": "Every query goes to the mid tier.",
+            "reference_quality": {
+              "mean": null,
+              "median": null,
+              "scored": 0,
+              "errors": 0
+            },
+            "strict": {
+              "checked": 30,
+              "correct": 29,
+              "accuracy": 0.9667,
+              "ci95": [
+                0.8333,
+                0.9941
+              ],
+              "unparseable": 0
+            },
+            "capability": {
+              "checked": 30,
+              "plumbing_failures": 0,
+              "plumbing_rate": 0.0,
+              "by_kind": {},
+              "readable": 30,
+              "readable_correct": 29,
+              "readable_accuracy": 0.9667
+            },
+            "deterministic": {
+              "checked": 30,
+              "accuracy": 0.9667
+            },
+            "serving_calls_mean": 1.0,
+            "cost_method": "exact",
+            "generation_failures": 0,
+            "provider_calls_mean": 2.2,
+            "serving_judge_calls": 0,
+            "judge_failures": 0,
+            "judge_usage": {
+              "gemini-3.5-flash-lite": 30
+            },
+            "tier_accuracy": {
+              "mid": {
+                "correct": 29,
+                "checked": 30
+              }
+            },
+            "strong_calls": 0,
+            "escalations": {
+              "total": 0,
+              "necessary": 0,
+              "unnecessary": 0,
+              "unknown": 0
+            },
+            "judge_accuracy": {
+              "primary_judge": {
+                "checked": 30,
+                "agree": 28,
+                "false_accept": 1,
+                "false_reject": 1
+              },
+              "decision": {
+                "checked": 30,
+                "agree": 28,
+                "false_accept": 1,
+                "false_reject": 1
+              }
+            },
+            "second_opinions": {
+              "requested": 0,
+              "succeeded": 0,
+              "failed": 0,
+              "success_rate": null,
+              "latency_ms_median": null,
+              "latency_ms_max": null,
+              "by_trigger": {
+                "primary_rejection": 0,
+                "low_confidence_acceptance": 0
+              }
+            },
+            "cost_incl_judge": {
+              "mean": 3.0
+            },
+            "judge_usd": {
+              "per_1k_queries": 0.5514,
+              "priced_queries": 30,
+              "queries": 30
+            },
+            "cost_usd": {
+              "per_1k_queries": 0.3788,
+              "priced_queries": 30,
+              "queries": 30
+            }
+          },
+          "always_strong": {
+            "n": 30,
+            "quality": {
+              "mean": 1.0,
+              "median": 1.0,
+              "scored": 30
+            },
+            "cost": {
+              "mean": 10.0,
+              "total": 300.0
+            },
+            "utilization": {
+              "calls": {
+                "cheap": 0,
+                "mid": 0,
+                "strong": 30
+              },
+              "calls_pct": {
+                "cheap": 0.0,
+                "mid": 0.0,
+                "strong": 1.0
+              },
+              "final_pct": {
+                "cheap": 0.0,
+                "mid": 0.0,
+                "strong": 1.0
+              }
+            },
+            "escalation": {
+              "rate": 0.0,
+              "mean_count": 0.0
+            },
+            "latency_ms": {
+              "mean": 27155.0,
+              "median": 18039.5,
+              "p95": 60484.5,
+              "generation_median": 11857.8
+            },
+            "judge_calls": 30,
+            "failure_groups": {},
+            "routing_flow": [
+              {
+                "from": "strong",
+                "to": "accepted",
+                "count": 30
+              }
+            ],
+            "failure_rate": 0.0,
+            "below_threshold_rate": 0.0,
+            "per_category": {
+              "coding": {
+                "n": 9,
+                "quality_mean": 1.0,
+                "cost_mean": 10.0,
+                "escalation_rate": 0.0,
+                "reference_quality_mean": null
+              },
+              "math": {
+                "n": 12,
+                "quality_mean": 1.0,
+                "cost_mean": 10.0,
+                "escalation_rate": 0.0,
+                "reference_quality_mean": null
+              },
+              "reasoning": {
+                "n": 9,
+                "quality_mean": 1.0,
+                "cost_mean": 10.0,
+                "escalation_rate": 0.0,
+                "reference_quality_mean": null
+              }
+            },
+            "label": "Always Strong",
+            "mode": "always_strong",
+            "description": "Every query goes to the strong tier (quality ceiling / cost reference).",
+            "reference_quality": {
+              "mean": null,
+              "median": null,
+              "scored": 0,
+              "errors": 0
+            },
+            "strict": {
+              "checked": 30,
+              "correct": 30,
+              "accuracy": 1.0,
+              "ci95": [
+                0.8865,
+                1.0
+              ],
+              "unparseable": 0
+            },
+            "capability": {
+              "checked": 30,
+              "plumbing_failures": 0,
+              "plumbing_rate": 0.0,
+              "by_kind": {},
+              "readable": 30,
+              "readable_correct": 30,
+              "readable_accuracy": 1.0
+            },
+            "deterministic": {
+              "checked": 30,
+              "accuracy": 1.0
+            },
+            "serving_calls_mean": 1.0,
+            "cost_method": "exact",
+            "generation_failures": 0,
+            "provider_calls_mean": 2.1667,
+            "serving_judge_calls": 0,
+            "judge_failures": 0,
+            "judge_usage": {
+              "gemini-3.5-flash-lite": 30
+            },
+            "tier_accuracy": {
+              "strong": {
+                "correct": 30,
+                "checked": 30
+              }
+            },
+            "strong_calls": 30,
+            "escalations": {
+              "total": 0,
+              "necessary": 0,
+              "unnecessary": 0,
+              "unknown": 0
+            },
+            "judge_accuracy": {
+              "primary_judge": {
+                "checked": 30,
+                "agree": 30,
+                "false_accept": 0,
+                "false_reject": 0
+              },
+              "decision": {
+                "checked": 30,
+                "agree": 30,
+                "false_accept": 0,
+                "false_reject": 0
+              }
+            },
+            "second_opinions": {
+              "requested": 0,
+              "succeeded": 0,
+              "failed": 0,
+              "success_rate": null,
+              "latency_ms_median": null,
+              "latency_ms_max": null,
+              "by_trigger": {
+                "primary_rejection": 0,
+                "low_confidence_acceptance": 0
+              }
+            },
+            "cost_incl_judge": {
+              "mean": 10.0
+            },
+            "judge_usd": {
+              "per_1k_queries": 0.4977,
+              "priced_queries": 30,
+              "queries": 30
+            },
+            "cost_usd": {
+              "per_1k_queries": null,
+              "priced_queries": 0,
+              "queries": 30
+            }
+          },
+          "always_weak": {
+            "n": 30,
+            "quality": {
+              "mean": 0.9603,
+              "median": 1.0,
+              "scored": 29
+            },
+            "cost": {
+              "mean": 0.9667,
+              "total": 29.0
+            },
+            "utilization": {
+              "calls": {
+                "cheap": 30,
+                "mid": 0,
+                "strong": 0
+              },
+              "calls_pct": {
+                "cheap": 1.0,
+                "mid": 0.0,
+                "strong": 0.0
+              },
+              "final_pct": {
+                "cheap": 0.9667,
+                "mid": 0.0,
+                "strong": 0.0
+              }
+            },
+            "escalation": {
+              "rate": 0.0,
+              "mean_count": 0.0
+            },
+            "latency_ms": {
+              "mean": 7782.1167,
+              "median": 7938.2,
+              "p95": 10622.0,
+              "generation_median": 896.25
+            },
+            "judge_calls": 29,
+            "failure_groups": {
+              "Incorrect": 2,
+              "Provider error": 1
+            },
+            "routing_flow": [
+              {
+                "from": "cheap",
+                "to": "accepted",
+                "count": 27
+              },
+              {
+                "from": "cheap",
+                "to": "best_effort",
+                "count": 2
+              },
+              {
+                "from": "cheap",
+                "to": "failed",
+                "count": 1
+              }
+            ],
+            "failure_rate": 0.0333,
+            "below_threshold_rate": 0.1,
+            "per_category": {
+              "coding": {
+                "n": 9,
+                "quality_mean": 1.0,
+                "cost_mean": 1.0,
+                "escalation_rate": 0.0,
+                "reference_quality_mean": null
+              },
+              "math": {
+                "n": 12,
+                "quality_mean": 0.9409,
+                "cost_mean": 0.9167,
+                "escalation_rate": 0.0,
+                "reference_quality_mean": null
+              },
+              "reasoning": {
+                "n": 9,
+                "quality_mean": 0.9444,
+                "cost_mean": 1.0,
+                "escalation_rate": 0.0,
+                "reference_quality_mean": null
+              }
+            },
+            "label": "Always Cheap",
+            "mode": "always_cheap",
+            "description": "Every query goes to the cheap tier; no judge needed in production.",
+            "reference_quality": {
+              "mean": null,
+              "median": null,
+              "scored": 0,
+              "errors": 0
+            },
+            "strict": {
+              "checked": 30,
+              "correct": 27,
+              "accuracy": 0.9,
+              "ci95": [
+                0.7438,
+                0.9654
+              ],
+              "unparseable": 1
+            },
+            "capability": {
+              "checked": 30,
+              "plumbing_failures": 2,
+              "plumbing_rate": 0.0667,
+              "by_kind": {
+                "unreadable_final_number": 1,
+                "provider_error": 1
+              },
+              "readable": 28,
+              "readable_correct": 27,
+              "readable_accuracy": 0.9643
+            },
+            "deterministic": {
+              "checked": 29,
+              "accuracy": 0.931
+            },
+            "serving_calls_mean": 0.967,
+            "cost_method": "estimated_lower_bound",
+            "generation_failures": 1,
+            "provider_calls_mean": 2.1,
+            "serving_judge_calls": 0,
+            "judge_failures": 0,
+            "judge_usage": {
+              "gemini-3.5-flash-lite": 29
+            },
+            "tier_accuracy": {
+              "cheap": {
+                "correct": 27,
+                "checked": 29
+              }
+            },
+            "strong_calls": 0,
+            "escalations": {
+              "total": 0,
+              "necessary": 0,
+              "unnecessary": 0,
+              "unknown": 0
+            },
+            "judge_accuracy": {
+              "primary_judge": {
+                "checked": 28,
+                "agree": 25,
+                "false_accept": 1,
+                "false_reject": 2
+              },
+              "decision": {
+                "checked": 28,
+                "agree": 25,
+                "false_accept": 1,
+                "false_reject": 2
+              }
+            },
+            "second_opinions": {
+              "requested": 0,
+              "succeeded": 0,
+              "failed": 0,
+              "success_rate": null,
+              "latency_ms_median": null,
+              "latency_ms_max": null,
+              "by_trigger": {
+                "primary_rejection": 0,
+                "low_confidence_acceptance": 0
+              }
+            },
+            "cost_incl_judge": {
+              "mean": 0.9667
+            },
+            "judge_usd": {
+              "per_1k_queries": 0.4717,
+              "priced_queries": 30,
+              "queries": 30
+            },
+            "cost_usd": {
+              "per_1k_queries": 0.191,
+              "priced_queries": 30,
+              "queries": 30
+            }
+          },
+          "smart_router": {
+            "n": 30,
+            "quality": {
+              "mean": 0.95,
+              "median": 1.0,
+              "scored": 30
+            },
+            "cost": {
+              "mean": 2.7333,
+              "total": 82.0
+            },
+            "utilization": {
+              "calls": {
+                "cheap": 4,
+                "mid": 26,
+                "strong": 0
+              },
+              "calls_pct": {
+                "cheap": 0.1333,
+                "mid": 0.8667,
+                "strong": 0.0
+              },
+              "final_pct": {
+                "cheap": 0.1333,
+                "mid": 0.8667,
+                "strong": 0.0
+              }
+            },
+            "escalation": {
+              "rate": 0.0,
+              "mean_count": 0.0
+            },
+            "latency_ms": {
+              "mean": 3674.9333,
+              "median": 2884.7,
+              "p95": 10767.9,
+              "generation_median": 1260.55
+            },
+            "judge_calls": 32,
+            "failure_groups": {},
+            "routing_flow": [
+              {
+                "from": "cheap",
+                "to": "accepted",
+                "count": 4
+              },
+              {
+                "from": "mid",
+                "to": "accepted",
+                "count": 26
+              }
+            ],
+            "failure_rate": 0.0,
+            "below_threshold_rate": 0.0,
+            "per_category": {
+              "coding": {
+                "n": 9,
+                "quality_mean": 1.0,
+                "cost_mean": 3.0,
+                "escalation_rate": 0.0,
+                "reference_quality_mean": null
+              },
+              "math": {
+                "n": 12,
+                "quality_mean": 0.9375,
+                "cost_mean": 2.8333,
+                "escalation_rate": 0.0,
+                "reference_quality_mean": null
+              },
+              "reasoning": {
+                "n": 9,
+                "quality_mean": 0.9167,
+                "cost_mean": 2.3333,
+                "escalation_rate": 0.0,
+                "reference_quality_mean": null
+              }
+            },
+            "label": "SmartRouter",
+            "mode": "smart",
+            "description": "Heuristic routing + answer checks + judge-driven escalation.",
+            "reference_quality": {
+              "mean": null,
+              "median": null,
+              "scored": 0,
+              "errors": 0
+            },
+            "strict": {
+              "checked": 30,
+              "correct": 29,
+              "accuracy": 0.9667,
+              "ci95": [
+                0.8333,
+                0.9941
+              ],
+              "unparseable": 0
+            },
+            "capability": {
+              "checked": 30,
+              "plumbing_failures": 0,
+              "plumbing_rate": 0.0,
+              "by_kind": {},
+              "readable": 30,
+              "readable_correct": 29,
+              "readable_accuracy": 0.9667
+            },
+            "deterministic": {
+              "checked": 30,
+              "accuracy": 0.9667
+            },
+            "serving_calls_mean": 2.067,
+            "cost_method": "exact",
+            "generation_failures": 0,
+            "provider_calls_mean": 2.1667,
+            "serving_judge_calls": 32,
+            "judge_failures": 0,
+            "judge_usage": {
+              "gemini-3.5-flash-lite": 30
+            },
+            "tier_accuracy": {
+              "mid": {
+                "correct": 25,
+                "checked": 26
+              },
+              "cheap": {
+                "correct": 4,
+                "checked": 4
+              }
+            },
+            "strong_calls": 0,
+            "escalations": {
+              "total": 0,
+              "necessary": 0,
+              "unnecessary": 0,
+              "unknown": 0
+            },
+            "judge_accuracy": {
+              "primary_judge": {
+                "checked": 30,
+                "agree": 27,
+                "false_accept": 1,
+                "false_reject": 2
+              },
+              "decision": {
+                "checked": 30,
+                "agree": 29,
+                "false_accept": 1,
+                "false_reject": 0
+              }
+            },
+            "second_opinions": {
+              "requested": 2,
+              "succeeded": 2,
+              "failed": 0,
+              "success_rate": 1.0,
+              "latency_ms_median": 359.0,
+              "latency_ms_max": 359.0,
+              "by_trigger": {
+                "primary_rejection": 2,
+                "low_confidence_acceptance": 0
+              }
+            },
+            "cost_incl_judge": {
+              "mean": 5.9333
+            },
+            "judge_usd": {
+              "per_1k_queries": 0.5978,
+              "priced_queries": 30,
+              "queries": 30
+            },
+            "cost_usd": {
+              "per_1k_queries": 1.0364,
+              "priced_queries": 30,
+              "queries": 30
+            }
+          },
+          "static_router": {
+            "n": 30,
+            "quality": {
+              "mean": 0.95,
+              "median": 1.0,
+              "scored": 30
+            },
+            "cost": {
+              "mean": 2.7333,
+              "total": 82.0
+            },
+            "utilization": {
+              "calls": {
+                "cheap": 4,
+                "mid": 26,
+                "strong": 0
+              },
+              "calls_pct": {
+                "cheap": 0.1333,
+                "mid": 0.8667,
+                "strong": 0.0
+              },
+              "final_pct": {
+                "cheap": 0.1333,
+                "mid": 0.8667,
+                "strong": 0.0
+              }
+            },
+            "escalation": {
+              "rate": 0.0,
+              "mean_count": 0.0
+            },
+            "latency_ms": {
+              "mean": 3252.7233,
+              "median": 2878.15,
+              "p95": 6596.8,
+              "generation_median": 1431.35
+            },
+            "judge_calls": 30,
+            "failure_groups": {
+              "Incorrect": 2,
+              "Reasoning weakness": 1
+            },
+            "routing_flow": [
+              {
+                "from": "cheap",
+                "to": "accepted",
+                "count": 4
+              },
+              {
+                "from": "mid",
+                "to": "accepted",
+                "count": 24
+              },
+              {
+                "from": "mid",
+                "to": "best_effort",
+                "count": 2
+              }
+            ],
+            "failure_rate": 0.0,
+            "below_threshold_rate": 0.0667,
+            "per_category": {
+              "coding": {
+                "n": 9,
+                "quality_mean": 1.0,
+                "cost_mean": 3.0,
+                "escalation_rate": 0.0,
+                "reference_quality_mean": null
+              },
+              "math": {
+                "n": 12,
+                "quality_mean": 0.875,
+                "cost_mean": 2.8333,
+                "escalation_rate": 0.0,
+                "reference_quality_mean": null
+              },
+              "reasoning": {
+                "n": 9,
+                "quality_mean": 1.0,
+                "cost_mean": 2.3333,
+                "escalation_rate": 0.0,
+                "reference_quality_mean": null
+              }
+            },
+            "label": "Static Router",
+            "mode": "static",
+            "description": "Heuristic difficulty routing; no judge-driven escalation.",
+            "reference_quality": {
+              "mean": null,
+              "median": null,
+              "scored": 0,
+              "errors": 0
+            },
+            "strict": {
+              "checked": 30,
+              "correct": 27,
+              "accuracy": 0.9,
+              "ci95": [
+                0.7438,
+                0.9654
+              ],
+              "unparseable": 0
+            },
+            "capability": {
+              "checked": 30,
+              "plumbing_failures": 0,
+              "plumbing_rate": 0.0,
+              "by_kind": {},
+              "readable": 30,
+              "readable_correct": 27,
+              "readable_accuracy": 0.9
+            },
+            "deterministic": {
+              "checked": 30,
+              "accuracy": 0.9
+            },
+            "serving_calls_mean": 1.0,
+            "cost_method": "exact",
+            "generation_failures": 0,
+            "provider_calls_mean": 2.1333,
+            "serving_judge_calls": 0,
+            "judge_failures": 0,
+            "judge_usage": {
+              "gemini-3.5-flash-lite": 30
+            },
+            "tier_accuracy": {
+              "mid": {
+                "correct": 23,
+                "checked": 26
+              },
+              "cheap": {
+                "correct": 4,
+                "checked": 4
+              }
+            },
+            "strong_calls": 0,
+            "escalations": {
+              "total": 0,
+              "necessary": 0,
+              "unnecessary": 0,
+              "unknown": 0
+            },
+            "judge_accuracy": {
+              "primary_judge": {
+                "checked": 30,
+                "agree": 25,
+                "false_accept": 3,
+                "false_reject": 2
+              },
+              "decision": {
+                "checked": 30,
+                "agree": 25,
+                "false_accept": 3,
+                "false_reject": 2
+              }
+            },
+            "second_opinions": {
+              "requested": 0,
+              "succeeded": 0,
+              "failed": 0,
+              "success_rate": null,
+              "latency_ms_median": null,
+              "latency_ms_max": null,
+              "by_trigger": {
+                "primary_rejection": 0,
+                "low_confidence_acceptance": 0
+              }
+            },
+            "cost_incl_judge": {
+              "mean": 2.7333
+            },
+            "judge_usd": {
+              "per_1k_queries": 0.6173,
+              "priced_queries": 30,
+              "queries": 30
+            },
+            "cost_usd": {
+              "per_1k_queries": 0.3127,
+              "priced_queries": 30,
+              "queries": 30
+            }
+          }
+        }
+      }
+    },
+    {
       "title": "`hard` pooled over 3 complete runs of 4 systems with one model lineup (cheap=`openai/gpt-oss-20b`, mid=`openai/gpt-oss-120b`, strong=`nvidia/nemotron-3-ultra-550b-a55b`); repeated measurements of the same items",
       "summary": {
         "comparisons": {
@@ -3320,6 +6277,1055 @@
             "cost_usd": {
               "per_1k_queries": null,
               "priced_queries": 0,
+              "queries": 90
+            }
+          }
+        }
+      }
+    },
+    {
+      "title": "`hard` pooled over 3 complete runs of 5 systems with one model lineup (cheap=`openai/gpt-oss-20b`, mid=`openai/gpt-oss-120b`, strong=`nvidia/nemotron-3-ultra-550b-a55b`); repeated measurements of the same items",
+      "summary": {
+        "comparisons": {
+          "always_weak": {
+            "cost_incl_judge_vs_cheap_x": 1.0,
+            "cost_reduction_pct_vs_strong": 90.3,
+            "cost_incl_judge_reduction_pct_vs_strong": 90.3,
+            "strong_call_reduction_pct": 100.0,
+            "reference_quality_delta_vs_strong": null,
+            "median_latency_delta_ms_vs_strong": -9146.9
+          },
+          "always_mid": {
+            "cost_incl_judge_vs_cheap_x": 3.1,
+            "cost_reduction_pct_vs_strong": 70.0,
+            "cost_incl_judge_reduction_pct_vs_strong": 70.0,
+            "strong_call_reduction_pct": 100.0,
+            "reference_quality_delta_vs_strong": null,
+            "median_latency_delta_ms_vs_strong": -8902.4
+          },
+          "always_strong": {
+            "cost_incl_judge_vs_cheap_x": 10.34,
+            "cost_reduction_pct_vs_strong": 0.0,
+            "cost_incl_judge_reduction_pct_vs_strong": 0.0,
+            "strong_call_reduction_pct": 0.0,
+            "reference_quality_delta_vs_strong": null,
+            "median_latency_delta_ms_vs_strong": 0.0
+          },
+          "static_router": {
+            "cost_incl_judge_vs_cheap_x": 2.83,
+            "cost_reduction_pct_vs_strong": 72.7,
+            "cost_incl_judge_reduction_pct_vs_strong": 72.7,
+            "strong_call_reduction_pct": 100.0,
+            "reference_quality_delta_vs_strong": null,
+            "median_latency_delta_ms_vs_strong": -11465.9
+          },
+          "smart_router": {
+            "cost_incl_judge_vs_cheap_x": 6.36,
+            "cost_reduction_pct_vs_strong": 71.6,
+            "cost_incl_judge_reduction_pct_vs_strong": 38.6,
+            "strong_call_reduction_pct": 98.9,
+            "reference_quality_delta_vs_strong": null,
+            "median_latency_delta_ms_vs_strong": -10067.1
+          }
+        },
+        "paired": {
+          "smart_vs_cheap": {
+            "items": 90,
+            "wins": 9,
+            "losses": 3,
+            "both_correct": 78,
+            "both_wrong": 0,
+            "sign_test_p": 0.146
+          },
+          "smart_vs_mid": {
+            "items": 90,
+            "wins": 3,
+            "losses": 1,
+            "both_correct": 84,
+            "both_wrong": 2,
+            "sign_test_p": 0.625
+          },
+          "smart_vs_strong": {
+            "items": 90,
+            "wins": 1,
+            "losses": 3,
+            "both_correct": 86,
+            "both_wrong": 0,
+            "sign_test_p": 0.625
+          },
+          "static_vs_cheap": {
+            "items": 90,
+            "wins": 7,
+            "losses": 4,
+            "both_correct": 77,
+            "both_wrong": 2,
+            "sign_test_p": 0.5488
+          },
+          "strong_vs_cheap": {
+            "items": 90,
+            "wins": 9,
+            "losses": 1,
+            "both_correct": 80,
+            "both_wrong": 0,
+            "sign_test_p": 0.0215
+          }
+        },
+        "claim": {
+          "verdict": "not_supported_cheap_dominates",
+          "explanation": "Paired by question (majority of 3 runs). SmartRouter is cheaper than Always Strong without a measurable accuracy loss, but Always Cheap matches it for less money, so routing adds cost without a measurable benefit on this dataset (strict accuracy SmartRouter 96.7%, Always Cheap 90.0%, Always Strong 98.9%; cost incl. judge 6.14 vs 0.97 vs 10.00; paired vs cheap 3 wins / 0 losses (p=0.25))."
+        },
+        "paired_by_question": {
+          "smart_vs_cheap": {
+            "items": 30,
+            "wins": 3,
+            "losses": 0,
+            "both_correct": 27,
+            "both_wrong": 0,
+            "sign_test_p": 0.25
+          },
+          "smart_vs_mid": {
+            "items": 30,
+            "wins": 2,
+            "losses": 0,
+            "both_correct": 28,
+            "both_wrong": 0,
+            "sign_test_p": 0.5
+          },
+          "smart_vs_strong": {
+            "items": 30,
+            "wins": 0,
+            "losses": 0,
+            "both_correct": 30,
+            "both_wrong": 0,
+            "sign_test_p": null
+          },
+          "static_vs_cheap": {
+            "items": 30,
+            "wins": 3,
+            "losses": 0,
+            "both_correct": 27,
+            "both_wrong": 0,
+            "sign_test_p": 0.25
+          },
+          "strong_vs_cheap": {
+            "items": 30,
+            "wins": 3,
+            "losses": 0,
+            "both_correct": 27,
+            "both_wrong": 0,
+            "sign_test_p": 0.25
+          }
+        },
+        "systems": {
+          "always_weak": {
+            "n": 90,
+            "quality": {
+              "mean": 0.9621,
+              "median": 1.0,
+              "scored": 87
+            },
+            "cost": {
+              "mean": 0.9667,
+              "total": 87.0
+            },
+            "utilization": {
+              "calls": {
+                "cheap": 90,
+                "mid": 0,
+                "strong": 0
+              },
+              "calls_pct": {
+                "cheap": 1.0,
+                "mid": 0.0,
+                "strong": 0.0
+              },
+              "final_pct": {
+                "cheap": 0.9667,
+                "mid": 0.0,
+                "strong": 0.0
+              }
+            },
+            "escalation": {
+              "rate": 0.0,
+              "mean_count": 0.0
+            },
+            "latency_ms": {
+              "mean": 7038.1356,
+              "median": 7125.65,
+              "p95": 14516.7,
+              "generation_median": 811.45
+            },
+            "judge_calls": 87,
+            "failure_groups": {
+              "Incorrect": 5,
+              "Reasoning weakness": 1,
+              "Provider error": 3
+            },
+            "routing_flow": [
+              {
+                "from": "cheap",
+                "to": "accepted",
+                "count": 82
+              },
+              {
+                "from": "cheap",
+                "to": "best_effort",
+                "count": 5
+              },
+              {
+                "from": "cheap",
+                "to": "failed",
+                "count": 3
+              }
+            ],
+            "failure_rate": 0.0333,
+            "below_threshold_rate": 0.0889,
+            "per_category": {
+              "coding": {
+                "n": 27,
+                "quality_mean": 1.0,
+                "cost_mean": 1.0,
+                "escalation_rate": 0.0,
+                "reference_quality_mean": null
+              },
+              "math": {
+                "n": 36,
+                "quality_mean": 0.9152,
+                "cost_mean": 0.9167,
+                "escalation_rate": 0.0,
+                "reference_quality_mean": null
+              },
+              "reasoning": {
+                "n": 27,
+                "quality_mean": 0.9815,
+                "cost_mean": 1.0,
+                "escalation_rate": 0.0,
+                "reference_quality_mean": null
+              }
+            },
+            "label": "Always Cheap",
+            "mode": "always_cheap",
+            "description": "Every query goes to the cheap tier; no judge needed in production.",
+            "reference_quality": {
+              "mean": null,
+              "median": null,
+              "scored": 0,
+              "errors": 0
+            },
+            "strict": {
+              "checked": 90,
+              "correct": 81,
+              "accuracy": 0.9,
+              "ci95": [
+                0.8208,
+                0.9465
+              ],
+              "unparseable": 3
+            },
+            "capability": {
+              "checked": 90,
+              "plumbing_failures": 6,
+              "plumbing_rate": 0.0667,
+              "by_kind": {
+                "truncation": 1,
+                "unreadable_final_number": 3,
+                "provider_error": 2
+              },
+              "readable": 84,
+              "readable_correct": 81,
+              "readable_accuracy": 0.9643
+            },
+            "deterministic": {
+              "checked": 87,
+              "accuracy": 0.931
+            },
+            "serving_calls_mean": 0.967,
+            "cost_method": "estimated_lower_bound",
+            "generation_failures": 3,
+            "provider_calls_mean": 2.1111,
+            "serving_judge_calls": 0,
+            "judge_failures": 0,
+            "judge_usage": {
+              "gemini-3.5-flash-lite": 87
+            },
+            "tier_accuracy": {
+              "cheap": {
+                "correct": 81,
+                "checked": 87
+              }
+            },
+            "strong_calls": 0,
+            "escalations": {
+              "total": 0,
+              "necessary": 0,
+              "unnecessary": 0,
+              "unknown": 0
+            },
+            "judge_accuracy": {
+              "primary_judge": {
+                "checked": 84,
+                "agree": 76,
+                "false_accept": 3,
+                "false_reject": 5
+              },
+              "decision": {
+                "checked": 84,
+                "agree": 76,
+                "false_accept": 3,
+                "false_reject": 5
+              }
+            },
+            "second_opinions": {
+              "requested": 0,
+              "succeeded": 0,
+              "failed": 0,
+              "success_rate": null,
+              "latency_ms_median": null,
+              "latency_ms_max": null,
+              "by_trigger": {
+                "primary_rejection": 0,
+                "low_confidence_acceptance": 0
+              }
+            },
+            "cost_incl_judge": {
+              "mean": 0.9667
+            },
+            "judge_usd": {
+              "per_1k_queries": 0.4698,
+              "priced_queries": 90,
+              "queries": 90
+            },
+            "cost_usd": {
+              "per_1k_queries": 0.2212,
+              "priced_queries": 90,
+              "queries": 90
+            }
+          },
+          "always_mid": {
+            "n": 90,
+            "quality": {
+              "mean": 0.9733,
+              "median": 1.0,
+              "scored": 90
+            },
+            "cost": {
+              "mean": 3.0,
+              "total": 270.0
+            },
+            "utilization": {
+              "calls": {
+                "cheap": 0,
+                "mid": 90,
+                "strong": 0
+              },
+              "calls_pct": {
+                "cheap": 0.0,
+                "mid": 1.0,
+                "strong": 0.0
+              },
+              "final_pct": {
+                "cheap": 0.0,
+                "mid": 1.0,
+                "strong": 0.0
+              }
+            },
+            "escalation": {
+              "rate": 0.0,
+              "mean_count": 0.0
+            },
+            "latency_ms": {
+              "mean": 7702.0933,
+              "median": 7370.1,
+              "p95": 14929.7,
+              "generation_median": 1309.95
+            },
+            "judge_calls": 90,
+            "failure_groups": {
+              "Incorrect": 3,
+              "Reasoning weakness": 2
+            },
+            "routing_flow": [
+              {
+                "from": "mid",
+                "to": "accepted",
+                "count": 87
+              },
+              {
+                "from": "mid",
+                "to": "best_effort",
+                "count": 3
+              }
+            ],
+            "failure_rate": 0.0,
+            "below_threshold_rate": 0.0333,
+            "per_category": {
+              "coding": {
+                "n": 27,
+                "quality_mean": 1.0,
+                "cost_mean": 3.0,
+                "escalation_rate": 0.0,
+                "reference_quality_mean": null
+              },
+              "math": {
+                "n": 36,
+                "quality_mean": 0.9333,
+                "cost_mean": 3.0,
+                "escalation_rate": 0.0,
+                "reference_quality_mean": null
+              },
+              "reasoning": {
+                "n": 27,
+                "quality_mean": 1.0,
+                "cost_mean": 3.0,
+                "escalation_rate": 0.0,
+                "reference_quality_mean": null
+              }
+            },
+            "label": "Always Mid",
+            "mode": "always_mid",
+            "description": "Every query goes to the mid tier.",
+            "reference_quality": {
+              "mean": null,
+              "median": null,
+              "scored": 0,
+              "errors": 0
+            },
+            "strict": {
+              "checked": 90,
+              "correct": 85,
+              "accuracy": 0.9444,
+              "ci95": [
+                0.8765,
+                0.976
+              ],
+              "unparseable": 0
+            },
+            "capability": {
+              "checked": 90,
+              "plumbing_failures": 0,
+              "plumbing_rate": 0.0,
+              "by_kind": {},
+              "readable": 90,
+              "readable_correct": 85,
+              "readable_accuracy": 0.9444
+            },
+            "deterministic": {
+              "checked": 90,
+              "accuracy": 0.9444
+            },
+            "serving_calls_mean": 1.0,
+            "cost_method": "exact",
+            "generation_failures": 0,
+            "provider_calls_mean": 2.2,
+            "serving_judge_calls": 0,
+            "judge_failures": 0,
+            "judge_usage": {
+              "gemini-3.5-flash-lite": 90
+            },
+            "tier_accuracy": {
+              "mid": {
+                "correct": 85,
+                "checked": 90
+              }
+            },
+            "strong_calls": 0,
+            "escalations": {
+              "total": 0,
+              "necessary": 0,
+              "unnecessary": 0,
+              "unknown": 0
+            },
+            "judge_accuracy": {
+              "primary_judge": {
+                "checked": 90,
+                "agree": 82,
+                "false_accept": 5,
+                "false_reject": 3
+              },
+              "decision": {
+                "checked": 90,
+                "agree": 82,
+                "false_accept": 5,
+                "false_reject": 3
+              }
+            },
+            "second_opinions": {
+              "requested": 0,
+              "succeeded": 0,
+              "failed": 0,
+              "success_rate": null,
+              "latency_ms_median": null,
+              "latency_ms_max": null,
+              "by_trigger": {
+                "primary_rejection": 0,
+                "low_confidence_acceptance": 0
+              }
+            },
+            "cost_incl_judge": {
+              "mean": 3.0
+            },
+            "judge_usd": {
+              "per_1k_queries": 0.567,
+              "priced_queries": 90,
+              "queries": 90
+            },
+            "cost_usd": {
+              "per_1k_queries": 0.3985,
+              "priced_queries": 90,
+              "queries": 90
+            }
+          },
+          "always_strong": {
+            "n": 90,
+            "quality": {
+              "mean": 0.9961,
+              "median": 1.0,
+              "scored": 90
+            },
+            "cost": {
+              "mean": 10.0,
+              "total": 900.0
+            },
+            "utilization": {
+              "calls": {
+                "cheap": 0,
+                "mid": 0,
+                "strong": 90
+              },
+              "calls_pct": {
+                "cheap": 0.0,
+                "mid": 0.0,
+                "strong": 1.0
+              },
+              "final_pct": {
+                "cheap": 0.0,
+                "mid": 0.0,
+                "strong": 1.0
+              }
+            },
+            "escalation": {
+              "rate": 0.0,
+              "mean_count": 0.0
+            },
+            "latency_ms": {
+              "mean": 27077.3533,
+              "median": 16272.5,
+              "p95": 88558.1,
+              "generation_median": 10779.25
+            },
+            "judge_calls": 90,
+            "failure_groups": {
+              "Incomplete": 1
+            },
+            "routing_flow": [
+              {
+                "from": "strong",
+                "to": "accepted",
+                "count": 89
+              },
+              {
+                "from": "strong",
+                "to": "best_effort",
+                "count": 1
+              }
+            ],
+            "failure_rate": 0.0,
+            "below_threshold_rate": 0.0111,
+            "per_category": {
+              "coding": {
+                "n": 27,
+                "quality_mean": 0.987,
+                "cost_mean": 10.0,
+                "escalation_rate": 0.0,
+                "reference_quality_mean": null
+              },
+              "math": {
+                "n": 36,
+                "quality_mean": 1.0,
+                "cost_mean": 10.0,
+                "escalation_rate": 0.0,
+                "reference_quality_mean": null
+              },
+              "reasoning": {
+                "n": 27,
+                "quality_mean": 1.0,
+                "cost_mean": 10.0,
+                "escalation_rate": 0.0,
+                "reference_quality_mean": null
+              }
+            },
+            "label": "Always Strong",
+            "mode": "always_strong",
+            "description": "Every query goes to the strong tier (quality ceiling / cost reference).",
+            "reference_quality": {
+              "mean": null,
+              "median": null,
+              "scored": 0,
+              "errors": 0
+            },
+            "strict": {
+              "checked": 90,
+              "correct": 89,
+              "accuracy": 0.9889,
+              "ci95": [
+                0.9397,
+                0.998
+              ],
+              "unparseable": 0
+            },
+            "capability": {
+              "checked": 90,
+              "plumbing_failures": 1,
+              "plumbing_rate": 0.0111,
+              "by_kind": {
+                "truncation": 1
+              },
+              "readable": 89,
+              "readable_correct": 89,
+              "readable_accuracy": 1.0
+            },
+            "deterministic": {
+              "checked": 90,
+              "accuracy": 0.9889
+            },
+            "serving_calls_mean": 1.0,
+            "cost_method": "exact",
+            "generation_failures": 0,
+            "provider_calls_mean": 2.1333,
+            "serving_judge_calls": 0,
+            "judge_failures": 0,
+            "judge_usage": {
+              "gemini-3.5-flash-lite": 90
+            },
+            "tier_accuracy": {
+              "strong": {
+                "correct": 89,
+                "checked": 90
+              }
+            },
+            "strong_calls": 90,
+            "escalations": {
+              "total": 0,
+              "necessary": 0,
+              "unnecessary": 0,
+              "unknown": 0
+            },
+            "judge_accuracy": {
+              "primary_judge": {
+                "checked": 90,
+                "agree": 90,
+                "false_accept": 0,
+                "false_reject": 0
+              },
+              "decision": {
+                "checked": 90,
+                "agree": 90,
+                "false_accept": 0,
+                "false_reject": 0
+              }
+            },
+            "second_opinions": {
+              "requested": 0,
+              "succeeded": 0,
+              "failed": 0,
+              "success_rate": null,
+              "latency_ms_median": null,
+              "latency_ms_max": null,
+              "by_trigger": {
+                "primary_rejection": 0,
+                "low_confidence_acceptance": 0
+              }
+            },
+            "cost_incl_judge": {
+              "mean": 10.0
+            },
+            "judge_usd": {
+              "per_1k_queries": 0.4982,
+              "priced_queries": 90,
+              "queries": 90
+            },
+            "cost_usd": {
+              "per_1k_queries": null,
+              "priced_queries": 0,
+              "queries": 90
+            }
+          },
+          "static_router": {
+            "n": 90,
+            "quality": {
+              "mean": 0.9467,
+              "median": 1.0,
+              "scored": 90
+            },
+            "cost": {
+              "mean": 2.7333,
+              "total": 246.0
+            },
+            "utilization": {
+              "calls": {
+                "cheap": 12,
+                "mid": 78,
+                "strong": 0
+              },
+              "calls_pct": {
+                "cheap": 0.1333,
+                "mid": 0.8667,
+                "strong": 0.0
+              },
+              "final_pct": {
+                "cheap": 0.1333,
+                "mid": 0.8667,
+                "strong": 0.0
+              }
+            },
+            "escalation": {
+              "rate": 0.0,
+              "mean_count": 0.0
+            },
+            "latency_ms": {
+              "mean": 5676.1489,
+              "median": 4806.6,
+              "p95": 10424.0,
+              "generation_median": 1295.65
+            },
+            "judge_calls": 90,
+            "failure_groups": {
+              "Incorrect": 6,
+              "Reasoning weakness": 4
+            },
+            "routing_flow": [
+              {
+                "from": "cheap",
+                "to": "accepted",
+                "count": 12
+              },
+              {
+                "from": "mid",
+                "to": "accepted",
+                "count": 72
+              },
+              {
+                "from": "mid",
+                "to": "best_effort",
+                "count": 6
+              }
+            ],
+            "failure_rate": 0.0,
+            "below_threshold_rate": 0.0667,
+            "per_category": {
+              "coding": {
+                "n": 27,
+                "quality_mean": 1.0,
+                "cost_mean": 3.0,
+                "escalation_rate": 0.0,
+                "reference_quality_mean": null
+              },
+              "math": {
+                "n": 36,
+                "quality_mean": 0.8917,
+                "cost_mean": 2.8333,
+                "escalation_rate": 0.0,
+                "reference_quality_mean": null
+              },
+              "reasoning": {
+                "n": 27,
+                "quality_mean": 0.9667,
+                "cost_mean": 2.3333,
+                "escalation_rate": 0.0,
+                "reference_quality_mean": null
+              }
+            },
+            "label": "Static Router",
+            "mode": "static",
+            "description": "Heuristic difficulty routing; no judge-driven escalation.",
+            "reference_quality": {
+              "mean": null,
+              "median": null,
+              "scored": 0,
+              "errors": 0
+            },
+            "strict": {
+              "checked": 90,
+              "correct": 84,
+              "accuracy": 0.9333,
+              "ci95": [
+                0.8621,
+                0.9691
+              ],
+              "unparseable": 2
+            },
+            "capability": {
+              "checked": 90,
+              "plumbing_failures": 2,
+              "plumbing_rate": 0.0222,
+              "by_kind": {
+                "unreadable_final_number": 2
+              },
+              "readable": 88,
+              "readable_correct": 84,
+              "readable_accuracy": 0.9545
+            },
+            "deterministic": {
+              "checked": 88,
+              "accuracy": 0.9545
+            },
+            "serving_calls_mean": 1.0,
+            "cost_method": "exact",
+            "generation_failures": 0,
+            "provider_calls_mean": 2.1556,
+            "serving_judge_calls": 0,
+            "judge_failures": 0,
+            "judge_usage": {
+              "gemini-3.5-flash-lite": 90
+            },
+            "tier_accuracy": {
+              "mid": {
+                "correct": 72,
+                "checked": 76
+              },
+              "cheap": {
+                "correct": 12,
+                "checked": 12
+              }
+            },
+            "strong_calls": 0,
+            "escalations": {
+              "total": 0,
+              "necessary": 0,
+              "unnecessary": 0,
+              "unknown": 0
+            },
+            "judge_accuracy": {
+              "primary_judge": {
+                "checked": 88,
+                "agree": 79,
+                "false_accept": 4,
+                "false_reject": 5
+              },
+              "decision": {
+                "checked": 88,
+                "agree": 79,
+                "false_accept": 4,
+                "false_reject": 5
+              }
+            },
+            "second_opinions": {
+              "requested": 0,
+              "succeeded": 0,
+              "failed": 0,
+              "success_rate": null,
+              "latency_ms_median": null,
+              "latency_ms_max": null,
+              "by_trigger": {
+                "primary_rejection": 0,
+                "low_confidence_acceptance": 0
+              }
+            },
+            "cost_incl_judge": {
+              "mean": 2.7333
+            },
+            "judge_usd": {
+              "per_1k_queries": 0.5685,
+              "priced_queries": 90,
+              "queries": 90
+            },
+            "cost_usd": {
+              "per_1k_queries": 0.3329,
+              "priced_queries": 90,
+              "queries": 90
+            }
+          },
+          "smart_router": {
+            "n": 90,
+            "quality": {
+              "mean": 0.95,
+              "median": 1.0,
+              "scored": 90
+            },
+            "cost": {
+              "mean": 2.8444,
+              "total": 256.0
+            },
+            "utilization": {
+              "calls": {
+                "cheap": 12,
+                "mid": 78,
+                "strong": 1
+              },
+              "calls_pct": {
+                "cheap": 0.1319,
+                "mid": 0.8571,
+                "strong": 0.011
+              },
+              "final_pct": {
+                "cheap": 0.1333,
+                "mid": 0.8556,
+                "strong": 0.0111
+              }
+            },
+            "escalation": {
+              "rate": 0.0111,
+              "mean_count": 0.0111
+            },
+            "latency_ms": {
+              "mean": 12697.5578,
+              "median": 6205.4,
+              "p95": 15845.0,
+              "generation_median": 1309.95
+            },
+            "judge_calls": 98,
+            "failure_groups": {
+              "Incorrect": 1
+            },
+            "routing_flow": [
+              {
+                "from": "cheap",
+                "to": "accepted",
+                "count": 12
+              },
+              {
+                "from": "mid",
+                "to": "accepted",
+                "count": 77
+              },
+              {
+                "from": "mid",
+                "to": "strong",
+                "count": 1
+              },
+              {
+                "from": "strong",
+                "to": "accepted",
+                "count": 1
+              }
+            ],
+            "failure_rate": 0.0,
+            "below_threshold_rate": 0.0,
+            "per_category": {
+              "coding": {
+                "n": 27,
+                "quality_mean": 1.0,
+                "cost_mean": 3.0,
+                "escalation_rate": 0.0,
+                "reference_quality_mean": null
+              },
+              "math": {
+                "n": 36,
+                "quality_mean": 0.9375,
+                "cost_mean": 3.1111,
+                "escalation_rate": 0.0278,
+                "reference_quality_mean": null
+              },
+              "reasoning": {
+                "n": 27,
+                "quality_mean": 0.9167,
+                "cost_mean": 2.3333,
+                "escalation_rate": 0.0,
+                "reference_quality_mean": null
+              }
+            },
+            "label": "SmartRouter",
+            "mode": "smart",
+            "description": "Heuristic routing + answer checks + judge-driven escalation.",
+            "reference_quality": {
+              "mean": null,
+              "median": null,
+              "scored": 0,
+              "errors": 0
+            },
+            "strict": {
+              "checked": 90,
+              "correct": 87,
+              "accuracy": 0.9667,
+              "ci95": [
+                0.9065,
+                0.9886
+              ],
+              "unparseable": 0
+            },
+            "capability": {
+              "checked": 90,
+              "plumbing_failures": 1,
+              "plumbing_rate": 0.0111,
+              "by_kind": {
+                "truncation": 1
+              },
+              "readable": 89,
+              "readable_correct": 87,
+              "readable_accuracy": 0.9775
+            },
+            "deterministic": {
+              "checked": 90,
+              "accuracy": 0.9667
+            },
+            "serving_calls_mean": 2.111,
+            "cost_method": "exact",
+            "generation_failures": 0,
+            "provider_calls_mean": 2.2667,
+            "serving_judge_calls": 99,
+            "judge_failures": 0,
+            "judge_usage": {
+              "gemini-3.5-flash-lite": 90,
+              "z-ai/glm-5.3-flash": 1
+            },
+            "tier_accuracy": {
+              "mid": {
+                "correct": 74,
+                "checked": 77
+              },
+              "strong": {
+                "correct": 1,
+                "checked": 1
+              },
+              "cheap": {
+                "correct": 12,
+                "checked": 12
+              }
+            },
+            "strong_calls": 1,
+            "escalations": {
+              "total": 1,
+              "necessary": 0,
+              "unnecessary": 1,
+              "unknown": 0
+            },
+            "judge_accuracy": {
+              "primary_judge": {
+                "checked": 91,
+                "agree": 81,
+                "false_accept": 3,
+                "false_reject": 7
+              },
+              "decision": {
+                "checked": 91,
+                "agree": 87,
+                "false_accept": 3,
+                "false_reject": 1
+              }
+            },
+            "second_opinions": {
+              "requested": 7,
+              "succeeded": 6,
+              "failed": 1,
+              "success_rate": 0.8571,
+              "latency_ms_median": 381.0,
+              "latency_ms_max": 1704.8,
+              "by_trigger": {
+                "primary_rejection": 7,
+                "low_confidence_acceptance": 0
+              }
+            },
+            "cost_incl_judge": {
+              "mean": 6.1444
+            },
+            "judge_usd": {
+              "per_1k_queries": null,
+              "priced_queries": 89,
+              "queries": 90
+            },
+            "cost_usd": {
+              "per_1k_queries": null,
+              "priced_queries": 88,
               "queries": 90
             }
           }

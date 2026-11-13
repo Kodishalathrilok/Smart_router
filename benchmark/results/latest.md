@@ -6,17 +6,19 @@ Run `20261111T021401Z` · generated 2026-11-11T02:49:02+00:00
 
 > **Cost is estimated** for these older records: they did not store per-role billed calls, so SmartRouter's judge cost is a lower bound (parse retries and fallback-judge calls are not counted).
 
+> Re-scored from the raw per-item results by `benchmark.reanalyze` with the current methodology (no new model calls).
+
 ## Executive Summary
 
 Claim under test: *SmartRouter reduces cost without reducing answer quality.*
 
 **Verdict: NOT SUPPORTED (Always Cheap dominates).** SmartRouter is cheaper than Always Strong without a measurable accuracy loss, but Always Cheap matches it for less money, so routing adds cost without a measurable benefit on this dataset (strict accuracy SmartRouter 96.7%, Always Cheap 90.0%, Always Strong 96.7%; cost incl. judge 5.93 vs 0.97 vs 10.00; paired vs cheap 3 wins / 1 losses (p=0.625)).
 
-- Always Cheap: strict accuracy 90.0% (95% CI 74.4%-96.5%, n=30); cost incl. judge 0.97; median latency 9058 ms.
 - Always Mid: strict accuracy 93.3% (95% CI 78.7%-98.2%, n=30); cost incl. judge 3.00; median latency 9575 ms.
 - Always Strong: strict accuracy 96.7% (95% CI 83.3%-99.4%, n=30); cost incl. judge 10.00; median latency 16555 ms.
-- Static Router: strict accuracy 96.7% (95% CI 83.3%-99.4%, n=30); cost incl. judge 2.73; median latency 7808 ms.
+- Always Cheap: strict accuracy 90.0% (95% CI 74.4%-96.5%, n=30); cost incl. judge 0.97; median latency 9058 ms.
 - SmartRouter: strict accuracy 96.7% (95% CI 83.3%-99.4%, n=30); cost incl. judge 5.93; median latency 8440 ms.
+- Static Router: strict accuracy 96.7% (95% CI 83.3%-99.4%, n=30); cost incl. judge 2.73; median latency 7808 ms.
 
 Quality here means exact-check accuracy (numeric answers and unit tests). LLM-judge scores are secondary: the same judge family drives SmartRouter's escalations, so judging the systems with it would be circular.
 
@@ -55,11 +57,11 @@ Quality here means exact-check accuracy (numeric answers and unit tests). LLM-ju
 
 | System | Mode | Description |
 |---|---|---|
-| Always Cheap | `always_cheap` | Every query goes to the cheap tier; no judge needed in production. |
 | Always Mid | `always_mid` | Every query goes to the mid tier. |
 | Always Strong | `always_strong` | Every query goes to the strong tier (quality ceiling / cost reference). |
-| Static Router | `static` | Heuristic difficulty routing; no judge-driven escalation. |
+| Always Cheap | `always_cheap` | Every query goes to the cheap tier; no judge needed in production. |
 | SmartRouter | `smart` | Heuristic routing + answer checks + judge-driven escalation. |
+| Static Router | `static` | Heuristic difficulty routing; no judge-driven escalation. |
 
 ## Metrics
 
@@ -79,11 +81,11 @@ Quality here means exact-check accuracy (numeric answers and unit tests). LLM-ju
 
 | System | Strict acc. | 95% CI | Acc. among readable | Plumbing failures | Gen cost | Cost incl. judge | $ / 1k queries | vs cheap | vs strong (incl. judge) | Calls/query | p50 ms | p95 ms | Escalation | Failed | Ref. judge q. | In-loop judge q. |
 |---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|
-| Always Cheap | 90.0% | 74.4%-96.5% | 96.4% | 6.7% (2/30) | 0.97 | 0.97 | $0.20 | 1.00x | 90.3% lower | 0.97 | 9058 | 14691 | 0.0% | 3.3% | n/a | 0.974 |
 | Always Mid | 93.3% | 78.7%-98.2% | 93.3% | 0.0% (0/30) | 3.00 | 3.00 | $0.34 | 3.10x | 70.0% lower | 1.00 | 9575 | 14283 | 0.0% | 0.0% | n/a | 0.975 |
 | Always Strong | 96.7% | 83.3%-99.4% | 100.0% | 3.3% (1/30) | 10.00 | 10.00 | unknown | 10.34x | 0.0% lower | 1.00 | 16555 | 84943 | 0.0% | 0.0% | n/a | 0.988 |
-| Static Router | 96.7% | 83.3%-99.4% | 100.0% | 3.3% (1/30) | 2.73 | 2.73 | $0.35 | 2.83x | 72.7% lower | 1.00 | 7808 | 11257 | 0.0% | 0.0% | n/a | 0.945 |
+| Always Cheap | 90.0% | 74.4%-96.5% | 96.4% | 6.7% (2/30) | 0.97 | 0.97 | $0.20 | 1.00x | 90.3% lower | 0.97 | 9058 | 14691 | 0.0% | 3.3% | n/a | 0.974 |
 | SmartRouter | 96.7% | 83.3%-99.4% | 100.0% | 3.3% (1/30) | 2.73 | 5.93 | $1.15 | 6.14x | 40.7% lower | 2.07 | 8440 | 15845 | 0.0% | 0.0% | n/a | 0.950 |
+| Static Router | 96.7% | 83.3%-99.4% | 100.0% | 3.3% (1/30) | 2.73 | 2.73 | $0.35 | 2.83x | 72.7% lower | 1.00 | 7808 | 11257 | 0.0% | 0.0% | n/a | 0.945 |
 
 ### Paired comparison (same items, strict exact checks)
 
@@ -109,11 +111,11 @@ Heuristic category matches the dataset label on 66.7% of 30 items. Initial tier 
 
 | System | Cheap | Mid | Strong |
 |---|---|---|---|
-| Always Cheap | 100.0% | 0.0% | 0.0% |
 | Always Mid | 0.0% | 100.0% | 0.0% |
 | Always Strong | 0.0% | 0.0% | 100.0% |
-| Static Router | 13.3% | 86.7% | 0.0% |
+| Always Cheap | 100.0% | 0.0% | 0.0% |
 | SmartRouter | 13.3% | 86.7% | 0.0% |
+| Static Router | 13.3% | 86.7% | 0.0% |
 
 ### Accuracy by answering tier (exact checks, all systems pooled)
 
@@ -129,21 +131,21 @@ Which judge graded each attempt. More than one judge means scores mix evaluators
 
 | System | Graded by | Judge failures |
 |---|---|---|
-| Always Cheap | `gemini-3.5-flash-lite` 29 | 0 |
 | Always Mid | `gemini-3.5-flash-lite` 30 | 0 |
 | Always Strong | `gemini-3.5-flash-lite` 30 | 0 |
-| Static Router | `gemini-3.5-flash-lite` 30 | 0 |
+| Always Cheap | `gemini-3.5-flash-lite` 29 | 0 |
 | SmartRouter | `gemini-3.5-flash-lite` 30 | 0 |
+| Static Router | `gemini-3.5-flash-lite` 30 | 0 |
 
 ### Totals
 
 | System | Total gen cost | Strong calls | Judge calls | Judge failures | Escalations (necessary / unnecessary / unknown) |
 |---|---|---|---|---|---|
-| Always Cheap | 29.0 | 0 | 29 | 0 | 0 (0 / 0 / 0) |
 | Always Mid | 90.0 | 0 | 30 | 0 | 0 (0 / 0 / 0) |
 | Always Strong | 300.0 | 30 | 30 | 0 | 0 (0 / 0 / 0) |
-| Static Router | 82.0 | 0 | 30 | 0 | 0 (0 / 0 / 0) |
+| Always Cheap | 29.0 | 0 | 29 | 0 | 0 (0 / 0 / 0) |
 | SmartRouter | 82.0 | 0 | 32 | 0 | 0 (0 / 0 / 0) |
+| Static Router | 82.0 | 0 | 30 | 0 | 0 (0 / 0 / 0) |
 
 An escalation is *unnecessary* when the answer it replaced already passed the exact check.
 
@@ -151,12 +153,12 @@ An escalation is *unnecessary* when the answer it replaced already passed the ex
 
 | System | Scored | Checked | Agree | False accepts | False rejects |
 |---|---|---|---|---|---|
-| Always Cheap | primary judge | 28 | 26/28 | 1 | 1 |
 | Always Mid | primary judge | 30 | 27/30 | 2 | 1 |
 | Always Strong | primary judge | 30 | 30/30 | 0 | 0 |
-| Static Router | primary judge | 29 | 27/29 | 0 | 2 |
+| Always Cheap | primary judge | 28 | 26/28 | 1 | 1 |
 | SmartRouter | primary judge | 30 | 27/30 | 1 | 2 |
 | SmartRouter | final decision | 30 | 29/30 | 1 | 0 |
+| Static Router | primary judge | 29 | 27/29 | 0 | 2 |
 
 *Primary judge* is the first judge's verdict alone; *final decision* adds answer checks and second opinions.
 
@@ -204,11 +206,11 @@ Reference-graded quality (mean) / normalized cost (mean):
 
 | System | general_qa | reasoning | coding | math | summarization |
 |---|---|---|---|---|---|
-| Always Cheap | n/a | n/a / 1.00 | n/a / 1.00 | n/a / 0.92 | n/a |
 | Always Mid | n/a | n/a / 3.00 | n/a / 3.00 | n/a / 3.00 | n/a |
 | Always Strong | n/a | n/a / 10.00 | n/a / 10.00 | n/a / 10.00 | n/a |
-| Static Router | n/a | n/a / 2.33 | n/a / 3.00 | n/a / 2.83 | n/a |
+| Always Cheap | n/a | n/a / 1.00 | n/a / 1.00 | n/a / 0.92 | n/a |
 | SmartRouter | n/a | n/a / 2.33 | n/a / 3.00 | n/a / 2.83 | n/a |
+| Static Router | n/a | n/a / 2.33 | n/a / 3.00 | n/a / 2.83 | n/a |
 
 ## Failure Analysis
 
@@ -216,11 +218,11 @@ Counts of non-accepted attempts by cause (one attempt can have several judge-rep
 
 | System | Incorrect | Incomplete | Reasoning weakness | Provider error |
 |---|---|---|---|---|
-| Always Cheap | 1 | 0 | 0 | 1 |
 | Always Mid | 1 | 0 | 1 | 0 |
 | Always Strong | 0 | 1 | 0 | 0 |
-| Static Router | 2 | 0 | 1 | 0 |
+| Always Cheap | 1 | 0 | 0 | 1 |
 | SmartRouter | 0 | 0 | 0 | 0 |
+| Static Router | 2 | 0 | 1 | 0 |
 
 SmartRouter routing flow (edge counts):
 

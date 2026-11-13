@@ -15,6 +15,9 @@ data/benchmarks/*
 !data/benchmarks/20260929T050756Z/
 !data/benchmarks/20260929T111739Z/
 !data/benchmarks/20260929T131419Z/
+!data/benchmarks/20261111T013331Z/
+!data/benchmarks/20261111T021401Z/
+!data/benchmarks/20261111T024904Z/
 data/benchmarks/*/events.jsonl
 data/benchmarks/*/queries.jsonl
 data/benchmarks/*/*.db*
